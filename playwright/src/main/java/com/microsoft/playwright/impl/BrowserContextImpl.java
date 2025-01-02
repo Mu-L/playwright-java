@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
 
 import static com.microsoft.playwright.impl.Serialization.addHarUrlFilter;
 import static com.microsoft.playwright.impl.Serialization.gson;
-import static com.microsoft.playwright.impl.Utils.isSafeCloseError;
+import static com.microsoft.playwright.impl.Utils.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.readAllBytes;
 import static java.util.Arrays.asList;
@@ -45,8 +45,12 @@ class BrowserContextImpl extends ChannelOwner implements BrowserContext {
   private final BrowserImpl browser;
   private final TracingImpl tracing;
   private final APIRequestContextImpl request;
+  private final ClockImpl clock;
   final List<PageImpl> pages = new ArrayList<>();
+  final List<PageImpl> backgroundPages = new ArrayList<>();
+
   final Router routes = new Router();
+  final WebSocketRouter webSocketRoutes = new WebSocketRouter();
   private boolean closeWasCalled;
   private final WaitableEvent<EventType, ?> closePromise;
   final Map<String, BindingCallback> bindings = new HashMap<>();
@@ -80,6 +84,7 @@ class BrowserContextImpl extends ChannelOwner implements BrowserContext {
   }
 
   enum EventType {
+    BACKGROUNDPAGE,
     CLOSE,
     CONSOLE,
     DIALOG,
@@ -100,6 +105,7 @@ class BrowserContextImpl extends ChannelOwner implements BrowserContext {
     }
     tracing = connection.getExistingObject(initializer.getAsJsonObject("tracing").get("guid").getAsString());
     request = connection.getExistingObject(initializer.getAsJsonObject("requestContext").get("guid").getAsString());
+    clock = new ClockImpl(this);
     closePromise = new WaitableEvent<>(listeners, EventType.CLOSE);
   }
 
@@ -125,6 +131,16 @@ class BrowserContextImpl extends ChannelOwner implements BrowserContext {
       return browser.closeReason;
     }
     return null;
+  }
+
+  @Override
+  public void onBackgroundPage(Consumer<Page> handler) {
+    listeners.add(EventType.BACKGROUNDPAGE, handler);
+  }
+
+  @Override
+  public void offBackgroundPage(Consumer<Page> handler) {
+    listeners.remove(EventType.BACKGROUNDPAGE, handler);
   }
 
   @Override
@@ -217,6 +233,11 @@ class BrowserContextImpl extends ChannelOwner implements BrowserContext {
     listeners.remove(EventType.RESPONSE, handler);
   }
 
+  @Override
+  public ClockImpl clock() {
+    return clock;
+  }
+
   private <T> T waitForEventWithTimeout(EventType eventType, Runnable code, Predicate<T> predicate, Double timeout) {
     List<Waitable<T>> waitables = new ArrayList<>();
     waitables.add(new WaitableEvent<>(listeners, eventType, predicate));
@@ -270,6 +291,7 @@ class BrowserContextImpl extends ChannelOwner implements BrowserContext {
         options = new CloseOptions();
       }
       closeReason = options.reason;
+      request.dispose(convertType(options, APIRequestContext.DisposeOptions.class));
       for (Map.Entry<String, HarRecorder> entry : harRecorders.entrySet()) {
         JsonObject params = new JsonObject();
         params.addProperty("harId", entry.getKey());
@@ -323,6 +345,11 @@ class BrowserContextImpl extends ChannelOwner implements BrowserContext {
     });
   }
 
+  @Override
+  public List<Page> backgroundPages() {
+    return new ArrayList<>(backgroundPages);
+  }
+
   private void addInitScriptImpl(String script) {
     JsonObject params = new JsonObject();
     params.addProperty("source", script);
@@ -335,8 +362,29 @@ class BrowserContextImpl extends ChannelOwner implements BrowserContext {
   }
 
   @Override
-  public void clearCookies() {
-    withLogging("BrowserContext.clearCookies", () -> sendMessage("clearCookies"));
+  public void clearCookies(ClearCookiesOptions options) {
+    withLogging("BrowserContext.clearCookies", () -> clearCookiesImpl(options));
+  }
+
+  private void clearCookiesImpl(ClearCookiesOptions options) {
+    if (options == null) {
+      options = new ClearCookiesOptions();
+    }
+    JsonObject params = new JsonObject();
+    setStringOrRegex(params, "name", options.name);
+    setStringOrRegex(params, "domain", options.domain);
+    setStringOrRegex(params, "path", options.path);
+    sendMessage("clearCookies", params);
+  }
+
+  private static void setStringOrRegex(JsonObject params, String name, Object value) {
+    if (value instanceof String) {
+      params.addProperty(name, (String) value);
+    } else if (value instanceof Pattern) {
+      Pattern pattern = (Pattern) value;
+      params.addProperty(name + "RegexSource", pattern.pattern());
+      params.addProperty(name + "RegexFlags", toJsRegexFlags(pattern));
+    }
   }
 
   @Override
@@ -464,6 +512,28 @@ class BrowserContextImpl extends ChannelOwner implements BrowserContext {
     withLogging("BrowserContext.route", () -> {
       routes.add(matcher, handler, options == null ? null : options.times);
       updateInterceptionPatterns();
+    });
+  }
+
+  @Override
+  public void routeWebSocket(String url, Consumer<WebSocketRoute> handler) {
+    routeWebSocketImpl(new UrlMatcher(baseUrl, url), handler);
+  }
+
+  @Override
+  public void routeWebSocket(Pattern pattern, Consumer<WebSocketRoute> handler) {
+    routeWebSocketImpl(new UrlMatcher(pattern), handler);
+  }
+
+  @Override
+  public void routeWebSocket(Predicate<String> predicate, Consumer<WebSocketRoute> handler) {
+    routeWebSocketImpl(new UrlMatcher(predicate), handler);
+  }
+
+  private void routeWebSocketImpl(UrlMatcher matcher, Consumer<WebSocketRoute> handler) {
+    withLogging("BrowserContext.routeWebSocket", () -> {
+      webSocketRoutes.add(matcher, handler);
+      updateWebSocketInterceptionPatterns();
     });
   }
 
@@ -634,6 +704,10 @@ class BrowserContextImpl extends ChannelOwner implements BrowserContext {
     sendMessage("setNetworkInterceptionPatterns", routes.interceptionPatterns());
   }
 
+  private void updateWebSocketInterceptionPatterns() {
+    sendMessage("setWebSocketInterceptionPatterns", webSocketRoutes.interceptionPatterns());
+  }
+
   void handleRoute(RouteImpl route) {
     Router.HandleResult handled = routes.handle(route);
     if (handled != Router.HandleResult.NoMatchingHandler) {
@@ -641,6 +715,12 @@ class BrowserContextImpl extends ChannelOwner implements BrowserContext {
     }
     if (handled == Router.HandleResult.NoMatchingHandler || handled == Router.HandleResult.Fallback) {
       route.resume(null, true);
+    }
+  }
+
+  void handleWebSocketRoute(WebSocketRouteImpl route) {
+    if (!webSocketRoutes.handle(route)) {
+      route.connectToServer();
     }
   }
 
@@ -683,6 +763,9 @@ class BrowserContextImpl extends ChannelOwner implements BrowserContext {
       RouteImpl route = connection.getExistingObject(params.getAsJsonObject("route").get("guid").getAsString());
       route.browserContext = this;
       handleRoute(route);
+    } else if ("webSocketRoute".equals(event)) {
+      WebSocketRouteImpl route = connection.getExistingObject(params.getAsJsonObject("webSocketRoute").get("guid").getAsString());
+      handleWebSocketRoute(route);
     } else if ("page".equals(event)) {
       PageImpl page = connection.getExistingObject(params.getAsJsonObject("page").get("guid").getAsString());
       pages.add(page);
@@ -690,6 +773,10 @@ class BrowserContextImpl extends ChannelOwner implements BrowserContext {
       if (page.opener() != null && !page.opener().isClosed()) {
         page.opener().notifyPopup(page);
       }
+    } else if ("backgroundPage".equals(event)) {
+      PageImpl page = connection.getExistingObject(params.getAsJsonObject("page").get("guid").getAsString());
+      backgroundPages.add(page);
+      listeners.notify(EventType.BACKGROUNDPAGE, page);
     } else if ("bindingCall".equals(event)) {
       BindingCall bindingCall = connection.getExistingObject(params.getAsJsonObject("binding").get("guid").getAsString());
       BindingCallback binding = bindings.get(bindingCall.name());

@@ -23,14 +23,14 @@ import java.util.*;
 /**
  * Exposes API that can be used for the Web API testing. This class is used for creating {@code APIRequestContext} instance
  * which in turn can be used for sending web requests. An instance of this class can be obtained via {@link
- * Playwright#request Playwright.request()}. For more information see {@code APIRequestContext}.
+ * com.microsoft.playwright.Playwright#request Playwright.request()}. For more information see {@code APIRequestContext}.
  */
 public interface APIRequest {
   class NewContextOptions {
     /**
-     * Methods like {@link APIRequestContext#get APIRequestContext.get()} take the base URL into consideration by using the <a
-     * href="https://developer.mozilla.org/en-US/docs/Web/API/URL/URL">{@code URL()}</a> constructor for building the
-     * corresponding URL. Examples:
+     * Methods like {@link com.microsoft.playwright.APIRequestContext#get APIRequestContext.get()} take the base URL into
+     * consideration by using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/URL/URL">{@code URL()}</a>
+     * constructor for building the corresponding URL. Examples:
      * <ul>
      * <li> baseURL: {@code http://localhost:3000} and sending request to {@code /bar.html} results in {@code
      * http://localhost:3000/bar.html}</li>
@@ -41,6 +41,20 @@ public interface APIRequest {
      * </ul>
      */
     public String baseURL;
+    /**
+     * TLS Client Authentication allows the server to request a client certificate and verify it.
+     *
+     * <p> <strong>Details</strong>
+     *
+     * <p> An array of client certificates to be used. Each certificate object must have either both {@code certPath} and {@code
+     * keyPath}, a single {@code pfxPath}, or their corresponding direct value equivalents ({@code cert} and {@code key}, or
+     * {@code pfx}). Optionally, {@code passphrase} property should be provided if the certificate is encrypted. The {@code
+     * origin} property should be provided with an exact match to the request origin that the certificate is valid for.
+     *
+     * <p> <strong>NOTE:</strong> When using WebKit on macOS, accessing {@code localhost} will not pick up client certificates. You can make it work by
+     * replacing {@code localhost} with {@code local.playwright}.
+     */
+    public List<ClientCertificate> clientCertificates;
     /**
      * An object containing additional HTTP headers to be sent with every request. Defaults to none.
      */
@@ -60,16 +74,17 @@ public interface APIRequest {
     public Proxy proxy;
     /**
      * Populates context with given storage state. This option can be used to initialize context with logged-in information
-     * obtained via {@link BrowserContext#storageState BrowserContext.storageState()} or {@link APIRequestContext#storageState
-     * APIRequestContext.storageState()}. Either a path to the file with saved storage, or the value returned by one of {@link
-     * BrowserContext#storageState BrowserContext.storageState()} or {@link APIRequestContext#storageState
+     * obtained via {@link com.microsoft.playwright.BrowserContext#storageState BrowserContext.storageState()} or {@link
+     * com.microsoft.playwright.APIRequestContext#storageState APIRequestContext.storageState()}. Either a path to the file
+     * with saved storage, or the value returned by one of {@link com.microsoft.playwright.BrowserContext#storageState
+     * BrowserContext.storageState()} or {@link com.microsoft.playwright.APIRequestContext#storageState
      * APIRequestContext.storageState()} methods.
      */
     public String storageState;
     /**
      * Populates context with given storage state. This option can be used to initialize context with logged-in information
-     * obtained via {@link BrowserContext#storageState BrowserContext.storageState()}. Path to the file with saved storage
-     * state.
+     * obtained via {@link com.microsoft.playwright.BrowserContext#storageState BrowserContext.storageState()}. Path to the
+     * file with saved storage state.
      */
     public Path storageStatePath;
     /**
@@ -83,9 +98,9 @@ public interface APIRequest {
     public String userAgent;
 
     /**
-     * Methods like {@link APIRequestContext#get APIRequestContext.get()} take the base URL into consideration by using the <a
-     * href="https://developer.mozilla.org/en-US/docs/Web/API/URL/URL">{@code URL()}</a> constructor for building the
-     * corresponding URL. Examples:
+     * Methods like {@link com.microsoft.playwright.APIRequestContext#get APIRequestContext.get()} take the base URL into
+     * consideration by using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/URL/URL">{@code URL()}</a>
+     * constructor for building the corresponding URL. Examples:
      * <ul>
      * <li> baseURL: {@code http://localhost:3000} and sending request to {@code /bar.html} results in {@code
      * http://localhost:3000/bar.html}</li>
@@ -97,6 +112,23 @@ public interface APIRequest {
      */
     public NewContextOptions setBaseURL(String baseURL) {
       this.baseURL = baseURL;
+      return this;
+    }
+    /**
+     * TLS Client Authentication allows the server to request a client certificate and verify it.
+     *
+     * <p> <strong>Details</strong>
+     *
+     * <p> An array of client certificates to be used. Each certificate object must have either both {@code certPath} and {@code
+     * keyPath}, a single {@code pfxPath}, or their corresponding direct value equivalents ({@code cert} and {@code key}, or
+     * {@code pfx}). Optionally, {@code passphrase} property should be provided if the certificate is encrypted. The {@code
+     * origin} property should be provided with an exact match to the request origin that the certificate is valid for.
+     *
+     * <p> <strong>NOTE:</strong> When using WebKit on macOS, accessing {@code localhost} will not pick up client certificates. You can make it work by
+     * replacing {@code localhost} with {@code local.playwright}.
+     */
+    public NewContextOptions setClientCertificates(List<ClientCertificate> clientCertificates) {
+      this.clientCertificates = clientCertificates;
       return this;
     }
     /**
@@ -143,9 +175,10 @@ public interface APIRequest {
     }
     /**
      * Populates context with given storage state. This option can be used to initialize context with logged-in information
-     * obtained via {@link BrowserContext#storageState BrowserContext.storageState()} or {@link APIRequestContext#storageState
-     * APIRequestContext.storageState()}. Either a path to the file with saved storage, or the value returned by one of {@link
-     * BrowserContext#storageState BrowserContext.storageState()} or {@link APIRequestContext#storageState
+     * obtained via {@link com.microsoft.playwright.BrowserContext#storageState BrowserContext.storageState()} or {@link
+     * com.microsoft.playwright.APIRequestContext#storageState APIRequestContext.storageState()}. Either a path to the file
+     * with saved storage, or the value returned by one of {@link com.microsoft.playwright.BrowserContext#storageState
+     * BrowserContext.storageState()} or {@link com.microsoft.playwright.APIRequestContext#storageState
      * APIRequestContext.storageState()} methods.
      */
     public NewContextOptions setStorageState(String storageState) {
@@ -154,8 +187,8 @@ public interface APIRequest {
     }
     /**
      * Populates context with given storage state. This option can be used to initialize context with logged-in information
-     * obtained via {@link BrowserContext#storageState BrowserContext.storageState()}. Path to the file with saved storage
-     * state.
+     * obtained via {@link com.microsoft.playwright.BrowserContext#storageState BrowserContext.storageState()}. Path to the
+     * file with saved storage state.
      */
     public NewContextOptions setStorageStatePath(Path storageStatePath) {
       this.storageStatePath = storageStatePath;

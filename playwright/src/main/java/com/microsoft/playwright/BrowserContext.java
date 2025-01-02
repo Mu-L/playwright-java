@@ -30,8 +30,9 @@ import java.util.regex.Pattern;
  * <p> If a page opens another page, e.g. with a {@code window.open} call, the popup will belong to the parent page's browser
  * context.
  *
- * <p> Playwright allows creating "incognito" browser contexts with {@link Browser#newContext Browser.newContext()} method.
- * "Incognito" browser contexts don't write any browsing data to disk.
+ * <p> Playwright allows creating isolated non-persistent browser contexts with {@link
+ * com.microsoft.playwright.Browser#newContext Browser.newContext()} method. Non-persistent browser contexts don't write
+ * any browsing data to disk.
  * <pre>{@code
  * // Create a new incognito browser context
  * BrowserContext context = browser.newContext();
@@ -45,11 +46,27 @@ import java.util.regex.Pattern;
 public interface BrowserContext extends AutoCloseable {
 
   /**
+   * <strong>NOTE:</strong> Only works with Chromium browser's persistent context.
+   *
+   * <p> Emitted when new background page is created in the context.
+   * <pre>{@code
+   * context.onBackgroundPage(backgroundPage -> {
+   *   System.out.println(backgroundPage.url());
+   * });
+   * }</pre>
+   */
+  void onBackgroundPage(Consumer<Page> handler);
+  /**
+   * Removes handler that was previously added with {@link #onBackgroundPage onBackgroundPage(handler)}.
+   */
+  void offBackgroundPage(Consumer<Page> handler);
+
+  /**
    * Emitted when Browser context gets closed. This might happen because of one of the following:
    * <ul>
    * <li> Browser context is closed.</li>
    * <li> Browser application is closed or crashed.</li>
-   * <li> The {@link Browser#close Browser.close()} method was called.</li>
+   * <li> The {@link com.microsoft.playwright.Browser#close Browser.close()} method was called.</li>
    * </ul>
    */
   void onClose(Consumer<BrowserContext> handler);
@@ -60,12 +77,12 @@ public interface BrowserContext extends AutoCloseable {
 
   /**
    * Emitted when JavaScript within the page calls one of console API methods, e.g. {@code console.log} or {@code
-   * console.dir}. Also emitted if the page throws an error or a warning.
+   * console.dir}.
    *
    * <p> The arguments passed into {@code console.log} and the page are available on the {@code ConsoleMessage} event handler
    * argument.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * context.onConsoleMessage(msg -> {
    *   for (int i = 0; i < msg.args().size(); ++i)
@@ -82,20 +99,21 @@ public interface BrowserContext extends AutoCloseable {
 
   /**
    * Emitted when a JavaScript dialog appears, such as {@code alert}, {@code prompt}, {@code confirm} or {@code
-   * beforeunload}. Listener **must** either {@link Dialog#accept Dialog.accept()} or {@link Dialog#dismiss Dialog.dismiss()}
-   * the dialog - otherwise the page will <a
+   * beforeunload}. Listener **must** either {@link com.microsoft.playwright.Dialog#accept Dialog.accept()} or {@link
+   * com.microsoft.playwright.Dialog#dismiss Dialog.dismiss()} the dialog - otherwise the page will <a
    * href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#never_blocking">freeze</a> waiting for the
    * dialog, and actions like click will never finish.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * context.onDialog(dialog -> {
    *   dialog.accept();
    * });
    * }</pre>
    *
-   * <p> <strong>NOTE:</strong> When no {@link Page#onDialog Page.onDialog()} or {@link BrowserContext#onDialog BrowserContext.onDialog()} listeners are
-   * present, all dialogs are automatically dismissed.
+   * <p> <strong>NOTE:</strong> When no {@link com.microsoft.playwright.Page#onDialog Page.onDialog()} or {@link
+   * com.microsoft.playwright.BrowserContext#onDialog BrowserContext.onDialog()} listeners are present, all dialogs are
+   * automatically dismissed.
    */
   void onDialog(Consumer<Dialog> handler);
   /**
@@ -105,12 +123,15 @@ public interface BrowserContext extends AutoCloseable {
 
   /**
    * The event is emitted when a new Page is created in the BrowserContext. The page may still be loading. The event will
-   * also fire for popup pages. See also {@link Page#onPopup Page.onPopup()} to receive events about popups relevant to a
-   * specific page.
+   * also fire for popup pages. See also {@link com.microsoft.playwright.Page#onPopup Page.onPopup()} to receive events about
+   * popups relevant to a specific page.
    *
    * <p> The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a
    * popup with {@code window.open('http://example.com')}, this event will fire when the network request to
-   * "http://example.com" is done and its response has started loading in the popup.
+   * "http://example.com" is done and its response has started loading in the popup. If you would like to route/listen to
+   * this network request, use {@link com.microsoft.playwright.BrowserContext#route BrowserContext.route()} and {@link
+   * com.microsoft.playwright.BrowserContext#onRequest BrowserContext.onRequest()} respectively instead of similar methods on
+   * the {@code Page}.
    * <pre>{@code
    * Page newPage = context.waitForPage(() -> {
    *   page.getByText("open new page").click();
@@ -118,8 +139,8 @@ public interface BrowserContext extends AutoCloseable {
    * System.out.println(newPage.evaluate("location.href"));
    * }</pre>
    *
-   * <p> <strong>NOTE:</strong> Use {@link Page#waitForLoadState Page.waitForLoadState()} to wait until the page gets to a particular state (you should
-   * not need it in most cases).
+   * <p> <strong>NOTE:</strong> Use {@link com.microsoft.playwright.Page#waitForLoadState Page.waitForLoadState()} to wait until the page gets to a
+   * particular state (you should not need it in most cases).
    */
   void onPage(Consumer<Page> handler);
   /**
@@ -129,7 +150,7 @@ public interface BrowserContext extends AutoCloseable {
 
   /**
    * Emitted when exception is unhandled in any of the pages in this context. To listen for errors from a particular page,
-   * use {@link Page#onPageError Page.onPageError()} instead.
+   * use {@link com.microsoft.playwright.Page#onPageError Page.onPageError()} instead.
    */
   void onWebError(Consumer<WebError> handler);
   /**
@@ -139,10 +160,10 @@ public interface BrowserContext extends AutoCloseable {
 
   /**
    * Emitted when a request is issued from any pages created through this context. The [request] object is read-only. To only
-   * listen for requests from a particular page, use {@link Page#onRequest Page.onRequest()}.
+   * listen for requests from a particular page, use {@link com.microsoft.playwright.Page#onRequest Page.onRequest()}.
    *
-   * <p> In order to intercept and mutate requests, see {@link BrowserContext#route BrowserContext.route()} or {@link Page#route
-   * Page.route()}.
+   * <p> In order to intercept and mutate requests, see {@link com.microsoft.playwright.BrowserContext#route
+   * BrowserContext.route()} or {@link com.microsoft.playwright.Page#route Page.route()}.
    */
   void onRequest(Consumer<Request> handler);
   /**
@@ -152,11 +173,11 @@ public interface BrowserContext extends AutoCloseable {
 
   /**
    * Emitted when a request fails, for example by timing out. To only listen for failed requests from a particular page, use
-   * {@link Page#onRequestFailed Page.onRequestFailed()}.
+   * {@link com.microsoft.playwright.Page#onRequestFailed Page.onRequestFailed()}.
    *
    * <p> <strong>NOTE:</strong> HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete
-   * with {@link BrowserContext#onRequestFinished BrowserContext.onRequestFinished()} event and not with {@link
-   * BrowserContext#onRequestFailed BrowserContext.onRequestFailed()}.
+   * with {@link com.microsoft.playwright.BrowserContext#onRequestFinished BrowserContext.onRequestFinished()} event and not
+   * with {@link com.microsoft.playwright.BrowserContext#onRequestFailed BrowserContext.onRequestFailed()}.
    */
   void onRequestFailed(Consumer<Request> handler);
   /**
@@ -167,7 +188,7 @@ public interface BrowserContext extends AutoCloseable {
   /**
    * Emitted when a request finishes successfully after downloading the response body. For a successful response, the
    * sequence of events is {@code request}, {@code response} and {@code requestfinished}. To listen for successful requests
-   * from a particular page, use {@link Page#onRequestFinished Page.onRequestFinished()}.
+   * from a particular page, use {@link com.microsoft.playwright.Page#onRequestFinished Page.onRequestFinished()}.
    */
   void onRequestFinished(Consumer<Request> handler);
   /**
@@ -178,7 +199,7 @@ public interface BrowserContext extends AutoCloseable {
   /**
    * Emitted when [response] status and headers are received for a request. For a successful response, the sequence of events
    * is {@code request}, {@code response} and {@code requestfinished}. To listen for response events from a particular page,
-   * use {@link Page#onResponse Page.onResponse()}.
+   * use {@link com.microsoft.playwright.Page#onResponse Page.onResponse()}.
    */
   void onResponse(Consumer<Response> handler);
   /**
@@ -186,6 +207,63 @@ public interface BrowserContext extends AutoCloseable {
    */
   void offResponse(Consumer<Response> handler);
 
+  class ClearCookiesOptions {
+    /**
+     * Only removes cookies with the given domain.
+     */
+    public Object domain;
+    /**
+     * Only removes cookies with the given name.
+     */
+    public Object name;
+    /**
+     * Only removes cookies with the given path.
+     */
+    public Object path;
+
+    /**
+     * Only removes cookies with the given domain.
+     */
+    public ClearCookiesOptions setDomain(String domain) {
+      this.domain = domain;
+      return this;
+    }
+    /**
+     * Only removes cookies with the given domain.
+     */
+    public ClearCookiesOptions setDomain(Pattern domain) {
+      this.domain = domain;
+      return this;
+    }
+    /**
+     * Only removes cookies with the given name.
+     */
+    public ClearCookiesOptions setName(String name) {
+      this.name = name;
+      return this;
+    }
+    /**
+     * Only removes cookies with the given name.
+     */
+    public ClearCookiesOptions setName(Pattern name) {
+      this.name = name;
+      return this;
+    }
+    /**
+     * Only removes cookies with the given path.
+     */
+    public ClearCookiesOptions setPath(String path) {
+      this.path = path;
+      return this;
+    }
+    /**
+     * Only removes cookies with the given path.
+     */
+    public ClearCookiesOptions setPath(Pattern path) {
+      this.path = path;
+      return this;
+    }
+  }
   class CloseOptions {
     /**
      * The reason to be reported to the operations interrupted by the context closure.
@@ -202,14 +280,12 @@ public interface BrowserContext extends AutoCloseable {
   }
   class ExposeBindingOptions {
     /**
-     * Whether to pass the argument as a handle, instead of passing by value. When passing a handle, only one argument is
-     * supported. When passing by value, multiple arguments are supported.
+     * @deprecated This option will be removed in the future.
      */
     public Boolean handle;
 
     /**
-     * Whether to pass the argument as a handle, instead of passing by value. When passing a handle, only one argument is
-     * supported. When passing by value, multiple arguments are supported.
+     * @deprecated This option will be removed in the future.
      */
     public ExposeBindingOptions setHandle(boolean handle) {
       this.handle = handle;
@@ -256,7 +332,7 @@ public interface BrowserContext extends AutoCloseable {
     public HarNotFound notFound;
     /**
      * If specified, updates the given HAR with the actual network information instead of serving from file. The file is
-     * written to disk when {@link BrowserContext#close BrowserContext.close()} is called.
+     * written to disk when {@link com.microsoft.playwright.BrowserContext#close BrowserContext.close()} is called.
      */
     public Boolean update;
     /**
@@ -290,7 +366,7 @@ public interface BrowserContext extends AutoCloseable {
     }
     /**
      * If specified, updates the given HAR with the actual network information instead of serving from file. The file is
-     * written to disk when {@link BrowserContext#close BrowserContext.close()} is called.
+     * written to disk when {@link com.microsoft.playwright.BrowserContext#close BrowserContext.close()} is called.
      */
     public RouteFromHAROptions setUpdate(boolean update) {
       this.update = update;
@@ -349,15 +425,17 @@ public interface BrowserContext extends AutoCloseable {
   class WaitForConditionOptions {
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or
-     * {@link Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or
-     * {@link Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public WaitForConditionOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -371,7 +449,8 @@ public interface BrowserContext extends AutoCloseable {
     public Predicate<ConsoleMessage> predicate;
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}.
      */
     public Double timeout;
 
@@ -384,7 +463,8 @@ public interface BrowserContext extends AutoCloseable {
     }
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}.
      */
     public WaitForConsoleMessageOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -398,7 +478,8 @@ public interface BrowserContext extends AutoCloseable {
     public Predicate<Page> predicate;
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}.
      */
     public Double timeout;
 
@@ -411,7 +492,8 @@ public interface BrowserContext extends AutoCloseable {
     }
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}.
      */
     public WaitForPageOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -419,17 +501,20 @@ public interface BrowserContext extends AutoCloseable {
     }
   }
   /**
-   * Adds cookies into this browser context. All pages within this context will have these cookies installed. Cookies can be
-   * obtained via {@link BrowserContext#cookies BrowserContext.cookies()}.
+   * Playwright has ability to mock clock and passage of time.
    *
-   * <p> **Usage**
+   * @since v1.45
+   */
+  Clock clock();
+  /**
+   * Adds cookies into this browser context. All pages within this context will have these cookies installed. Cookies can be
+   * obtained via {@link com.microsoft.playwright.BrowserContext#cookies BrowserContext.cookies()}.
+   *
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * browserContext.addCookies(Arrays.asList(cookieObject1, cookieObject2));
    * }</pre>
    *
-   * @param cookies Adds cookies to the browser context.
-   *
-   * <p> For the cookie to apply to all subdomains as well, prefix domain with a dot, like this: ".example.com".
    * @since v1.8
    */
   void addCookies(List<Cookie> cookies);
@@ -444,7 +529,7 @@ public interface BrowserContext extends AutoCloseable {
    * <p> The script is evaluated after the document was created but before any of its scripts were run. This is useful to amend
    * the JavaScript environment, e.g. to seed {@code Math.random}.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of overriding {@code Math.random} before the page loads:
    * <pre>{@code
@@ -452,8 +537,9 @@ public interface BrowserContext extends AutoCloseable {
    * browserContext.addInitScript(Paths.get("preload.js"));
    * }</pre>
    *
-   * <p> <strong>NOTE:</strong> The order of evaluation of multiple scripts installed via {@link BrowserContext#addInitScript
-   * BrowserContext.addInitScript()} and {@link Page#addInitScript Page.addInitScript()} is not defined.
+   * <p> <strong>NOTE:</strong> The order of evaluation of multiple scripts installed via {@link com.microsoft.playwright.BrowserContext#addInitScript
+   * BrowserContext.addInitScript()} and {@link com.microsoft.playwright.Page#addInitScript Page.addInitScript()} is not
+   * defined.
    *
    * @param script Script to be evaluated in all pages in the browser context.
    * @since v1.8
@@ -470,7 +556,7 @@ public interface BrowserContext extends AutoCloseable {
    * <p> The script is evaluated after the document was created but before any of its scripts were run. This is useful to amend
    * the JavaScript environment, e.g. to seed {@code Math.random}.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of overriding {@code Math.random} before the page loads:
    * <pre>{@code
@@ -478,13 +564,22 @@ public interface BrowserContext extends AutoCloseable {
    * browserContext.addInitScript(Paths.get("preload.js"));
    * }</pre>
    *
-   * <p> <strong>NOTE:</strong> The order of evaluation of multiple scripts installed via {@link BrowserContext#addInitScript
-   * BrowserContext.addInitScript()} and {@link Page#addInitScript Page.addInitScript()} is not defined.
+   * <p> <strong>NOTE:</strong> The order of evaluation of multiple scripts installed via {@link com.microsoft.playwright.BrowserContext#addInitScript
+   * BrowserContext.addInitScript()} and {@link com.microsoft.playwright.Page#addInitScript Page.addInitScript()} is not
+   * defined.
    *
    * @param script Script to be evaluated in all pages in the browser context.
    * @since v1.8
    */
   void addInitScript(Path script);
+  /**
+   * <strong>NOTE:</strong> Background pages are only supported on Chromium-based browsers.
+   *
+   * <p> All existing background pages in the context.
+   *
+   * @since v1.11
+   */
+  List<Page> backgroundPages();
   /**
    * Returns the browser instance of the context. If it was launched as a persistent context null gets returned.
    *
@@ -492,15 +587,45 @@ public interface BrowserContext extends AutoCloseable {
    */
   Browser browser();
   /**
-   * Clears context cookies.
+   * Removes cookies from context. Accepts optional filter.
+   *
+   * <p> <strong>Usage</strong>
+   * <pre>{@code
+   * context.clearCookies();
+   * context.clearCookies(new BrowserContext.ClearCookiesOptions().setName("session-id"));
+   * context.clearCookies(new BrowserContext.ClearCookiesOptions().setDomain("my-origin.com"));
+   * context.clearCookies(new BrowserContext.ClearCookiesOptions().setPath("/api/v1"));
+   * context.clearCookies(new BrowserContext.ClearCookiesOptions()
+   *                          .setName("session-id")
+   *                          .setDomain("my-origin.com"));
+   * }</pre>
    *
    * @since v1.8
    */
-  void clearCookies();
+  default void clearCookies() {
+    clearCookies(null);
+  }
+  /**
+   * Removes cookies from context. Accepts optional filter.
+   *
+   * <p> <strong>Usage</strong>
+   * <pre>{@code
+   * context.clearCookies();
+   * context.clearCookies(new BrowserContext.ClearCookiesOptions().setName("session-id"));
+   * context.clearCookies(new BrowserContext.ClearCookiesOptions().setDomain("my-origin.com"));
+   * context.clearCookies(new BrowserContext.ClearCookiesOptions().setPath("/api/v1"));
+   * context.clearCookies(new BrowserContext.ClearCookiesOptions()
+   *                          .setName("session-id")
+   *                          .setDomain("my-origin.com"));
+   * }</pre>
+   *
+   * @since v1.8
+   */
+  void clearCookies(ClearCookiesOptions options);
   /**
    * Clears all permission overrides for the browser context.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * BrowserContext context = browser.newContext();
    * context.grantPermissions(Arrays.asList("clipboard-read"));
@@ -565,9 +690,9 @@ public interface BrowserContext extends AutoCloseable {
    * <p> The first argument of the {@code callback} function contains information about the caller: {@code { browserContext:
    * BrowserContext, page: Page, frame: Frame }}.
    *
-   * <p> See {@link Page#exposeBinding Page.exposeBinding()} for page-only version.
+   * <p> See {@link com.microsoft.playwright.Page#exposeBinding Page.exposeBinding()} for page-only version.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of exposing page URL to all frames in all pages in the context:
    * <pre>{@code
@@ -576,7 +701,7 @@ public interface BrowserContext extends AutoCloseable {
    * public class Example {
    *   public static void main(String[] args) {
    *     try (Playwright playwright = Playwright.create()) {
-   *       BrowserType webkit = playwright.webkit()
+   *       BrowserType webkit = playwright.webkit();
    *       Browser browser = webkit.launch(new BrowserType.LaunchOptions().setHeadless(false));
    *       BrowserContext context = browser.newContext();
    *       context.exposeBinding("pageURL", (source, args) -> source.page().url());
@@ -592,21 +717,6 @@ public interface BrowserContext extends AutoCloseable {
    *     }
    *   }
    * }
-   * }</pre>
-   *
-   * <p> An example of passing an element handle:
-   * <pre>{@code
-   * context.exposeBinding("clicked", (source, args) -> {
-   *   ElementHandle element = (ElementHandle) args[0];
-   *   System.out.println(element.textContent());
-   *   return null;
-   * }, new BrowserContext.ExposeBindingOptions().setHandle(true));
-   * page.setContent("" +
-   *   "<script>\n" +
-   *   "  document.addEventListener('click', event => window.clicked(event.target));\n" +
-   *   "</script>\n" +
-   *   "<div>Click me</div>\n" +
-   *   "<div>Or click me</div>\n");
    * }</pre>
    *
    * @param name Name of the function on the window object.
@@ -627,9 +737,9 @@ public interface BrowserContext extends AutoCloseable {
    * <p> The first argument of the {@code callback} function contains information about the caller: {@code { browserContext:
    * BrowserContext, page: Page, frame: Frame }}.
    *
-   * <p> See {@link Page#exposeBinding Page.exposeBinding()} for page-only version.
+   * <p> See {@link com.microsoft.playwright.Page#exposeBinding Page.exposeBinding()} for page-only version.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of exposing page URL to all frames in all pages in the context:
    * <pre>{@code
@@ -638,7 +748,7 @@ public interface BrowserContext extends AutoCloseable {
    * public class Example {
    *   public static void main(String[] args) {
    *     try (Playwright playwright = Playwright.create()) {
-   *       BrowserType webkit = playwright.webkit()
+   *       BrowserType webkit = playwright.webkit();
    *       Browser browser = webkit.launch(new BrowserType.LaunchOptions().setHeadless(false));
    *       BrowserContext context = browser.newContext();
    *       context.exposeBinding("pageURL", (source, args) -> source.page().url());
@@ -656,21 +766,6 @@ public interface BrowserContext extends AutoCloseable {
    * }
    * }</pre>
    *
-   * <p> An example of passing an element handle:
-   * <pre>{@code
-   * context.exposeBinding("clicked", (source, args) -> {
-   *   ElementHandle element = (ElementHandle) args[0];
-   *   System.out.println(element.textContent());
-   *   return null;
-   * }, new BrowserContext.ExposeBindingOptions().setHandle(true));
-   * page.setContent("" +
-   *   "<script>\n" +
-   *   "  document.addEventListener('click', event => window.clicked(event.target));\n" +
-   *   "</script>\n" +
-   *   "<div>Click me</div>\n" +
-   *   "<div>Or click me</div>\n");
-   * }</pre>
-   *
    * @param name Name of the function on the window object.
    * @param callback Callback function that will be called in the Playwright's context.
    * @since v1.8
@@ -686,9 +781,9 @@ public interface BrowserContext extends AutoCloseable {
    * href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise'>Promise</a>, it will be
    * awaited.
    *
-   * <p> See {@link Page#exposeFunction Page.exposeFunction()} for page-only version.
+   * <p> See {@link com.microsoft.playwright.Page#exposeFunction Page.exposeFunction()} for page-only version.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of adding a {@code sha256} function to all pages in the context:
    * <pre>{@code
@@ -702,8 +797,9 @@ public interface BrowserContext extends AutoCloseable {
    * public class Example {
    *   public static void main(String[] args) {
    *     try (Playwright playwright = Playwright.create()) {
-   *       BrowserType webkit = playwright.webkit()
+   *       BrowserType webkit = playwright.webkit();
    *       Browser browser = webkit.launch(new BrowserType.LaunchOptions().setHeadless(false));
+   *       BrowserContext context = browser.newContext();
    *       context.exposeFunction("sha256", args -> {
    *         String text = (String) args[0];
    *         MessageDigest crypto;
@@ -740,21 +836,22 @@ public interface BrowserContext extends AutoCloseable {
    *
    * @param permissions A permission or an array of permissions to grant. Permissions can be one of the following values:
    * <ul>
-   * <li> {@code "geolocation"}</li>
-   * <li> {@code "midi"}</li>
-   * <li> {@code "midi-sysex"} (system-exclusive midi)</li>
-   * <li> {@code "notifications"}</li>
-   * <li> {@code "camera"}</li>
-   * <li> {@code "microphone"}</li>
-   * <li> {@code "background-sync"}</li>
-   * <li> {@code "ambient-light-sensor"}</li>
    * <li> {@code "accelerometer"}</li>
-   * <li> {@code "gyroscope"}</li>
-   * <li> {@code "magnetometer"}</li>
    * <li> {@code "accessibility-events"}</li>
+   * <li> {@code "ambient-light-sensor"}</li>
+   * <li> {@code "background-sync"}</li>
+   * <li> {@code "camera"}</li>
    * <li> {@code "clipboard-read"}</li>
    * <li> {@code "clipboard-write"}</li>
+   * <li> {@code "geolocation"}</li>
+   * <li> {@code "gyroscope"}</li>
+   * <li> {@code "magnetometer"}</li>
+   * <li> {@code "microphone"}</li>
+   * <li> {@code "midi-sysex"} (system-exclusive midi)</li>
+   * <li> {@code "midi"}</li>
+   * <li> {@code "notifications"}</li>
    * <li> {@code "payment-handler"}</li>
+   * <li> {@code "storage-access"}</li>
    * </ul>
    * @since v1.8
    */
@@ -767,21 +864,22 @@ public interface BrowserContext extends AutoCloseable {
    *
    * @param permissions A permission or an array of permissions to grant. Permissions can be one of the following values:
    * <ul>
-   * <li> {@code "geolocation"}</li>
-   * <li> {@code "midi"}</li>
-   * <li> {@code "midi-sysex"} (system-exclusive midi)</li>
-   * <li> {@code "notifications"}</li>
-   * <li> {@code "camera"}</li>
-   * <li> {@code "microphone"}</li>
-   * <li> {@code "background-sync"}</li>
-   * <li> {@code "ambient-light-sensor"}</li>
    * <li> {@code "accelerometer"}</li>
-   * <li> {@code "gyroscope"}</li>
-   * <li> {@code "magnetometer"}</li>
    * <li> {@code "accessibility-events"}</li>
+   * <li> {@code "ambient-light-sensor"}</li>
+   * <li> {@code "background-sync"}</li>
+   * <li> {@code "camera"}</li>
    * <li> {@code "clipboard-read"}</li>
    * <li> {@code "clipboard-write"}</li>
+   * <li> {@code "geolocation"}</li>
+   * <li> {@code "gyroscope"}</li>
+   * <li> {@code "magnetometer"}</li>
+   * <li> {@code "microphone"}</li>
+   * <li> {@code "midi-sysex"} (system-exclusive midi)</li>
+   * <li> {@code "midi"}</li>
+   * <li> {@code "notifications"}</li>
    * <li> {@code "payment-handler"}</li>
+   * <li> {@code "storage-access"}</li>
    * </ul>
    * @since v1.8
    */
@@ -828,11 +926,11 @@ public interface BrowserContext extends AutoCloseable {
    * Routing provides the capability to modify network requests that are made by any page in the browser context. Once route
    * is enabled, every request matching the url pattern will stall unless it's continued, fulfilled or aborted.
    *
-   * <p> <strong>NOTE:</strong> {@link BrowserContext#route BrowserContext.route()} will not intercept requests intercepted by Service Worker. See <a
-   * href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling Service Workers when
-   * using request interception by setting {@code Browser.newContext.serviceWorkers} to {@code "block"}.
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.BrowserContext#route BrowserContext.route()} will not intercept requests intercepted by
+   * Service Worker. See <a href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling
+   * Service Workers when using request interception by setting {@code serviceWorkers} to {@code "block"}.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of a naive handler that aborts all image requests:
    * <pre>{@code
@@ -863,10 +961,11 @@ public interface BrowserContext extends AutoCloseable {
    * });
    * }</pre>
    *
-   * <p> Page routes (set up with {@link Page#route Page.route()}) take precedence over browser context routes when request
-   * matches both handlers.
+   * <p> Page routes (set up with {@link com.microsoft.playwright.Page#route Page.route()}) take precedence over browser context
+   * routes when request matches both handlers.
    *
-   * <p> To remove a route with its handler you can use {@link BrowserContext#unroute BrowserContext.unroute()}.
+   * <p> To remove a route with its handler you can use {@link com.microsoft.playwright.BrowserContext#unroute
+   * BrowserContext.unroute()}.
    *
    * <p> <strong>NOTE:</strong> Enabling routing disables http cache.
    *
@@ -883,11 +982,11 @@ public interface BrowserContext extends AutoCloseable {
    * Routing provides the capability to modify network requests that are made by any page in the browser context. Once route
    * is enabled, every request matching the url pattern will stall unless it's continued, fulfilled or aborted.
    *
-   * <p> <strong>NOTE:</strong> {@link BrowserContext#route BrowserContext.route()} will not intercept requests intercepted by Service Worker. See <a
-   * href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling Service Workers when
-   * using request interception by setting {@code Browser.newContext.serviceWorkers} to {@code "block"}.
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.BrowserContext#route BrowserContext.route()} will not intercept requests intercepted by
+   * Service Worker. See <a href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling
+   * Service Workers when using request interception by setting {@code serviceWorkers} to {@code "block"}.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of a naive handler that aborts all image requests:
    * <pre>{@code
@@ -918,10 +1017,11 @@ public interface BrowserContext extends AutoCloseable {
    * });
    * }</pre>
    *
-   * <p> Page routes (set up with {@link Page#route Page.route()}) take precedence over browser context routes when request
-   * matches both handlers.
+   * <p> Page routes (set up with {@link com.microsoft.playwright.Page#route Page.route()}) take precedence over browser context
+   * routes when request matches both handlers.
    *
-   * <p> To remove a route with its handler you can use {@link BrowserContext#unroute BrowserContext.unroute()}.
+   * <p> To remove a route with its handler you can use {@link com.microsoft.playwright.BrowserContext#unroute
+   * BrowserContext.unroute()}.
    *
    * <p> <strong>NOTE:</strong> Enabling routing disables http cache.
    *
@@ -936,11 +1036,11 @@ public interface BrowserContext extends AutoCloseable {
    * Routing provides the capability to modify network requests that are made by any page in the browser context. Once route
    * is enabled, every request matching the url pattern will stall unless it's continued, fulfilled or aborted.
    *
-   * <p> <strong>NOTE:</strong> {@link BrowserContext#route BrowserContext.route()} will not intercept requests intercepted by Service Worker. See <a
-   * href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling Service Workers when
-   * using request interception by setting {@code Browser.newContext.serviceWorkers} to {@code "block"}.
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.BrowserContext#route BrowserContext.route()} will not intercept requests intercepted by
+   * Service Worker. See <a href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling
+   * Service Workers when using request interception by setting {@code serviceWorkers} to {@code "block"}.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of a naive handler that aborts all image requests:
    * <pre>{@code
@@ -971,10 +1071,11 @@ public interface BrowserContext extends AutoCloseable {
    * });
    * }</pre>
    *
-   * <p> Page routes (set up with {@link Page#route Page.route()}) take precedence over browser context routes when request
-   * matches both handlers.
+   * <p> Page routes (set up with {@link com.microsoft.playwright.Page#route Page.route()}) take precedence over browser context
+   * routes when request matches both handlers.
    *
-   * <p> To remove a route with its handler you can use {@link BrowserContext#unroute BrowserContext.unroute()}.
+   * <p> To remove a route with its handler you can use {@link com.microsoft.playwright.BrowserContext#unroute
+   * BrowserContext.unroute()}.
    *
    * <p> <strong>NOTE:</strong> Enabling routing disables http cache.
    *
@@ -991,11 +1092,11 @@ public interface BrowserContext extends AutoCloseable {
    * Routing provides the capability to modify network requests that are made by any page in the browser context. Once route
    * is enabled, every request matching the url pattern will stall unless it's continued, fulfilled or aborted.
    *
-   * <p> <strong>NOTE:</strong> {@link BrowserContext#route BrowserContext.route()} will not intercept requests intercepted by Service Worker. See <a
-   * href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling Service Workers when
-   * using request interception by setting {@code Browser.newContext.serviceWorkers} to {@code "block"}.
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.BrowserContext#route BrowserContext.route()} will not intercept requests intercepted by
+   * Service Worker. See <a href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling
+   * Service Workers when using request interception by setting {@code serviceWorkers} to {@code "block"}.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of a naive handler that aborts all image requests:
    * <pre>{@code
@@ -1026,10 +1127,11 @@ public interface BrowserContext extends AutoCloseable {
    * });
    * }</pre>
    *
-   * <p> Page routes (set up with {@link Page#route Page.route()}) take precedence over browser context routes when request
-   * matches both handlers.
+   * <p> Page routes (set up with {@link com.microsoft.playwright.Page#route Page.route()}) take precedence over browser context
+   * routes when request matches both handlers.
    *
-   * <p> To remove a route with its handler you can use {@link BrowserContext#unroute BrowserContext.unroute()}.
+   * <p> To remove a route with its handler you can use {@link com.microsoft.playwright.BrowserContext#unroute
+   * BrowserContext.unroute()}.
    *
    * <p> <strong>NOTE:</strong> Enabling routing disables http cache.
    *
@@ -1044,11 +1146,11 @@ public interface BrowserContext extends AutoCloseable {
    * Routing provides the capability to modify network requests that are made by any page in the browser context. Once route
    * is enabled, every request matching the url pattern will stall unless it's continued, fulfilled or aborted.
    *
-   * <p> <strong>NOTE:</strong> {@link BrowserContext#route BrowserContext.route()} will not intercept requests intercepted by Service Worker. See <a
-   * href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling Service Workers when
-   * using request interception by setting {@code Browser.newContext.serviceWorkers} to {@code "block"}.
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.BrowserContext#route BrowserContext.route()} will not intercept requests intercepted by
+   * Service Worker. See <a href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling
+   * Service Workers when using request interception by setting {@code serviceWorkers} to {@code "block"}.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of a naive handler that aborts all image requests:
    * <pre>{@code
@@ -1079,10 +1181,11 @@ public interface BrowserContext extends AutoCloseable {
    * });
    * }</pre>
    *
-   * <p> Page routes (set up with {@link Page#route Page.route()}) take precedence over browser context routes when request
-   * matches both handlers.
+   * <p> Page routes (set up with {@link com.microsoft.playwright.Page#route Page.route()}) take precedence over browser context
+   * routes when request matches both handlers.
    *
-   * <p> To remove a route with its handler you can use {@link BrowserContext#unroute BrowserContext.unroute()}.
+   * <p> To remove a route with its handler you can use {@link com.microsoft.playwright.BrowserContext#unroute
+   * BrowserContext.unroute()}.
    *
    * <p> <strong>NOTE:</strong> Enabling routing disables http cache.
    *
@@ -1099,11 +1202,11 @@ public interface BrowserContext extends AutoCloseable {
    * Routing provides the capability to modify network requests that are made by any page in the browser context. Once route
    * is enabled, every request matching the url pattern will stall unless it's continued, fulfilled or aborted.
    *
-   * <p> <strong>NOTE:</strong> {@link BrowserContext#route BrowserContext.route()} will not intercept requests intercepted by Service Worker. See <a
-   * href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling Service Workers when
-   * using request interception by setting {@code Browser.newContext.serviceWorkers} to {@code "block"}.
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.BrowserContext#route BrowserContext.route()} will not intercept requests intercepted by
+   * Service Worker. See <a href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling
+   * Service Workers when using request interception by setting {@code serviceWorkers} to {@code "block"}.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of a naive handler that aborts all image requests:
    * <pre>{@code
@@ -1134,10 +1237,11 @@ public interface BrowserContext extends AutoCloseable {
    * });
    * }</pre>
    *
-   * <p> Page routes (set up with {@link Page#route Page.route()}) take precedence over browser context routes when request
-   * matches both handlers.
+   * <p> Page routes (set up with {@link com.microsoft.playwright.Page#route Page.route()}) take precedence over browser context
+   * routes when request matches both handlers.
    *
-   * <p> To remove a route with its handler you can use {@link BrowserContext#unroute BrowserContext.unroute()}.
+   * <p> To remove a route with its handler you can use {@link com.microsoft.playwright.BrowserContext#unroute
+   * BrowserContext.unroute()}.
    *
    * <p> <strong>NOTE:</strong> Enabling routing disables http cache.
    *
@@ -1154,7 +1258,7 @@ public interface BrowserContext extends AutoCloseable {
    *
    * <p> Playwright will not serve requests intercepted by Service Worker from the HAR file. See <a
    * href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling Service Workers when
-   * using request interception by setting {@code Browser.newContext.serviceWorkers} to {@code "block"}.
+   * using request interception by setting {@code serviceWorkers} to {@code "block"}.
    *
    * @param har Path to a <a href="http://www.softwareishard.com/blog/har-12-spec">HAR</a> file with prerecorded network data. If {@code
    * path} is a relative path, then it is resolved relative to the current working directory.
@@ -1169,7 +1273,7 @@ public interface BrowserContext extends AutoCloseable {
    *
    * <p> Playwright will not serve requests intercepted by Service Worker from the HAR file. See <a
    * href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling Service Workers when
-   * using request interception by setting {@code Browser.newContext.serviceWorkers} to {@code "block"}.
+   * using request interception by setting {@code serviceWorkers} to {@code "block"}.
    *
    * @param har Path to a <a href="http://www.softwareishard.com/blog/har-12-spec">HAR</a> file with prerecorded network data. If {@code
    * path} is a relative path, then it is resolved relative to the current working directory.
@@ -1177,19 +1281,100 @@ public interface BrowserContext extends AutoCloseable {
    */
   void routeFromHAR(Path har, RouteFromHAROptions options);
   /**
+   * This method allows to modify websocket connections that are made by any page in the browser context.
+   *
+   * <p> Note that only {@code WebSocket}s created after this method was called will be routed. It is recommended to call this
+   * method before creating any pages.
+   *
+   * <p> <strong>Usage</strong>
+   *
+   * <p> Below is an example of a simple handler that blocks some websocket messages. See {@code WebSocketRoute} for more details
+   * and examples.
+   * <pre>{@code
+   * context.routeWebSocket("/ws", ws -> {
+   *   ws.routeSend(message -> {
+   *     if ("to-be-blocked".equals(message))
+   *       return;
+   *     ws.send(message);
+   *   });
+   *   ws.connect();
+   * });
+   * }</pre>
+   *
+   * @param url Only WebSockets with the url matching this pattern will be routed. A string pattern can be relative to the {@code
+   * baseURL} context option.
+   * @param handler Handler function to route the WebSocket.
+   * @since v1.48
+   */
+  void routeWebSocket(String url, Consumer<WebSocketRoute> handler);
+  /**
+   * This method allows to modify websocket connections that are made by any page in the browser context.
+   *
+   * <p> Note that only {@code WebSocket}s created after this method was called will be routed. It is recommended to call this
+   * method before creating any pages.
+   *
+   * <p> <strong>Usage</strong>
+   *
+   * <p> Below is an example of a simple handler that blocks some websocket messages. See {@code WebSocketRoute} for more details
+   * and examples.
+   * <pre>{@code
+   * context.routeWebSocket("/ws", ws -> {
+   *   ws.routeSend(message -> {
+   *     if ("to-be-blocked".equals(message))
+   *       return;
+   *     ws.send(message);
+   *   });
+   *   ws.connect();
+   * });
+   * }</pre>
+   *
+   * @param url Only WebSockets with the url matching this pattern will be routed. A string pattern can be relative to the {@code
+   * baseURL} context option.
+   * @param handler Handler function to route the WebSocket.
+   * @since v1.48
+   */
+  void routeWebSocket(Pattern url, Consumer<WebSocketRoute> handler);
+  /**
+   * This method allows to modify websocket connections that are made by any page in the browser context.
+   *
+   * <p> Note that only {@code WebSocket}s created after this method was called will be routed. It is recommended to call this
+   * method before creating any pages.
+   *
+   * <p> <strong>Usage</strong>
+   *
+   * <p> Below is an example of a simple handler that blocks some websocket messages. See {@code WebSocketRoute} for more details
+   * and examples.
+   * <pre>{@code
+   * context.routeWebSocket("/ws", ws -> {
+   *   ws.routeSend(message -> {
+   *     if ("to-be-blocked".equals(message))
+   *       return;
+   *     ws.send(message);
+   *   });
+   *   ws.connect();
+   * });
+   * }</pre>
+   *
+   * @param url Only WebSockets with the url matching this pattern will be routed. A string pattern can be relative to the {@code
+   * baseURL} context option.
+   * @param handler Handler function to route the WebSocket.
+   * @since v1.48
+   */
+  void routeWebSocket(Predicate<String> url, Consumer<WebSocketRoute> handler);
+  /**
    * This setting will change the default maximum navigation time for the following methods and related shortcuts:
    * <ul>
-   * <li> {@link Page#goBack Page.goBack()}</li>
-   * <li> {@link Page#goForward Page.goForward()}</li>
-   * <li> {@link Page#navigate Page.navigate()}</li>
-   * <li> {@link Page#reload Page.reload()}</li>
-   * <li> {@link Page#setContent Page.setContent()}</li>
-   * <li> {@link Page#waitForNavigation Page.waitForNavigation()}</li>
+   * <li> {@link com.microsoft.playwright.Page#goBack Page.goBack()}</li>
+   * <li> {@link com.microsoft.playwright.Page#goForward Page.goForward()}</li>
+   * <li> {@link com.microsoft.playwright.Page#navigate Page.navigate()}</li>
+   * <li> {@link com.microsoft.playwright.Page#reload Page.reload()}</li>
+   * <li> {@link com.microsoft.playwright.Page#setContent Page.setContent()}</li>
+   * <li> {@link com.microsoft.playwright.Page#waitForNavigation Page.waitForNavigation()}</li>
    * </ul>
    *
-   * <p> <strong>NOTE:</strong> {@link Page#setDefaultNavigationTimeout Page.setDefaultNavigationTimeout()} and {@link Page#setDefaultTimeout
-   * Page.setDefaultTimeout()} take priority over {@link BrowserContext#setDefaultNavigationTimeout
-   * BrowserContext.setDefaultNavigationTimeout()}.
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.Page#setDefaultNavigationTimeout Page.setDefaultNavigationTimeout()} and {@link
+   * com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()} take priority over {@link
+   * com.microsoft.playwright.BrowserContext#setDefaultNavigationTimeout BrowserContext.setDefaultNavigationTimeout()}.
    *
    * @param timeout Maximum navigation time in milliseconds
    * @since v1.8
@@ -1198,10 +1383,10 @@ public interface BrowserContext extends AutoCloseable {
   /**
    * This setting will change the default maximum time for all the methods accepting {@code timeout} option.
    *
-   * <p> <strong>NOTE:</strong> {@link Page#setDefaultNavigationTimeout Page.setDefaultNavigationTimeout()}, {@link Page#setDefaultTimeout
-   * Page.setDefaultTimeout()} and {@link BrowserContext#setDefaultNavigationTimeout
-   * BrowserContext.setDefaultNavigationTimeout()} take priority over {@link BrowserContext#setDefaultTimeout
-   * BrowserContext.setDefaultTimeout()}.
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.Page#setDefaultNavigationTimeout Page.setDefaultNavigationTimeout()}, {@link
+   * com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()} and {@link
+   * com.microsoft.playwright.BrowserContext#setDefaultNavigationTimeout BrowserContext.setDefaultNavigationTimeout()} take
+   * priority over {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}.
    *
    * @param timeout Maximum time in milliseconds
    * @since v1.8
@@ -1209,11 +1394,12 @@ public interface BrowserContext extends AutoCloseable {
   void setDefaultTimeout(double timeout);
   /**
    * The extra HTTP headers will be sent with every request initiated by any page in the context. These headers are merged
-   * with page-specific extra HTTP headers set with {@link Page#setExtraHTTPHeaders Page.setExtraHTTPHeaders()}. If page
-   * overrides a particular header, page-specific header value will be used instead of the browser context header value.
+   * with page-specific extra HTTP headers set with {@link com.microsoft.playwright.Page#setExtraHTTPHeaders
+   * Page.setExtraHTTPHeaders()}. If page overrides a particular header, page-specific header value will be used instead of
+   * the browser context header value.
    *
-   * <p> <strong>NOTE:</strong> {@link BrowserContext#setExtraHTTPHeaders BrowserContext.setExtraHTTPHeaders()} does not guarantee the order of headers
-   * in the outgoing requests.
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.BrowserContext#setExtraHTTPHeaders BrowserContext.setExtraHTTPHeaders()} does not
+   * guarantee the order of headers in the outgoing requests.
    *
    * @param headers An object containing additional HTTP headers to be sent with every request. All header values must be strings.
    * @since v1.8
@@ -1222,13 +1408,13 @@ public interface BrowserContext extends AutoCloseable {
   /**
    * Sets the context's geolocation. Passing {@code null} or {@code undefined} emulates position unavailable.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * browserContext.setGeolocation(new Geolocation(59.95, 30.31667));
    * }</pre>
    *
-   * <p> <strong>NOTE:</strong> Consider using {@link BrowserContext#grantPermissions BrowserContext.grantPermissions()} to grant permissions for the
-   * browser context pages to read its geolocation.
+   * <p> <strong>NOTE:</strong> Consider using {@link com.microsoft.playwright.BrowserContext#grantPermissions BrowserContext.grantPermissions()} to
+   * grant permissions for the browser context pages to read its geolocation.
    *
    * @since v1.8
    */
@@ -1261,72 +1447,75 @@ public interface BrowserContext extends AutoCloseable {
    */
   Tracing tracing();
   /**
-   * Removes all routes created with {@link BrowserContext#route BrowserContext.route()} and {@link
-   * BrowserContext#routeFromHAR BrowserContext.routeFromHAR()}.
+   * Removes all routes created with {@link com.microsoft.playwright.BrowserContext#route BrowserContext.route()} and {@link
+   * com.microsoft.playwright.BrowserContext#routeFromHAR BrowserContext.routeFromHAR()}.
    *
    * @since v1.41
    */
   void unrouteAll();
   /**
-   * Removes a route created with {@link BrowserContext#route BrowserContext.route()}. When {@code handler} is not specified,
-   * removes all routes for the {@code url}.
+   * Removes a route created with {@link com.microsoft.playwright.BrowserContext#route BrowserContext.route()}. When {@code
+   * handler} is not specified, removes all routes for the {@code url}.
    *
-   * @param url A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with {@link BrowserContext#route
-   * BrowserContext.route()}.
+   * @param url A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with {@link
+   * com.microsoft.playwright.BrowserContext#route BrowserContext.route()}.
    * @since v1.8
    */
   default void unroute(String url) {
     unroute(url, null);
   }
   /**
-   * Removes a route created with {@link BrowserContext#route BrowserContext.route()}. When {@code handler} is not specified,
-   * removes all routes for the {@code url}.
+   * Removes a route created with {@link com.microsoft.playwright.BrowserContext#route BrowserContext.route()}. When {@code
+   * handler} is not specified, removes all routes for the {@code url}.
    *
-   * @param url A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with {@link BrowserContext#route
+   * @param url A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with {@link
+   * com.microsoft.playwright.BrowserContext#route BrowserContext.route()}.
+   * @param handler Optional handler function used to register a routing with {@link com.microsoft.playwright.BrowserContext#route
    * BrowserContext.route()}.
-   * @param handler Optional handler function used to register a routing with {@link BrowserContext#route BrowserContext.route()}.
    * @since v1.8
    */
   void unroute(String url, Consumer<Route> handler);
   /**
-   * Removes a route created with {@link BrowserContext#route BrowserContext.route()}. When {@code handler} is not specified,
-   * removes all routes for the {@code url}.
+   * Removes a route created with {@link com.microsoft.playwright.BrowserContext#route BrowserContext.route()}. When {@code
+   * handler} is not specified, removes all routes for the {@code url}.
    *
-   * @param url A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with {@link BrowserContext#route
-   * BrowserContext.route()}.
+   * @param url A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with {@link
+   * com.microsoft.playwright.BrowserContext#route BrowserContext.route()}.
    * @since v1.8
    */
   default void unroute(Pattern url) {
     unroute(url, null);
   }
   /**
-   * Removes a route created with {@link BrowserContext#route BrowserContext.route()}. When {@code handler} is not specified,
-   * removes all routes for the {@code url}.
+   * Removes a route created with {@link com.microsoft.playwright.BrowserContext#route BrowserContext.route()}. When {@code
+   * handler} is not specified, removes all routes for the {@code url}.
    *
-   * @param url A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with {@link BrowserContext#route
+   * @param url A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with {@link
+   * com.microsoft.playwright.BrowserContext#route BrowserContext.route()}.
+   * @param handler Optional handler function used to register a routing with {@link com.microsoft.playwright.BrowserContext#route
    * BrowserContext.route()}.
-   * @param handler Optional handler function used to register a routing with {@link BrowserContext#route BrowserContext.route()}.
    * @since v1.8
    */
   void unroute(Pattern url, Consumer<Route> handler);
   /**
-   * Removes a route created with {@link BrowserContext#route BrowserContext.route()}. When {@code handler} is not specified,
-   * removes all routes for the {@code url}.
+   * Removes a route created with {@link com.microsoft.playwright.BrowserContext#route BrowserContext.route()}. When {@code
+   * handler} is not specified, removes all routes for the {@code url}.
    *
-   * @param url A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with {@link BrowserContext#route
-   * BrowserContext.route()}.
+   * @param url A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with {@link
+   * com.microsoft.playwright.BrowserContext#route BrowserContext.route()}.
    * @since v1.8
    */
   default void unroute(Predicate<String> url) {
     unroute(url, null);
   }
   /**
-   * Removes a route created with {@link BrowserContext#route BrowserContext.route()}. When {@code handler} is not specified,
-   * removes all routes for the {@code url}.
+   * Removes a route created with {@link com.microsoft.playwright.BrowserContext#route BrowserContext.route()}. When {@code
+   * handler} is not specified, removes all routes for the {@code url}.
    *
-   * @param url A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with {@link BrowserContext#route
+   * @param url A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with {@link
+   * com.microsoft.playwright.BrowserContext#route BrowserContext.route()}.
+   * @param handler Optional handler function used to register a routing with {@link com.microsoft.playwright.BrowserContext#route
    * BrowserContext.route()}.
-   * @param handler Optional handler function used to register a routing with {@link BrowserContext#route BrowserContext.route()}.
    * @since v1.8
    */
   void unroute(Predicate<String> url, Consumer<Route> handler);
@@ -1334,7 +1523,7 @@ public interface BrowserContext extends AutoCloseable {
    * The method will block until the condition returns true. All Playwright events will be dispatched while the method is
    * waiting for the condition.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> Use the method to wait for a condition that depends on page events:
    * <pre>{@code
@@ -1359,7 +1548,7 @@ public interface BrowserContext extends AutoCloseable {
    * The method will block until the condition returns true. All Playwright events will be dispatched while the method is
    * waiting for the condition.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> Use the method to wait for a condition that depends on page events:
    * <pre>{@code
@@ -1382,7 +1571,7 @@ public interface BrowserContext extends AutoCloseable {
    * Performs action and waits for a {@code ConsoleMessage} to be logged by in the pages in the context. If predicate is
    * provided, it passes {@code ConsoleMessage} value into the {@code predicate} function and waits for {@code
    * predicate(message)} to return a truthy value. Will throw an error if the page is closed before the {@link
-   * BrowserContext#onConsoleMessage BrowserContext.onConsoleMessage()} event is fired.
+   * com.microsoft.playwright.BrowserContext#onConsoleMessage BrowserContext.onConsoleMessage()} event is fired.
    *
    * @param callback Callback that performs the action triggering the event.
    * @since v1.34
@@ -1394,7 +1583,7 @@ public interface BrowserContext extends AutoCloseable {
    * Performs action and waits for a {@code ConsoleMessage} to be logged by in the pages in the context. If predicate is
    * provided, it passes {@code ConsoleMessage} value into the {@code predicate} function and waits for {@code
    * predicate(message)} to return a truthy value. Will throw an error if the page is closed before the {@link
-   * BrowserContext#onConsoleMessage BrowserContext.onConsoleMessage()} event is fired.
+   * com.microsoft.playwright.BrowserContext#onConsoleMessage BrowserContext.onConsoleMessage()} event is fired.
    *
    * @param callback Callback that performs the action triggering the event.
    * @since v1.34

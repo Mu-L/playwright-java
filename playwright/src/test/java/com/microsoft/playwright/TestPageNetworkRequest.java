@@ -62,10 +62,16 @@ public class TestPageNetworkRequest extends TestBase {
     });
 
     responseWritten.acquire();
+
     List<HttpHeader> expectedHeaders = serverHeaders;
     if (isWebKit() && isWindows) {
       expectedHeaders = expectedHeaders.stream()
         .filter(h -> !"accept-encoding".equals(h.name.toLowerCase()) && !"accept-language".equals(h.name.toLowerCase()))
+        .collect(Collectors.toList());
+    }
+    if (isFirefox()) {
+      expectedHeaders = expectedHeaders.stream()
+        .filter(h -> !"priority".equals(h.name.toLowerCase()))
         .collect(Collectors.toList());
     }
 
@@ -133,5 +139,32 @@ public class TestPageNetworkRequest extends TestBase {
     waitForCondition(() -> request[0] != null);
     assertTrue(request[0].isNavigationRequest());
     assertTrue(error[0].getMessage().contains("Frame for this navigation request is not available"), error[0].getMessage());
+  }
+
+  @Test
+  void shouldParseDataIfContentTypeIsApplicationFormUrlEncoded() {
+    page.navigate(server.EMPTY_PAGE);
+    server.setRoute("/post", exchange -> exchange.close());
+    Request[] request = {null};
+    page.onRequest(r -> request[0] = r);
+    page.setContent("<form method='POST' action='/post'><input type='text' name='foo' value='bar'><input type='number' name='baz' value='123'><input type='submit'></form>");
+    page.click("input[type=submit]");
+    assertNotNull(request[0]);
+    assertEquals("foo=bar&baz=123", request[0].postData());
+  }
+
+  @Test
+  void shouldParseDataIfContentTypeIsApplicationFormUrlEncodedCharsetUTF8() {
+    page.navigate(server.EMPTY_PAGE);
+    Request request = page.waitForRequest("**/post", () -> {
+      page.evaluate("() => fetch('./post', {\n" +
+        "  method: 'POST',\n" +
+        "  headers: {\n" +
+        "    'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',\n" +
+        "  },\n" +
+        "  body: 'foo=bar&baz=123'\n" +
+        "})");
+    });
+    assertEquals("foo=bar&baz=123", request.postData());
   }
 }

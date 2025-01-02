@@ -46,16 +46,16 @@ public class TestBrowserContextStorageState extends TestBase {
     assertJsonEquals("{" +
       "cookies:[]," +
       "origins:[{\n" +
-      "  origin: 'https://www.example.com',\n" +
-      "  localStorage: [{\n" +
-      "    name: 'name1',\n" +
-      "    value: 'value1'\n" +
-      "  }]\n" +
-      "}, {\n" +
       "  origin: 'https://www.domain.com',\n" +
       "  localStorage: [{\n" +
       "    name: 'name2',\n" +
       "    value: 'value2'\n" +
+      "  }]\n" +
+      "}, {\n" +
+      "  origin: 'https://www.example.com',\n" +
+      "  localStorage: [{\n" +
+      "    name: 'name1',\n" +
+      "    value: 'value1'\n" +
       "  }]\n" +
       "}]}", new Gson().fromJson(storageState, JsonObject.class));
   }
@@ -98,6 +98,20 @@ public class TestBrowserContextStorageState extends TestBase {
       "}");
     Path path = tempDir.resolve("storage-state.json");
     context.storageState(new BrowserContext.StorageStateOptions().setPath(path));
+
+    String sameSiteCamelCase = "Lax";
+    switch (defaultSameSiteCookieValue) {
+      case STRICT:
+        sameSiteCamelCase = "Strict";
+        break;
+      case LAX:
+        sameSiteCamelCase = "Lax";
+        break;
+      case NONE:
+        sameSiteCamelCase = "None";
+        break;
+    }
+
     JsonObject expected = new Gson().fromJson(
       "{\n" +
       "  'cookies':[\n" +
@@ -109,7 +123,7 @@ public class TestBrowserContextStorageState extends TestBase {
       "      'expires':-1,\n" +
       "      'httpOnly':false,\n" +
       "      'secure':false,\n" +
-      "      'sameSite':'" + (isChromium() ? "Lax" : "None") + "'\n" +
+      "      'sameSite':'" + sameSiteCamelCase + "'\n" +
       "    }],\n" +
       "  'origins':[\n" +
       "    {\n" +
@@ -151,7 +165,7 @@ public class TestBrowserContextStorageState extends TestBase {
       "  origin: 'http://localhost:" + server.PORT + "',\n" +
       "  localStorage: [{\n" +
       "    name: 'foo',\n" +
-      "    value: '" + (char)55934 + "'\n" +
+      "    value: '" + (char)65533 + "'\n" +
       "  }]\n" +
       "}]}", new Gson().fromJson(storageState, JsonObject.class));
   }

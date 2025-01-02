@@ -29,7 +29,7 @@ import com.microsoft.playwright.impl.RequestOptionsImpl;
  *     .setData("My data"));
  * }</pre>
  *
- * <p> **Uploading html form data**
+ * <p> <strong>Uploading html form data</strong>
  *
  * <p> {@code FormData} class can be used to send a form to the server, by default the request will use {@code
  * application/x-www-form-urlencoded} encoding:
@@ -133,6 +133,15 @@ public interface RequestOptions {
    * @since v1.26
    */
   RequestOptions setMaxRedirects(int maxRedirects);
+  /**
+   *
+   *
+   * @param maxRetries Maximum number of times network errors should be retried. Currently only {@code ECONNRESET} error is retried. Does not
+   * retry based on HTTP response codes. An error will be thrown if the limit is exceeded. Defaults to {@code 0} - no
+   * retries.
+   * @since v1.46
+   */
+  RequestOptions setMaxRetries(int maxRetries);
   /**
    * Changes the request method (e.g. <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PUT">PUT</a> or <a
    * href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST">POST</a>).

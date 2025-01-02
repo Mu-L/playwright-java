@@ -21,7 +21,7 @@ import com.microsoft.playwright.options.*;
 /**
  * The Mouse class operates in main-frame CSS pixels relative to the top-left corner of the viewport.
  *
- * <p> Every {@code page} object has its own Mouse, accessible with {@link Page#mouse Page.mouse()}.
+ * <p> Every {@code page} object has its own Mouse, accessible with {@link com.microsoft.playwright.Page#mouse Page.mouse()}.
  * <pre>{@code
  * // Using ‘page.mouse’ to trace a 100x100 square.
  * page.mouse().move(0, 0);
@@ -160,32 +160,44 @@ public interface Mouse {
     }
   }
   /**
-   * Shortcut for {@link Mouse#move Mouse.move()}, {@link Mouse#down Mouse.down()}, {@link Mouse#up Mouse.up()}.
+   * Shortcut for {@link com.microsoft.playwright.Mouse#move Mouse.move()}, {@link com.microsoft.playwright.Mouse#down
+   * Mouse.down()}, {@link com.microsoft.playwright.Mouse#up Mouse.up()}.
    *
+   * @param x X coordinate relative to the main frame's viewport in CSS pixels.
+   * @param y Y coordinate relative to the main frame's viewport in CSS pixels.
    * @since v1.8
    */
   default void click(double x, double y) {
     click(x, y, null);
   }
   /**
-   * Shortcut for {@link Mouse#move Mouse.move()}, {@link Mouse#down Mouse.down()}, {@link Mouse#up Mouse.up()}.
+   * Shortcut for {@link com.microsoft.playwright.Mouse#move Mouse.move()}, {@link com.microsoft.playwright.Mouse#down
+   * Mouse.down()}, {@link com.microsoft.playwright.Mouse#up Mouse.up()}.
    *
+   * @param x X coordinate relative to the main frame's viewport in CSS pixels.
+   * @param y Y coordinate relative to the main frame's viewport in CSS pixels.
    * @since v1.8
    */
   void click(double x, double y, ClickOptions options);
   /**
-   * Shortcut for {@link Mouse#move Mouse.move()}, {@link Mouse#down Mouse.down()}, {@link Mouse#up Mouse.up()}, {@link
-   * Mouse#down Mouse.down()} and {@link Mouse#up Mouse.up()}.
+   * Shortcut for {@link com.microsoft.playwright.Mouse#move Mouse.move()}, {@link com.microsoft.playwright.Mouse#down
+   * Mouse.down()}, {@link com.microsoft.playwright.Mouse#up Mouse.up()}, {@link com.microsoft.playwright.Mouse#down
+   * Mouse.down()} and {@link com.microsoft.playwright.Mouse#up Mouse.up()}.
    *
+   * @param x X coordinate relative to the main frame's viewport in CSS pixels.
+   * @param y Y coordinate relative to the main frame's viewport in CSS pixels.
    * @since v1.8
    */
   default void dblclick(double x, double y) {
     dblclick(x, y, null);
   }
   /**
-   * Shortcut for {@link Mouse#move Mouse.move()}, {@link Mouse#down Mouse.down()}, {@link Mouse#up Mouse.up()}, {@link
-   * Mouse#down Mouse.down()} and {@link Mouse#up Mouse.up()}.
+   * Shortcut for {@link com.microsoft.playwright.Mouse#move Mouse.move()}, {@link com.microsoft.playwright.Mouse#down
+   * Mouse.down()}, {@link com.microsoft.playwright.Mouse#up Mouse.up()}, {@link com.microsoft.playwright.Mouse#down
+   * Mouse.down()} and {@link com.microsoft.playwright.Mouse#up Mouse.up()}.
    *
+   * @param x X coordinate relative to the main frame's viewport in CSS pixels.
+   * @param y Y coordinate relative to the main frame's viewport in CSS pixels.
    * @since v1.8
    */
   void dblclick(double x, double y, DblclickOptions options);
@@ -206,6 +218,8 @@ public interface Mouse {
   /**
    * Dispatches a {@code mousemove} event.
    *
+   * @param x X coordinate relative to the main frame's viewport in CSS pixels.
+   * @param y Y coordinate relative to the main frame's viewport in CSS pixels.
    * @since v1.8
    */
   default void move(double x, double y) {
@@ -214,6 +228,8 @@ public interface Mouse {
   /**
    * Dispatches a {@code mousemove} event.
    *
+   * @param x X coordinate relative to the main frame's viewport in CSS pixels.
+   * @param y Y coordinate relative to the main frame's viewport in CSS pixels.
    * @since v1.8
    */
   void move(double x, double y, MoveOptions options);
@@ -232,7 +248,8 @@ public interface Mouse {
    */
   void up(UpOptions options);
   /**
-   * Dispatches a {@code wheel} event.
+   * Dispatches a {@code wheel} event. This method is usually used to manually scroll the page. See <a
+   * href="https://playwright.dev/java/docs/input#scrolling">scrolling</a> for alternative ways to scroll.
    *
    * <p> <strong>NOTE:</strong> Wheel events may cause scrolling if they are not handled, and this method does not wait for the scrolling to finish
    * before returning.

@@ -22,14 +22,14 @@ import java.util.regex.Pattern;
  * The {@code PageAssertions} class provides assertion methods that can be used to make assertions about the {@code Page}
  * state in the tests.
  * <pre>{@code
- * ...
+ * // ...
  * import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
  *
  * public class TestPage {
- *   ...
+ *   // ...
  *   @Test
  *   void navigatesToLoginPage() {
- *     ...
+ *     // ...
  *     page.getByText("Sign in").click();
  *     assertThat(page).hasURL(Pattern.compile(".*\/login"));
  *   }
@@ -53,10 +53,23 @@ public interface PageAssertions {
   }
   class HasURLOptions {
     /**
+     * Whether to perform case-insensitive match. {@code ignoreCase} option takes precedence over the corresponding regular
+     * expression flag if specified.
+     */
+    public Boolean ignoreCase;
+    /**
      * Time to retry the assertion for in milliseconds. Defaults to {@code 5000}.
      */
     public Double timeout;
 
+    /**
+     * Whether to perform case-insensitive match. {@code ignoreCase} option takes precedence over the corresponding regular
+     * expression flag if specified.
+     */
+    public HasURLOptions setIgnoreCase(boolean ignoreCase) {
+      this.ignoreCase = ignoreCase;
+      return this;
+    }
     /**
      * Time to retry the assertion for in milliseconds. Defaults to {@code 5000}.
      */
@@ -78,7 +91,7 @@ public interface PageAssertions {
   /**
    * Ensures the page has the given title.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page).hasTitle("Playwright");
    * }</pre>
@@ -92,7 +105,7 @@ public interface PageAssertions {
   /**
    * Ensures the page has the given title.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page).hasTitle("Playwright");
    * }</pre>
@@ -104,7 +117,7 @@ public interface PageAssertions {
   /**
    * Ensures the page has the given title.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page).hasTitle("Playwright");
    * }</pre>
@@ -118,7 +131,7 @@ public interface PageAssertions {
   /**
    * Ensures the page has the given title.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page).hasTitle("Playwright");
    * }</pre>
@@ -130,7 +143,7 @@ public interface PageAssertions {
   /**
    * Ensures the page is navigated to the given URL.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page).hasURL(".com");
    * }</pre>
@@ -144,7 +157,7 @@ public interface PageAssertions {
   /**
    * Ensures the page is navigated to the given URL.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page).hasURL(".com");
    * }</pre>
@@ -156,7 +169,7 @@ public interface PageAssertions {
   /**
    * Ensures the page is navigated to the given URL.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page).hasURL(".com");
    * }</pre>
@@ -170,7 +183,7 @@ public interface PageAssertions {
   /**
    * Ensures the page is navigated to the given URL.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page).hasURL(".com");
    * }</pre>

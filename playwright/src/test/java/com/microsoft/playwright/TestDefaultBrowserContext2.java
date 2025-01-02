@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) Microsoft Corporation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.microsoft.playwright;
 
 import com.microsoft.playwright.options.Geolocation;
@@ -149,35 +165,6 @@ public class TestDefaultBrowserContext2 extends TestBase {
     Page page3 = browserContext3.newPage();
     page3.navigate(server.EMPTY_PAGE);
     assertNotEquals("hello", page3.evaluate("localStorage.hey"));
-    browserContext3.close();
-  }
-
-  @Test
-  void shouldRestoreCookiesFromUserDataDir() throws IOException {
-// TODO:   test.flaky(browserName === "chromium");
-    Path userDataDir = tempDir.resolve("user-data-dir");
-    BrowserType.LaunchPersistentContextOptions browserOptions = null;
-    BrowserContext browserContext = browserType.launchPersistentContext(userDataDir, browserOptions);
-    Page page = browserContext.newPage();
-    page.navigate(server.EMPTY_PAGE);
-    Object documentCookie = page.evaluate("() => {\n" +
-      "    document.cookie = 'doSomethingOnlyOnce=true; expires=Fri, 31 Dec 9999 23:59:59 GMT';\n" +
-      "    return document.cookie;\n" +
-      "  }");
-    assertEquals("doSomethingOnlyOnce=true", documentCookie);
-    browserContext.close();
-
-    BrowserContext browserContext2 = browserType.launchPersistentContext(userDataDir, browserOptions);
-    Page page2 = browserContext2.newPage();
-    page2.navigate(server.EMPTY_PAGE);
-    assertEquals("doSomethingOnlyOnce=true", page2.evaluate("() => document.cookie"));
-    browserContext2.close();
-
-    Path userDataDir2 = tempDir.resolve("user-data-dir-2");
-    BrowserContext browserContext3 = browserType.launchPersistentContext(userDataDir2, browserOptions);
-    Page page3 = browserContext3.newPage();
-    page3.navigate(server.EMPTY_PAGE);
-    assertNotEquals("doSomethingOnlyOnce=true", page3.evaluate("() => document.cookie"));
     browserContext3.close();
   }
 

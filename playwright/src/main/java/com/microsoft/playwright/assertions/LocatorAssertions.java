@@ -17,19 +17,20 @@
 package com.microsoft.playwright.assertions;
 
 import java.util.regex.Pattern;
+import com.microsoft.playwright.options.AriaRole;
 
 /**
  * The {@code LocatorAssertions} class provides assertion methods that can be used to make assertions about the {@code
  * Locator} state in the tests.
  * <pre>{@code
- * ...
+ * // ...
  * import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
  *
  * public class TestLocator {
- *   ...
+ *   // ...
  *   @Test
  *   void statusBecomesSubmitted() {
- *     ...
+ *     // ...
  *     page.getByRole(AriaRole.BUTTON).click();
  *     assertThat(page.locator(".status")).hasText("Submitted");
  *   }
@@ -253,6 +254,60 @@ public interface LocatorAssertions {
       return this;
     }
   }
+  class HasAccessibleDescriptionOptions {
+    /**
+     * Whether to perform case-insensitive match. {@code ignoreCase} option takes precedence over the corresponding regular
+     * expression flag if specified.
+     */
+    public Boolean ignoreCase;
+    /**
+     * Time to retry the assertion for in milliseconds. Defaults to {@code 5000}.
+     */
+    public Double timeout;
+
+    /**
+     * Whether to perform case-insensitive match. {@code ignoreCase} option takes precedence over the corresponding regular
+     * expression flag if specified.
+     */
+    public HasAccessibleDescriptionOptions setIgnoreCase(boolean ignoreCase) {
+      this.ignoreCase = ignoreCase;
+      return this;
+    }
+    /**
+     * Time to retry the assertion for in milliseconds. Defaults to {@code 5000}.
+     */
+    public HasAccessibleDescriptionOptions setTimeout(double timeout) {
+      this.timeout = timeout;
+      return this;
+    }
+  }
+  class HasAccessibleNameOptions {
+    /**
+     * Whether to perform case-insensitive match. {@code ignoreCase} option takes precedence over the corresponding regular
+     * expression flag if specified.
+     */
+    public Boolean ignoreCase;
+    /**
+     * Time to retry the assertion for in milliseconds. Defaults to {@code 5000}.
+     */
+    public Double timeout;
+
+    /**
+     * Whether to perform case-insensitive match. {@code ignoreCase} option takes precedence over the corresponding regular
+     * expression flag if specified.
+     */
+    public HasAccessibleNameOptions setIgnoreCase(boolean ignoreCase) {
+      this.ignoreCase = ignoreCase;
+      return this;
+    }
+    /**
+     * Time to retry the assertion for in milliseconds. Defaults to {@code 5000}.
+     */
+    public HasAccessibleNameOptions setTimeout(double timeout) {
+      this.timeout = timeout;
+      return this;
+    }
+  }
   class HasAttributeOptions {
     /**
      * Whether to perform case-insensitive match. {@code ignoreCase} option takes precedence over the corresponding regular
@@ -350,6 +405,20 @@ public interface LocatorAssertions {
       return this;
     }
   }
+  class HasRoleOptions {
+    /**
+     * Time to retry the assertion for in milliseconds. Defaults to {@code 5000}.
+     */
+    public Double timeout;
+
+    /**
+     * Time to retry the assertion for in milliseconds. Defaults to {@code 5000}.
+     */
+    public HasRoleOptions setTimeout(double timeout) {
+      this.timeout = timeout;
+      return this;
+    }
+  }
   class HasTextOptions {
     /**
      * Whether to perform case-insensitive match. {@code ignoreCase} option takes precedence over the corresponding regular
@@ -416,6 +485,20 @@ public interface LocatorAssertions {
       return this;
     }
   }
+  class MatchesAriaSnapshotOptions {
+    /**
+     * Time to retry the assertion for in milliseconds. Defaults to {@code 5000}.
+     */
+    public Double timeout;
+
+    /**
+     * Time to retry the assertion for in milliseconds. Defaults to {@code 5000}.
+     */
+    public MatchesAriaSnapshotOptions setTimeout(double timeout) {
+      this.timeout = timeout;
+      return this;
+    }
+  }
   /**
    * Makes the assertion check for the opposite condition. For example, this code tests that the Locator doesn't contain text
    * {@code "error"}:
@@ -430,7 +513,7 @@ public interface LocatorAssertions {
    * Ensures that {@code Locator} points to an element that is <a
    * href="https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected">connected</a> to a Document or a ShadowRoot.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.getByText("Hidden text")).isAttached();
    * }</pre>
@@ -444,7 +527,7 @@ public interface LocatorAssertions {
    * Ensures that {@code Locator} points to an element that is <a
    * href="https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected">connected</a> to a Document or a ShadowRoot.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.getByText("Hidden text")).isAttached();
    * }</pre>
@@ -455,7 +538,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} points to a checked input.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.getByLabel("Subscribe to newsletter")).isChecked();
    * }</pre>
@@ -468,7 +551,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} points to a checked input.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.getByLabel("Subscribe to newsletter")).isChecked();
    * }</pre>
@@ -484,7 +567,7 @@ public interface LocatorAssertions {
    * {@code option}, {@code optgroup} can be disabled by setting "disabled" attribute. "disabled" attribute on other elements
    * is ignored by the browser.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("button.submit")).isDisabled();
    * }</pre>
@@ -502,7 +585,7 @@ public interface LocatorAssertions {
    * {@code option}, {@code optgroup} can be disabled by setting "disabled" attribute. "disabled" attribute on other elements
    * is ignored by the browser.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("button.submit")).isDisabled();
    * }</pre>
@@ -513,7 +596,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} points to an editable element.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.getByRole(AriaRole.TEXTBOX)).isEditable();
    * }</pre>
@@ -526,7 +609,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} points to an editable element.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.getByRole(AriaRole.TEXTBOX)).isEditable();
    * }</pre>
@@ -537,7 +620,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} points to an empty editable element or to a DOM node that has no text.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("div.warning")).isEmpty();
    * }</pre>
@@ -550,7 +633,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} points to an empty editable element or to a DOM node that has no text.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("div.warning")).isEmpty();
    * }</pre>
@@ -561,7 +644,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} points to an enabled element.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("button.submit")).isEnabled();
    * }</pre>
@@ -574,7 +657,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} points to an enabled element.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("button.submit")).isEnabled();
    * }</pre>
@@ -585,7 +668,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} points to a focused DOM node.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.getByRole(AriaRole.TEXTBOX)).isFocused();
    * }</pre>
@@ -598,7 +681,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} points to a focused DOM node.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.getByRole(AriaRole.TEXTBOX)).isFocused();
    * }</pre>
@@ -610,7 +693,7 @@ public interface LocatorAssertions {
    * Ensures that {@code Locator} either does not resolve to any DOM node, or resolves to a <a
    * href="https://playwright.dev/java/docs/actionability#visible">non-visible</a> one.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator(".my-element")).isHidden();
    * }</pre>
@@ -624,7 +707,7 @@ public interface LocatorAssertions {
    * Ensures that {@code Locator} either does not resolve to any DOM node, or resolves to a <a
    * href="https://playwright.dev/java/docs/actionability#visible">non-visible</a> one.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator(".my-element")).isHidden();
    * }</pre>
@@ -636,7 +719,7 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element that intersects viewport, according to the <a
    * href="https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API">intersection observer API</a>.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * Locator locator = page.getByRole(AriaRole.BUTTON);
    * // Make sure at least some part of element intersects viewport.
@@ -656,7 +739,7 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element that intersects viewport, according to the <a
    * href="https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API">intersection observer API</a>.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * Locator locator = page.getByRole(AriaRole.BUTTON);
    * // Make sure at least some part of element intersects viewport.
@@ -674,18 +757,19 @@ public interface LocatorAssertions {
    * Ensures that {@code Locator} points to an attached and <a
    * href="https://playwright.dev/java/docs/actionability#visible">visible</a> DOM node.
    *
-   * <p> To check that at least one element from the list is visible, use {@link Locator#first Locator.first()}.
+   * <p> To check that at least one element from the list is visible, use {@link com.microsoft.playwright.Locator#first
+   * Locator.first()}.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // A specific element is visible.
    * assertThat(page.getByText("Welcome")).isVisible();
    *
    * // At least one item in the list is visible.
-   * asserThat(page.getByTestId("todo-item").first()).isVisible();
+   * assertThat(page.getByTestId("todo-item").first()).isVisible();
    *
    * // At least one of the two elements is visible, possibly both.
-   * asserThat(
+   * assertThat(
    *   page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Sign in"))
    *     .or(page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Sign up")))
    *     .first()
@@ -701,18 +785,19 @@ public interface LocatorAssertions {
    * Ensures that {@code Locator} points to an attached and <a
    * href="https://playwright.dev/java/docs/actionability#visible">visible</a> DOM node.
    *
-   * <p> To check that at least one element from the list is visible, use {@link Locator#first Locator.first()}.
+   * <p> To check that at least one element from the list is visible, use {@link com.microsoft.playwright.Locator#first
+   * Locator.first()}.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // A specific element is visible.
    * assertThat(page.getByText("Welcome")).isVisible();
    *
    * // At least one item in the list is visible.
-   * asserThat(page.getByTestId("todo-item").first()).isVisible();
+   * assertThat(page.getByTestId("todo-item").first()).isVisible();
    *
    * // At least one of the two elements is visible, possibly both.
-   * asserThat(
+   * assertThat(
    *   page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Sign in"))
    *     .or(page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Sign up")))
    *     .first()
@@ -726,12 +811,12 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element that contains the given text. All nested elements will be considered
    * when computing the text content of the element. You can use regular expressions for the value as well.
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> When {@code expected} parameter is a string, Playwright will normalize whitespaces and line breaks both in the actual
    * text and in the expected string before matching. When regular expression is used, the actual text is matched as is.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator(".title")).containsText("substring");
    * }</pre>
@@ -771,12 +856,12 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element that contains the given text. All nested elements will be considered
    * when computing the text content of the element. You can use regular expressions for the value as well.
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> When {@code expected} parameter is a string, Playwright will normalize whitespaces and line breaks both in the actual
    * text and in the expected string before matching. When regular expression is used, the actual text is matched as is.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator(".title")).containsText("substring");
    * }</pre>
@@ -814,12 +899,12 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element that contains the given text. All nested elements will be considered
    * when computing the text content of the element. You can use regular expressions for the value as well.
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> When {@code expected} parameter is a string, Playwright will normalize whitespaces and line breaks both in the actual
    * text and in the expected string before matching. When regular expression is used, the actual text is matched as is.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator(".title")).containsText("substring");
    * }</pre>
@@ -859,12 +944,12 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element that contains the given text. All nested elements will be considered
    * when computing the text content of the element. You can use regular expressions for the value as well.
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> When {@code expected} parameter is a string, Playwright will normalize whitespaces and line breaks both in the actual
    * text and in the expected string before matching. When regular expression is used, the actual text is matched as is.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator(".title")).containsText("substring");
    * }</pre>
@@ -902,12 +987,12 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element that contains the given text. All nested elements will be considered
    * when computing the text content of the element. You can use regular expressions for the value as well.
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> When {@code expected} parameter is a string, Playwright will normalize whitespaces and line breaks both in the actual
    * text and in the expected string before matching. When regular expression is used, the actual text is matched as is.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator(".title")).containsText("substring");
    * }</pre>
@@ -947,12 +1032,12 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element that contains the given text. All nested elements will be considered
    * when computing the text content of the element. You can use regular expressions for the value as well.
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> When {@code expected} parameter is a string, Playwright will normalize whitespaces and line breaks both in the actual
    * text and in the expected string before matching. When regular expression is used, the actual text is matched as is.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator(".title")).containsText("substring");
    * }</pre>
@@ -990,12 +1075,12 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element that contains the given text. All nested elements will be considered
    * when computing the text content of the element. You can use regular expressions for the value as well.
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> When {@code expected} parameter is a string, Playwright will normalize whitespaces and line breaks both in the actual
    * text and in the expected string before matching. When regular expression is used, the actual text is matched as is.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator(".title")).containsText("substring");
    * }</pre>
@@ -1035,12 +1120,12 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element that contains the given text. All nested elements will be considered
    * when computing the text content of the element. You can use regular expressions for the value as well.
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> When {@code expected} parameter is a string, Playwright will normalize whitespaces and line breaks both in the actual
    * text and in the expected string before matching. When regular expression is used, the actual text is matched as is.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator(".title")).containsText("substring");
    * }</pre>
@@ -1075,9 +1160,129 @@ public interface LocatorAssertions {
    */
   void containsText(Pattern[] expected, ContainsTextOptions options);
   /**
+   * Ensures the {@code Locator} points to an element with a given <a
+   * href="https://w3c.github.io/accname/#dfn-accessible-description">accessible description</a>.
+   *
+   * <p> <strong>Usage</strong>
+   * <pre>{@code
+   * Locator locator = page.getByTestId("save-button");
+   * assertThat(locator).hasAccessibleDescription("Save results to disk");
+   * }</pre>
+   *
+   * @param description Expected accessible description.
+   * @since v1.44
+   */
+  default void hasAccessibleDescription(String description) {
+    hasAccessibleDescription(description, null);
+  }
+  /**
+   * Ensures the {@code Locator} points to an element with a given <a
+   * href="https://w3c.github.io/accname/#dfn-accessible-description">accessible description</a>.
+   *
+   * <p> <strong>Usage</strong>
+   * <pre>{@code
+   * Locator locator = page.getByTestId("save-button");
+   * assertThat(locator).hasAccessibleDescription("Save results to disk");
+   * }</pre>
+   *
+   * @param description Expected accessible description.
+   * @since v1.44
+   */
+  void hasAccessibleDescription(String description, HasAccessibleDescriptionOptions options);
+  /**
+   * Ensures the {@code Locator} points to an element with a given <a
+   * href="https://w3c.github.io/accname/#dfn-accessible-description">accessible description</a>.
+   *
+   * <p> <strong>Usage</strong>
+   * <pre>{@code
+   * Locator locator = page.getByTestId("save-button");
+   * assertThat(locator).hasAccessibleDescription("Save results to disk");
+   * }</pre>
+   *
+   * @param description Expected accessible description.
+   * @since v1.44
+   */
+  default void hasAccessibleDescription(Pattern description) {
+    hasAccessibleDescription(description, null);
+  }
+  /**
+   * Ensures the {@code Locator} points to an element with a given <a
+   * href="https://w3c.github.io/accname/#dfn-accessible-description">accessible description</a>.
+   *
+   * <p> <strong>Usage</strong>
+   * <pre>{@code
+   * Locator locator = page.getByTestId("save-button");
+   * assertThat(locator).hasAccessibleDescription("Save results to disk");
+   * }</pre>
+   *
+   * @param description Expected accessible description.
+   * @since v1.44
+   */
+  void hasAccessibleDescription(Pattern description, HasAccessibleDescriptionOptions options);
+  /**
+   * Ensures the {@code Locator} points to an element with a given <a
+   * href="https://w3c.github.io/accname/#dfn-accessible-name">accessible name</a>.
+   *
+   * <p> <strong>Usage</strong>
+   * <pre>{@code
+   * Locator locator = page.getByTestId("save-button");
+   * assertThat(locator).hasAccessibleName("Save to disk");
+   * }</pre>
+   *
+   * @param name Expected accessible name.
+   * @since v1.44
+   */
+  default void hasAccessibleName(String name) {
+    hasAccessibleName(name, null);
+  }
+  /**
+   * Ensures the {@code Locator} points to an element with a given <a
+   * href="https://w3c.github.io/accname/#dfn-accessible-name">accessible name</a>.
+   *
+   * <p> <strong>Usage</strong>
+   * <pre>{@code
+   * Locator locator = page.getByTestId("save-button");
+   * assertThat(locator).hasAccessibleName("Save to disk");
+   * }</pre>
+   *
+   * @param name Expected accessible name.
+   * @since v1.44
+   */
+  void hasAccessibleName(String name, HasAccessibleNameOptions options);
+  /**
+   * Ensures the {@code Locator} points to an element with a given <a
+   * href="https://w3c.github.io/accname/#dfn-accessible-name">accessible name</a>.
+   *
+   * <p> <strong>Usage</strong>
+   * <pre>{@code
+   * Locator locator = page.getByTestId("save-button");
+   * assertThat(locator).hasAccessibleName("Save to disk");
+   * }</pre>
+   *
+   * @param name Expected accessible name.
+   * @since v1.44
+   */
+  default void hasAccessibleName(Pattern name) {
+    hasAccessibleName(name, null);
+  }
+  /**
+   * Ensures the {@code Locator} points to an element with a given <a
+   * href="https://w3c.github.io/accname/#dfn-accessible-name">accessible name</a>.
+   *
+   * <p> <strong>Usage</strong>
+   * <pre>{@code
+   * Locator locator = page.getByTestId("save-button");
+   * assertThat(locator).hasAccessibleName("Save to disk");
+   * }</pre>
+   *
+   * @param name Expected accessible name.
+   * @since v1.44
+   */
+  void hasAccessibleName(Pattern name, HasAccessibleNameOptions options);
+  /**
    * Ensures the {@code Locator} points to an element with given attribute.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("input")).hasAttribute("type", "text");
    * }</pre>
@@ -1092,7 +1297,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} points to an element with given attribute.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("input")).hasAttribute("type", "text");
    * }</pre>
@@ -1105,7 +1310,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} points to an element with given attribute.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("input")).hasAttribute("type", "text");
    * }</pre>
@@ -1120,7 +1325,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} points to an element with given attribute.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("input")).hasAttribute("type", "text");
    * }</pre>
@@ -1134,7 +1339,7 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element with given CSS classes. This needs to be a full match or using a
    * relaxed regular expression.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("#component")).hasClass(Pattern.compile("selected"));
    * assertThat(page.locator("#component")).hasClass("selected row");
@@ -1155,7 +1360,7 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element with given CSS classes. This needs to be a full match or using a
    * relaxed regular expression.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("#component")).hasClass(Pattern.compile("selected"));
    * assertThat(page.locator("#component")).hasClass("selected row");
@@ -1174,7 +1379,7 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element with given CSS classes. This needs to be a full match or using a
    * relaxed regular expression.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("#component")).hasClass(Pattern.compile("selected"));
    * assertThat(page.locator("#component")).hasClass("selected row");
@@ -1195,7 +1400,7 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element with given CSS classes. This needs to be a full match or using a
    * relaxed regular expression.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("#component")).hasClass(Pattern.compile("selected"));
    * assertThat(page.locator("#component")).hasClass("selected row");
@@ -1214,7 +1419,7 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element with given CSS classes. This needs to be a full match or using a
    * relaxed regular expression.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("#component")).hasClass(Pattern.compile("selected"));
    * assertThat(page.locator("#component")).hasClass("selected row");
@@ -1235,7 +1440,7 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element with given CSS classes. This needs to be a full match or using a
    * relaxed regular expression.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("#component")).hasClass(Pattern.compile("selected"));
    * assertThat(page.locator("#component")).hasClass("selected row");
@@ -1254,7 +1459,7 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element with given CSS classes. This needs to be a full match or using a
    * relaxed regular expression.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("#component")).hasClass(Pattern.compile("selected"));
    * assertThat(page.locator("#component")).hasClass("selected row");
@@ -1275,7 +1480,7 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element with given CSS classes. This needs to be a full match or using a
    * relaxed regular expression.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("#component")).hasClass(Pattern.compile("selected"));
    * assertThat(page.locator("#component")).hasClass("selected row");
@@ -1293,7 +1498,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} resolves to an exact number of DOM nodes.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("list > .component")).hasCount(3);
    * }</pre>
@@ -1307,7 +1512,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} resolves to an exact number of DOM nodes.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("list > .component")).hasCount(3);
    * }</pre>
@@ -1319,7 +1524,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} resolves to an element with the given computed CSS style.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.getByRole(AriaRole.BUTTON)).hasCSS("display", "flex");
    * }</pre>
@@ -1334,7 +1539,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} resolves to an element with the given computed CSS style.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.getByRole(AriaRole.BUTTON)).hasCSS("display", "flex");
    * }</pre>
@@ -1347,7 +1552,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} resolves to an element with the given computed CSS style.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.getByRole(AriaRole.BUTTON)).hasCSS("display", "flex");
    * }</pre>
@@ -1362,7 +1567,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} resolves to an element with the given computed CSS style.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.getByRole(AriaRole.BUTTON)).hasCSS("display", "flex");
    * }</pre>
@@ -1375,7 +1580,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} points to an element with the given DOM Node ID.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.getByRole(AriaRole.TEXTBOX)).hasId("lastname");
    * }</pre>
@@ -1389,7 +1594,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} points to an element with the given DOM Node ID.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.getByRole(AriaRole.TEXTBOX)).hasId("lastname");
    * }</pre>
@@ -1401,7 +1606,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} points to an element with the given DOM Node ID.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.getByRole(AriaRole.TEXTBOX)).hasId("lastname");
    * }</pre>
@@ -1415,7 +1620,7 @@ public interface LocatorAssertions {
   /**
    * Ensures the {@code Locator} points to an element with the given DOM Node ID.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.getByRole(AriaRole.TEXTBOX)).hasId("lastname");
    * }</pre>
@@ -1428,7 +1633,7 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element with given JavaScript property. Note that this property can be of a
    * primitive type as well as a plain serializable JavaScript object.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("input")).hasJSProperty("loaded", true);
    * }</pre>
@@ -1444,7 +1649,7 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element with given JavaScript property. Note that this property can be of a
    * primitive type as well as a plain serializable JavaScript object.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("input")).hasJSProperty("loaded", true);
    * }</pre>
@@ -1455,15 +1660,51 @@ public interface LocatorAssertions {
    */
   void hasJSProperty(String name, Object value, HasJSPropertyOptions options);
   /**
+   * Ensures the {@code Locator} points to an element with a given <a href="https://www.w3.org/TR/wai-aria-1.2/#roles">ARIA
+   * role</a>.
+   *
+   * <p> Note that role is matched as a string, disregarding the ARIA role hierarchy. For example, asserting  a superclass role
+   * {@code "checkbox"} on an element with a subclass role {@code "switch"} will fail.
+   *
+   * <p> <strong>Usage</strong>
+   * <pre>{@code
+   * Locator locator = page.getByTestId("save-button");
+   * assertThat(locator).hasRole(AriaRole.BUTTON);
+   * }</pre>
+   *
+   * @param role Required aria role.
+   * @since v1.44
+   */
+  default void hasRole(AriaRole role) {
+    hasRole(role, null);
+  }
+  /**
+   * Ensures the {@code Locator} points to an element with a given <a href="https://www.w3.org/TR/wai-aria-1.2/#roles">ARIA
+   * role</a>.
+   *
+   * <p> Note that role is matched as a string, disregarding the ARIA role hierarchy. For example, asserting  a superclass role
+   * {@code "checkbox"} on an element with a subclass role {@code "switch"} will fail.
+   *
+   * <p> <strong>Usage</strong>
+   * <pre>{@code
+   * Locator locator = page.getByTestId("save-button");
+   * assertThat(locator).hasRole(AriaRole.BUTTON);
+   * }</pre>
+   *
+   * @param role Required aria role.
+   * @since v1.44
+   */
+  void hasRole(AriaRole role, HasRoleOptions options);
+  /**
    * Ensures the {@code Locator} points to an element with the given text. All nested elements will be considered when
    * computing the text content of the element. You can use regular expressions for the value as well.
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> When {@code expected} parameter is a string, Playwright will normalize whitespaces and line breaks both in the actual
    * text and in the expected string before matching. When regular expression is used, the actual text is matched as is.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator(".title")).hasText("Welcome, Test User");
    * assertThat(page.locator(".title")).hasText(Pattern.compile("Welcome, .*"));
@@ -1503,12 +1744,12 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element with the given text. All nested elements will be considered when
    * computing the text content of the element. You can use regular expressions for the value as well.
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> When {@code expected} parameter is a string, Playwright will normalize whitespaces and line breaks both in the actual
    * text and in the expected string before matching. When regular expression is used, the actual text is matched as is.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator(".title")).hasText("Welcome, Test User");
    * assertThat(page.locator(".title")).hasText(Pattern.compile("Welcome, .*"));
@@ -1546,12 +1787,12 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element with the given text. All nested elements will be considered when
    * computing the text content of the element. You can use regular expressions for the value as well.
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> When {@code expected} parameter is a string, Playwright will normalize whitespaces and line breaks both in the actual
    * text and in the expected string before matching. When regular expression is used, the actual text is matched as is.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator(".title")).hasText("Welcome, Test User");
    * assertThat(page.locator(".title")).hasText(Pattern.compile("Welcome, .*"));
@@ -1591,12 +1832,12 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element with the given text. All nested elements will be considered when
    * computing the text content of the element. You can use regular expressions for the value as well.
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> When {@code expected} parameter is a string, Playwright will normalize whitespaces and line breaks both in the actual
    * text and in the expected string before matching. When regular expression is used, the actual text is matched as is.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator(".title")).hasText("Welcome, Test User");
    * assertThat(page.locator(".title")).hasText(Pattern.compile("Welcome, .*"));
@@ -1634,12 +1875,12 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element with the given text. All nested elements will be considered when
    * computing the text content of the element. You can use regular expressions for the value as well.
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> When {@code expected} parameter is a string, Playwright will normalize whitespaces and line breaks both in the actual
    * text and in the expected string before matching. When regular expression is used, the actual text is matched as is.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator(".title")).hasText("Welcome, Test User");
    * assertThat(page.locator(".title")).hasText(Pattern.compile("Welcome, .*"));
@@ -1679,12 +1920,12 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element with the given text. All nested elements will be considered when
    * computing the text content of the element. You can use regular expressions for the value as well.
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> When {@code expected} parameter is a string, Playwright will normalize whitespaces and line breaks both in the actual
    * text and in the expected string before matching. When regular expression is used, the actual text is matched as is.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator(".title")).hasText("Welcome, Test User");
    * assertThat(page.locator(".title")).hasText(Pattern.compile("Welcome, .*"));
@@ -1722,12 +1963,12 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element with the given text. All nested elements will be considered when
    * computing the text content of the element. You can use regular expressions for the value as well.
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> When {@code expected} parameter is a string, Playwright will normalize whitespaces and line breaks both in the actual
    * text and in the expected string before matching. When regular expression is used, the actual text is matched as is.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator(".title")).hasText("Welcome, Test User");
    * assertThat(page.locator(".title")).hasText(Pattern.compile("Welcome, .*"));
@@ -1767,12 +2008,12 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element with the given text. All nested elements will be considered when
    * computing the text content of the element. You can use regular expressions for the value as well.
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> When {@code expected} parameter is a string, Playwright will normalize whitespaces and line breaks both in the actual
    * text and in the expected string before matching. When regular expression is used, the actual text is matched as is.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator(".title")).hasText("Welcome, Test User");
    * assertThat(page.locator(".title")).hasText(Pattern.compile("Welcome, .*"));
@@ -1810,7 +2051,7 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element with the given input value. You can use regular expressions for the
    * value as well.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("input[type=number]")).hasValue(Pattern.compile("[0-9]"));
    * }</pre>
@@ -1825,7 +2066,7 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element with the given input value. You can use regular expressions for the
    * value as well.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("input[type=number]")).hasValue(Pattern.compile("[0-9]"));
    * }</pre>
@@ -1838,7 +2079,7 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element with the given input value. You can use regular expressions for the
    * value as well.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("input[type=number]")).hasValue(Pattern.compile("[0-9]"));
    * }</pre>
@@ -1853,7 +2094,7 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to an element with the given input value. You can use regular expressions for the
    * value as well.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * assertThat(page.locator("input[type=number]")).hasValue(Pattern.compile("[0-9]"));
    * }</pre>
@@ -1866,11 +2107,11 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to multi-select/combobox (i.e. a {@code select} with the {@code multiple} attribute)
    * and the specified values are selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> For example, given the following element:
    * <pre>{@code
-   * page.locator("id=favorite-colors").selectOption(["R", "G"]);
+   * page.locator("id=favorite-colors").selectOption(new String[]{"R", "G"});
    * assertThat(page.locator("id=favorite-colors")).hasValues(new Pattern[] { Pattern.compile("R"), Pattern.compile("G") });
    * }</pre>
    *
@@ -1884,11 +2125,11 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to multi-select/combobox (i.e. a {@code select} with the {@code multiple} attribute)
    * and the specified values are selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> For example, given the following element:
    * <pre>{@code
-   * page.locator("id=favorite-colors").selectOption(["R", "G"]);
+   * page.locator("id=favorite-colors").selectOption(new String[]{"R", "G"});
    * assertThat(page.locator("id=favorite-colors")).hasValues(new Pattern[] { Pattern.compile("R"), Pattern.compile("G") });
    * }</pre>
    *
@@ -1900,11 +2141,11 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to multi-select/combobox (i.e. a {@code select} with the {@code multiple} attribute)
    * and the specified values are selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> For example, given the following element:
    * <pre>{@code
-   * page.locator("id=favorite-colors").selectOption(["R", "G"]);
+   * page.locator("id=favorite-colors").selectOption(new String[]{"R", "G"});
    * assertThat(page.locator("id=favorite-colors")).hasValues(new Pattern[] { Pattern.compile("R"), Pattern.compile("G") });
    * }</pre>
    *
@@ -1918,11 +2159,11 @@ public interface LocatorAssertions {
    * Ensures the {@code Locator} points to multi-select/combobox (i.e. a {@code select} with the {@code multiple} attribute)
    * and the specified values are selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> For example, given the following element:
    * <pre>{@code
-   * page.locator("id=favorite-colors").selectOption(["R", "G"]);
+   * page.locator("id=favorite-colors").selectOption(new String[]{"R", "G"});
    * assertThat(page.locator("id=favorite-colors")).hasValues(new Pattern[] { Pattern.compile("R"), Pattern.compile("G") });
    * }</pre>
    *
@@ -1930,5 +2171,39 @@ public interface LocatorAssertions {
    * @since v1.23
    */
   void hasValues(Pattern[] values, HasValuesOptions options);
+  /**
+   * Asserts that the target element matches the given <a
+   * href="https://playwright.dev/java/docs/aria-snapshots">accessibility snapshot</a>.
+   *
+   * <p> <strong>Usage</strong>
+   * <pre>{@code
+   * page.navigate("https://demo.playwright.dev/todomvc/");
+   * assertThat(page.locator("body")).matchesAriaSnapshot("""
+   *   - heading "todos"
+   *   - textbox "What needs to be done?"
+   * """);
+   * }</pre>
+   *
+   * @since v1.49
+   */
+  default void matchesAriaSnapshot(String expected) {
+    matchesAriaSnapshot(expected, null);
+  }
+  /**
+   * Asserts that the target element matches the given <a
+   * href="https://playwright.dev/java/docs/aria-snapshots">accessibility snapshot</a>.
+   *
+   * <p> <strong>Usage</strong>
+   * <pre>{@code
+   * page.navigate("https://demo.playwright.dev/todomvc/");
+   * assertThat(page.locator("body")).matchesAriaSnapshot("""
+   *   - heading "todos"
+   *   - textbox "What needs to be done?"
+   * """);
+   * }</pre>
+   *
+   * @since v1.49
+   */
+  void matchesAriaSnapshot(String expected, MatchesAriaSnapshotOptions options);
 }
 

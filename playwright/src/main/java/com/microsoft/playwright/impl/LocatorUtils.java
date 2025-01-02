@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) Microsoft Corporation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.microsoft.playwright.impl;
 
 import com.microsoft.playwright.Locator;
@@ -9,12 +25,6 @@ import static com.microsoft.playwright.impl.Serialization.gson;
 import static com.microsoft.playwright.impl.Utils.toJsRegexFlags;
 
 public class LocatorUtils {
-  private static volatile String testIdAttributeName = "data-testid";;
-
-  static void setTestIdAttributeName(String name) {
-    testIdAttributeName = name;
-  }
-
   static String getByTextSelector(Object text, Locator.GetByTextOptions options) {
     boolean exact = options != null && options.exact != null && options.exact;
     return "internal:text=" + escapeForTextSelector(text, exact);
@@ -29,7 +39,8 @@ public class LocatorUtils {
     return "internal:attr=[" + attrName + "=" + escapeForAttributeSelector(value, exact) + "]";
   }
 
-  static String getByTestIdSelector(Object testId) {
+  static String getByTestIdSelector(Object testId, PlaywrightImpl playwright) {
+    String testIdAttributeName = ((SharedSelectors) playwright.selectors()).testIdAttributeName;
     return getByAttributeTextSelector(testIdAttributeName, testId, true);
   }
 

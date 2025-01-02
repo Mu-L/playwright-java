@@ -82,12 +82,12 @@ class FrameLocatorImpl implements FrameLocator {
 
   @Override
   public Locator getByTestId(String testId) {
-    return locator(getByTestIdSelector(testId));
+    return locator(getByTestIdSelector(testId, frame.connection.playwright));
   }
 
   @Override
   public Locator getByTestId(Pattern testId) {
-    return locator(getByTestIdSelector(testId));
+    return locator(getByTestIdSelector(testId, frame.connection.playwright));
   }
 
   @Override
@@ -132,5 +132,10 @@ class FrameLocatorImpl implements FrameLocator {
   @Override
   public FrameLocator nth(int index) {
     return new FrameLocatorImpl(frame, frameSelector + " >> nth=" + index);
+  }
+
+  @Override
+  public Locator owner() {
+    return new LocatorImpl(frame, frameSelector);
   }
 }

@@ -1,6 +1,24 @@
+/*
+ * Copyright (c) Microsoft Corporation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.microsoft.playwright;
 
 import com.microsoft.playwright.assertions.LocatorAssertions;
+import com.microsoft.playwright.junit.FixtureTest;
+import com.microsoft.playwright.junit.UsePlaywright;
 import org.junit.jupiter.api.Test;
 import org.opentest4j.AssertionFailedError;
 
@@ -8,9 +26,11 @@ import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertTha
 import static org.junit.jupiter.api.Assertions.*;
 
 // Copied from expect-misc.spec.ts > toBeInViewport
-public class TestAssertThatIsInViewport extends TestBase {
+@FixtureTest
+@UsePlaywright(TestOptionsFactories.BasicOptionsFactory.class)
+public class TestAssertThatIsInViewport {
   @Test
-  void shouldWork() {
+  void shouldWork(Page page) {
     page.setContent("<div id=big style=\"height: 10000px;\"></div>\n" +
       "      <div id=small>foo</div>");
     assertThat(page.locator("#big")).isInViewport();
@@ -21,7 +41,7 @@ public class TestAssertThatIsInViewport extends TestBase {
   }
 
   @Test
-  void shouldRespectRatioOption() {
+  void shouldRespectRatioOption(Page page) {
     page.setContent("<style>body, div, html { padding: 0; margin: 0; }</style>\n" +
       "      <div id=big style=\"height: 400vh;\"></div>");
     assertThat(page.locator("div")).isInViewport();
@@ -39,14 +59,14 @@ public class TestAssertThatIsInViewport extends TestBase {
   }
 
   @Test
-  void shouldHaveGoodStack() {
+  void shouldHaveGoodStack(Page page) {
     AssertionFailedError error = assertThrows(AssertionFailedError.class, () -> assertThat(page.locator("body")).not().isInViewport(new LocatorAssertions.IsInViewportOptions().setTimeout(100)));
     assertNotNull(error);
     assertTrue(error.getMessage().contains("Locator expected not to be in viewport"), error.getMessage());
   }
 
   @Test
-  void shouldReportIntersectionEvenIfFullyCoveredByOtherElement() {
+  void shouldReportIntersectionEvenIfFullyCoveredByOtherElement(Page page) {
     page.setContent("<h1>hello</h1>\n" +
       "      <div style=\"position: relative; height: 10000px; top: -5000px;></div>");
     assertThat(page.locator("h1")).isInViewport();

@@ -1,12 +1,12 @@
 /*
  * Copyright (c) Microsoft Corporation.
- * <p>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,8 +18,8 @@ package com.microsoft.playwright;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.microsoft.playwright.options.BrowserChannel;
-import org.junit.jupiter.api.Assumptions;
+import com.microsoft.playwright.junit.FixtureTest;
+import com.microsoft.playwright.junit.UsePlaywright;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
 
@@ -28,14 +28,12 @@ import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestBrowser extends TestBase {
-  @Override
-  void createContextAndPage() {
-    // Do not create anything.
-  }
+@FixtureTest
+@UsePlaywright(TestOptionsFactories.BasicOptionsFactory.class)
+public class TestBrowser1 {
 
   @Test
-  void shouldCreateNewPage() {
+  void shouldCreateNewPage(Browser browser) {
     Page page1 = browser.newPage();
     assertEquals(1, browser.contexts().size());
 
@@ -50,7 +48,7 @@ public class TestBrowser extends TestBase {
   }
 
   @Test
-  void shouldThrowUponSecondCreateNewPage() {
+  void shouldThrowUponSecondCreateNewPage(Browser browser) {
     Page page = browser.newPage();
     PlaywrightException e = assertThrows(PlaywrightException.class, () -> page.context().newPage());
     assertTrue(e.getMessage().contains("Please use browser.newContext()"));
@@ -58,54 +56,32 @@ public class TestBrowser extends TestBase {
   }
 
   @Test
-  void versionShouldWork() {
-    if (isChromium()) {
-      assertTrue(Pattern.matches("^\\d+\\.\\d+\\.\\d+\\.\\d+$", browser.version()));
-    } else if (isWebKit()) {
-      assertTrue(Pattern.matches("^\\d+\\.\\d+", browser.version()));
-    } else if (isFirefox()) {
-      // It can be 85.0b1 in Firefox.
-      assertTrue(Pattern.matches("^\\d+\\.\\d+.*", browser.version()));
-    }
-  }
-
-  private static BrowserChannel getBrowserChannelEnumFromEnv() {
-    String channel = getBrowserChannelFromEnv();
-    if (channel == null) {
-      return null;
-    }
-    switch (channel) {
-      case "chrome": return BrowserChannel.CHROME;
-      case "chrome-beta": return BrowserChannel.CHROME_BETA;
-      case "chrome-dev": return BrowserChannel.CHROME_DEV;
-      case "chrome-canary": return BrowserChannel.CHROME_CANARY;
-      case "msedge": return BrowserChannel.MSEDGE;
-      case "msedge-beta": return BrowserChannel.MSEDGE_BETA;
-      case "msedge-dev": return BrowserChannel.MSEDGE_DEV;
-      case "msedge-canary": return BrowserChannel.MSEDGE_CANARY;
-      default: throw new IllegalArgumentException("Unknown BROWSER_CHANNEL " + channel);
+  void versionShouldWork(Browser browser) {
+    switch (browser.browserType().name()) {
+      case "chromium":
+        assertTrue(Pattern.matches("^\\d+\\.\\d+\\.\\d+\\.\\d+$", browser.version()));
+        break;
+      case "webkit":
+        assertTrue(Pattern.matches("^\\d+\\.\\d+", browser.version()));
+        break;
+      case "firefox":
+        // It can be 85.0b1 in Firefox.
+        assertTrue(Pattern.matches("^\\d+\\.\\d+.*", browser.version()));
+        break;
+      default:
+        fail("Unknown browser");
     }
   }
 
   @Test
-  void shouldSupportDeprecatedChannelEnum() {
-    BrowserChannel channel = getBrowserChannelEnumFromEnv();
-    Assumptions.assumeTrue(channel != null);
-    BrowserType.LaunchOptions options = createLaunchOptions();
-    options.setChannel(channel);
-    Browser browser = browserType.launch(options);
-    assertNotNull(browser);
-    browser.close();
-  }
-
-  @Test
-  void shouldReturnBrowserType() {
+  void shouldReturnBrowserType(BrowserType browserType, Browser browser) {
     assertEquals(browserType, browser.browserType());
   }
 
   @Test
-  @EnabledIf(value = "com.microsoft.playwright.TestBase#isChromium", disabledReason = "Chrome Devtools Protocol supported by chromium only")
-  void shouldWorkWithNewBrowserCDPSession() {
+  @EnabledIf(value = "com.microsoft.playwright.TestOptionsFactories#isChromium",
+             disabledReason = "Chrome Devtools Protocol supported by chromium only")
+  void shouldWorkWithNewBrowserCDPSession(Browser browser) {
     CDPSession session = browser.newBrowserCDPSession();
 
     JsonElement response = session.send("Browser.getVersion");
@@ -129,8 +105,7 @@ public class TestBrowser extends TestBase {
   }
 
   @Test
-  void shouldPropagateCloseReasonToPendingActions() {
-    Browser browser = browserType.launch();
+  void shouldPropagateCloseReasonToPendingActions(Browser browser) {
     BrowserContext context = browser.newContext();
     PlaywrightException e = assertThrows(PlaywrightException.class, () -> context.waitForPage(() -> {
       browser.close(new Browser.CloseOptions().setReason("The reason."));

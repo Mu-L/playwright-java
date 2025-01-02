@@ -71,6 +71,7 @@ public class Connection {
     isLogging = (debug != null) && debug.contains("pw:channel");
   }
   LocalUtils localUtils;
+  PlaywrightImpl playwright;
   final Map<String, String> env;
   private int tracingCount;
 
@@ -79,7 +80,7 @@ public class Connection {
       super(connection, "Root", "");
     }
 
-    Playwright initialize() {
+    PlaywrightImpl initialize() {
       JsonObject params = new JsonObject();
       params.addProperty("sdkLanguage", "java");
       JsonElement result = sendMessage("initialize", params.getAsJsonObject());
@@ -177,7 +178,8 @@ public class Connection {
   }
 
   public PlaywrightImpl initializePlaywright() {
-    return (PlaywrightImpl) this.root.initialize();
+    playwright = root.initialize();
+    return playwright;
   }
 
   LocalUtils localUtils() {
@@ -381,6 +383,9 @@ public class Connection {
         break;
       case "WebSocket":
         result = new WebSocketImpl(parent, type, guid, initializer);
+        break;
+      case "WebSocketRoute":
+        result = new WebSocketRouteImpl(parent, type, guid, initializer);
         break;
       case "Worker":
         result = new WorkerImpl(parent, type, guid, initializer);

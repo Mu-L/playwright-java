@@ -29,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 public class DriverJar extends Driver {
   private static final String PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD";
   private static final String SELENIUM_REMOTE_URL = "SELENIUM_REMOTE_URL";
-  static final String PLAYWRIGHT_NODEJS_PATH = "PLAYWRIGHT_NODEJS_PATH";
   private final Path driverTempDir;
   private Path preinstalledNodePath;
 
@@ -64,7 +63,7 @@ public class DriverJar extends Driver {
       env.put(PLAYWRIGHT_NODEJS_PATH, preinstalledNodePath.toString());
     }
     extractDriverToTempDir();
-    logMessage("extracted driver from jar to " + driverPath());
+    logMessage("extracted driver from jar to " + driverDir());
     if (installBrowsers)
       installBrowsers(env);
   }
@@ -75,14 +74,14 @@ public class DriverJar extends Driver {
       skip = System.getenv(PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD);
     }
     if (skip != null && !"0".equals(skip) && !"false".equals(skip)) {
-      System.out.println("Skipping browsers download because `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` env variable is set");
+      logMessage("Skipping browsers download because `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` env variable is set");
       return;
     }
     if (env.get(SELENIUM_REMOTE_URL) != null || System.getenv(SELENIUM_REMOTE_URL) != null) {
       logMessage("Skipping browsers download because `SELENIUM_REMOTE_URL` env variable is set");
       return;
     }
-    Path driver = driverPath();
+    Path driver = driverDir();
     if (!Files.exists(driver)) {
       throw new RuntimeException("Failed to find driver: " + driver);
     }
@@ -204,7 +203,7 @@ public class DriverJar extends Driver {
   }
 
   @Override
-  protected Path driverDir() {
+  public Path driverDir() {
     return driverTempDir;
   }
 }
