@@ -186,7 +186,7 @@ public class FrameImpl extends ChannelOwner implements Frame {
         throw new PlaywrightException("Failed to read from file", e);
       }
       String content = new String(encoded, StandardCharsets.UTF_8);
-      content += "//# sourceURL=" + options.path.toString().replace("\n", "");
+      content = addSourceUrlToScript(content, options.path);
       jsonOptions.addProperty("content", content);
     }
     JsonElement json = sendMessage("addScriptTag", jsonOptions);
@@ -407,12 +407,12 @@ public class FrameImpl extends ChannelOwner implements Frame {
 
   @Override
   public Locator getByTestId(String testId) {
-    return locator(getByTestIdSelector(testId));
+    return locator(getByTestIdSelector(testId, connection.playwright));
   }
 
   @Override
   public Locator getByTestId(Pattern testId) {
-    return locator(getByTestIdSelector(testId));
+    return locator(getByTestIdSelector(testId, connection.playwright));
   }
 
   @Override

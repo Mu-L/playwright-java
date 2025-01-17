@@ -102,16 +102,7 @@ abstract class Element {
     for (JsonElement item : spec) {
       JsonObject node = item.getAsJsonObject();
       String type = node.get("type").getAsString();
-      if ("code".equals(type)) {
-        if (!node.get("codeLang").getAsString().contains("java")) {
-          continue;
-        }
-        out.add("<pre>{@code");
-        for (JsonElement line : node.getAsJsonArray("lines")) {
-          out.add(line.getAsString());
-        }
-        out.add("}</pre>");
-      } else if ("li".equals(type)) {
+      if ("li".equals(type)) {
         String text = node.get("text").getAsString();
         if (text.startsWith("extends: ")) {
           continue;
@@ -127,15 +118,43 @@ abstract class Element {
           }
         }
         out.add("<li> " + beautify(text) + "</li>");
+        continue;
       } else {
         if (currentItemList != null) {
           out.add("</" + currentItemList + ">");
           currentItemList = null;
         }
+      }
+      if ("code".equals(type)) {
+        if (!node.get("codeLang").getAsString().contains("java")) {
+          continue;
+        }
+        out.add("<pre>{@code");
+        for (JsonElement line : node.getAsJsonArray("lines")) {
+          out.add(line.getAsString());
+        }
+        out.add("}</pre>");
+      } else if ("note".equals(type)) {
+        StringBuilder paragraph = new StringBuilder();
+        if (!out.isEmpty())
+          paragraph.append("\n<p> ");
+        paragraph.append("<strong>NOTE:</strong> ");
+        for (JsonElement text : node.getAsJsonArray("children")) {
+          if (!"text".equals(text.getAsJsonObject().get("type").getAsString())) {
+            continue;
+          }
+          paragraph.append(beautify(text.getAsJsonObject().get("text").getAsString()));
+        }
+        out.add(paragraph.toString());
+      } else {
         String paragraph = node.get("text").getAsString();
-        paragraph = beautify(paragraph);
-        if ("note".equals(type)) {
-          paragraph = "<strong>NOTE:</strong> " + paragraph;
+        Matcher matcher = Pattern.compile("^\\*\\*(.+)\\*\\*$").matcher(paragraph);
+        // Format **Usage**, **Details** as bold text.
+        if (matcher.matches()) {
+          String title = matcher.group(1);
+          paragraph = "<strong>" + title + "</strong>";
+        } else {
+          paragraph = beautify(paragraph);
         }
         if (!out.isEmpty())
           paragraph = "\n<p> " + paragraph;
@@ -173,7 +192,13 @@ abstract class Element {
         String[] parts = name.split("\\.");
         name = parts[0] + ".on" + toTitle(parts[1]);
       }
-      linkified += "{@link " + name.replace(".", "#") + " " + name + "()}";
+      String packagePrefix = "";
+      if (ApiGenerator.isAssertionClass(name.split("\\.")[0])) {
+        packagePrefix = "com.microsoft.playwright.assertions.";
+      } else {
+        packagePrefix = "com.microsoft.playwright.";
+      }
+      linkified += "{@link " + packagePrefix + name.replace(".", "#") + " " + name + "()}";
       start = matcher.end();
     }
     linkified += paragraph.substring(start);
@@ -260,6 +285,11 @@ class TypeRef extends Element {
 
   private static final Map<String, String> customTypeNames = new HashMap<>();
   static {
+    customTypeNames.put("APIRequest.newContext.options.clientCertificates", "ClientCertificate");
+    customTypeNames.put("Browser.newContext.options.clientCertificates", "ClientCertificate");
+    customTypeNames.put("Browser.newPage.options.clientCertificates", "ClientCertificate");
+    customTypeNames.put("BrowserType.launchPersistentContext.options.clientCertificates", "ClientCertificate");
+
     customTypeNames.put("BrowserContext.addCookies.cookies", "Cookie");
     customTypeNames.put("BrowserContext.cookies", "Cookie");
 
@@ -278,6 +308,7 @@ class TypeRef extends Element {
     customTypeNames.put("Frame.setInputFiles.files", "FilePayload");
     customTypeNames.put("Page.setInputFiles.files", "FilePayload");
     customTypeNames.put("Page.setInputFiles.files", "FilePayload");
+    customTypeNames.put("FormData.append.value", "FilePayload");
     customTypeNames.put("FormData.set.value", "FilePayload");
 
     customTypeNames.put("Locator.dragTo.options.sourcePosition", "Position");
@@ -510,6 +541,9 @@ class TypeRef extends Element {
             throw new RuntimeException("Missing mapping for " + jsonPath);
         }
       }
+      if ("WebSocketRoute.onClose.handler".equals(jsonPath)) {
+        return "BiConsumer<Integer, String>";
+      }
       if (jsonType.getAsJsonArray("args").size() == 1) {
         String paramType = convertBuiltinType(jsonType.getAsJsonArray("args").get(0).getAsJsonObject());
         if (!jsonType.has("returnType") || jsonType.get("returnType").isJsonNull()) {
@@ -682,8 +716,8 @@ class Method extends Element {
     }
     if ("PlaywrightAssertions.setDefaultAssertionTimeout".equals(jsonPath)) {
       writeJavadoc(params, output, offset);
-      output.add(offset + "static void setDefaultAssertionTimeout(double milliseconds) {");
-      output.add(offset + "  AssertionsTimeout.setDefaultTimeout(milliseconds);");
+      output.add(offset + "static void setDefaultAssertionTimeout(double timeout) {");
+      output.add(offset + "  AssertionsTimeout.setDefaultTimeout(timeout);");
       output.add(offset + "}");
       output.add("");
       return;
@@ -952,7 +986,7 @@ class Interface extends TypeDefinition {
     if (methods.stream().anyMatch(m -> "create".equals(m.jsonName))) {
       output.add("import com.microsoft.playwright.impl." + jsonName + "Impl;");
     }
-    if (asList("Page", "Request", "Response", "APIRequestContext", "APIRequest", "APIResponse", "FileChooser", "Frame", "FrameLocator", "ElementHandle", "Locator", "Browser", "BrowserContext", "BrowserType", "Mouse", "Keyboard").contains(jsonName)) {
+    if (asList("Page", "Request", "Response", "APIRequestContext", "APIRequest", "APIResponse", "FileChooser", "Frame", "FrameLocator", "ElementHandle", "Locator", "Browser", "BrowserContext", "BrowserType", "Mouse", "Keyboard", "Tracing").contains(jsonName)) {
       output.add("import com.microsoft.playwright.options.*;");
     }
     if ("Download".equals(jsonName)) {
@@ -961,10 +995,16 @@ class Interface extends TypeDefinition {
     if (asList("Page", "Frame", "ElementHandle", "Locator", "FormData", "APIRequest", "APIRequestContext", "FileChooser", "Browser", "BrowserContext", "BrowserType", "Download", "Route", "Selectors", "Tracing", "Video").contains(jsonName)) {
       output.add("import java.nio.file.Path;");
     }
+    if ("Clock".equals(jsonName)) {
+      output.add("import java.util.Date;");
+    }
     if (asList("Page", "Frame", "ElementHandle", "Locator", "APIRequest", "Browser", "BrowserContext", "BrowserType", "Route", "Request", "Response", "JSHandle", "ConsoleMessage", "APIResponse", "Playwright").contains(jsonName)) {
       output.add("import java.util.*;");
     }
-    if (asList("Page", "Browser", "BrowserContext", "WebSocket", "Worker", "CDPSession").contains(jsonName)) {
+    if (asList("WebSocketRoute").contains(jsonName)) {
+      output.add("import java.util.function.BiConsumer;");
+    }
+    if (asList("Page", "Browser", "BrowserContext", "WebSocket", "Worker", "CDPSession", "WebSocketRoute").contains(jsonName)) {
       output.add("import java.util.function.Consumer;");
     }
     if (asList("Page", "BrowserContext").contains(jsonName)) {
@@ -979,6 +1019,9 @@ class Interface extends TypeDefinition {
     }
     if ("CDPSession".equals(jsonName)) {
       output.add("import com.google.gson.JsonObject;");
+    }
+    if ("LocatorAssertions".equals(jsonName)) {
+      output.add("import com.microsoft.playwright.options.AriaRole;");
     }
     if ("PlaywrightAssertions".equals(jsonName)) {
       output.add("import com.microsoft.playwright.APIResponse;");
@@ -1072,8 +1115,9 @@ class CustomClass extends TypeDefinition {
 
   @Override
   void writeTo(List<String> output, String offset) {
-    if (asList("RecordHar", "RecordVideo").contains(name)) {
+    if (asList("ClientCertificate").contains(name)) {
       output.add("import java.nio.file.Path;");
+      output.add("");
     }
     String access = (parent.typeScope() instanceof CustomClass) || topLevelTypes().containsKey(name) ? "public " : "";
     output.add(offset + access + "class " + name + " {");
@@ -1160,7 +1204,11 @@ public class ApiGenerator {
   }
 
   private static Predicate<String> isAssertion() {
-    return className -> className.toLowerCase().contains("assert");
+    return className -> isAssertionClass(className);
+  }
+
+  static boolean isAssertionClass(String className) {
+    return className.toLowerCase().contains("assert");
   }
 
   // TODO: Remove this predicate once SoftAssertions are implemented.
@@ -1193,6 +1241,11 @@ public class ApiGenerator {
       try (FileWriter writer = new FileWriter(new File(dir, name + ".java"))) {
         writer.write(text);
       }
+    }
+
+    // No options under assertions.
+    if (packageName.contains(".assertions")) {
+      return;
     }
 
     dir = new File(dir, "options");

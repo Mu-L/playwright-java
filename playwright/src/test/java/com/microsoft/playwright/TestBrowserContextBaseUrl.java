@@ -1,5 +1,23 @@
+/*
+ * Copyright (c) Microsoft Corporation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.microsoft.playwright;
 
+import com.microsoft.playwright.junit.FixtureTest;
+import com.microsoft.playwright.junit.UsePlaywright;
 import org.junit.jupiter.api.Test;
 
 import java.net.MalformedURLException;
@@ -7,9 +25,11 @@ import java.net.MalformedURLException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class TestBrowserContextBaseUrl extends TestBase {
+@FixtureTest
+@UsePlaywright(TestOptionsFactories.BasicOptionsFactory.class)
+public class TestBrowserContextBaseUrl {
   @Test
-  void shouldConstructANewURLWhenABaseURLInBrowserNewContextIsPassedToPageGoto() throws MalformedURLException {
+  void shouldConstructANewURLWhenABaseURLInBrowserNewContextIsPassedToPageGoto(Browser browser, Server server) {
     try (BrowserContext context = browser.newContext(new Browser.NewContextOptions().setBaseURL(server.PREFIX))) {
       Page page = context.newPage();
       assertEquals(server.EMPTY_PAGE, page.navigate("/empty.html").url());
@@ -17,13 +37,13 @@ public class TestBrowserContextBaseUrl extends TestBase {
   }
 
   @Test
-  void shouldConstructANewURLWhenABaseURLInBrowserNewPageIsPassedToPageGoto() {
+  void shouldConstructANewURLWhenABaseURLInBrowserNewPageIsPassedToPageGoto(Browser browser, Server server) {
     try (Page page = browser.newPage(new Browser.NewPageOptions().setBaseURL(server.PREFIX))) {
       assertEquals(server.EMPTY_PAGE, page.navigate("/empty.html").url());
     }
   }
   @Test
-  void shouldConstructTheURLsCorrectlyWhenABaseURLWithoutATrailingSlashInBrowserNewPageIsPassedToPageGoto() {
+  void shouldConstructTheURLsCorrectlyWhenABaseURLWithoutATrailingSlashInBrowserNewPageIsPassedToPageGoto(Browser browser, Server server) {
     try (Page page = browser.newPage(new Browser.NewPageOptions().setBaseURL(server.PREFIX + "/url-construction"))) {
       assertEquals(server.PREFIX + "/mypage.html", page.navigate("mypage.html").url());
       assertEquals(server.PREFIX + "/mypage.html", page.navigate("./mypage.html").url());
@@ -32,7 +52,7 @@ public class TestBrowserContextBaseUrl extends TestBase {
   }
 
   @Test
-  void shouldConstructTheURLsCorrectlyWhenABaseURLWithATrailingSlashInBrowserNewPageIsPassedToPageGoto() {
+  void shouldConstructTheURLsCorrectlyWhenABaseURLWithATrailingSlashInBrowserNewPageIsPassedToPageGoto(Browser browser, Server server) {
     try (Page page = browser.newPage(new Browser.NewPageOptions().setBaseURL(server.PREFIX + "/url-construction/"))) {
       assertEquals(server.PREFIX + "/url-construction/mypage.html", page.navigate("mypage.html").url());
       assertEquals(server.PREFIX + "/url-construction/mypage.html", page.navigate("./mypage.html").url());
@@ -43,7 +63,7 @@ public class TestBrowserContextBaseUrl extends TestBase {
   }
 
   @Test
-  void shouldNotConstructANewURLWhenValidURLsArePassed() {
+  void shouldNotConstructANewURLWhenValidURLsArePassed(Browser browser, Server server) {
     try (Page page = browser.newPage(new Browser.NewPageOptions().setBaseURL("http://microsoft.com"))) {
       assertEquals(server.EMPTY_PAGE, page.navigate(server.EMPTY_PAGE).url());
 
@@ -56,7 +76,7 @@ public class TestBrowserContextBaseUrl extends TestBase {
   }
 
   @Test
-  void shouldBeAbleToMatchAURLRelativeToItsGivenURLWithUrlMatcher() {
+  void shouldBeAbleToMatchAURLRelativeToItsGivenURLWithUrlMatcher(Browser browser, Server server) {
     try (Page page = browser.newPage(new Browser.NewPageOptions().setBaseURL(server.PREFIX + "/foobar/"))) {
       page.navigate("/kek/index.html");
       page.waitForURL("/kek/index.html");

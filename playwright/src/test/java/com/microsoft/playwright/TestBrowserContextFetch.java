@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) Microsoft Corporation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.microsoft.playwright;
 
 import com.google.gson.Gson;
@@ -7,10 +23,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -114,7 +132,7 @@ public class TestBrowserContextFetch extends TestBase {
     context.request().get(server.EMPTY_PAGE + "?p1=foo",
       RequestOptions.create().setQueryParam("p1", "v1").setQueryParam("парам2", "знач2"));
     assertNotNull(req.get());
-    assertEquals("/empty.html?p1=v1&%D0%BF%D0%B0%D1%80%D0%B0%D0%BC2=%D0%B7%D0%BD%D0%B0%D1%872", req.get().url);
+    assertEquals("/empty.html?p1=foo&p1=v1&%D0%BF%D0%B0%D1%80%D0%B0%D0%BC2=%D0%B7%D0%BD%D0%B0%D1%872", req.get().url);
   }
 
   ;
@@ -200,7 +218,7 @@ public class TestBrowserContextFetch extends TestBase {
         writer.write("<title>Served by the proxy</title>");
       }
     });
-    try (Browser browser = browserType.launch(new BrowserType.LaunchOptions().setProxy("http://per-context"))) {
+    try (Browser browser = browserType.launch()) {
       BrowserContext context = browser.newContext(new Browser.NewContextOptions().setProxy("localhost:" + server.PORT));
       Future<Server.Request> request = server.futureRequest("/target.html");
       APIResponse response = context.request().get("http://non-existent.com/target.html");
@@ -500,8 +518,18 @@ public class TestBrowserContextFetch extends TestBase {
     testData.date = new Date(currentMillis);
     testData.localDateTime = testData.date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     context.request().fetch(pageReq, RequestOptions.create().setMethod("POST").setData(testData));
-    assertEquals("{\"name\":\"foo\",\"localDateTime\":\"2022-12-23T06:14:58.818Z\",\"date\":\"2022-12-23T06:14:58.818Z\"}",
+    assertEquals("{\"name\":\"foo\",\"localDateTime\":\"2022-12-23T06:14:58.818Z\",\"date\":\"2022-12-23T06:14:58.818Z\",\"nullLocalDateTime\":null,\"nullDate\":null}",
       new String(req.get().postBody));
+  }
+
+  @Test
+  void shouldSupportOffsetDateTimeInData() throws ExecutionException, InterruptedException {
+    APIRequestContext request = playwright.request().newContext();
+    OffsetDateTime offsetDateTime = OffsetDateTime.parse("2024-07-10T10:15:30-08:00");
+    Future<Server.Request> serverRequest = server.futureRequest("/empty.html");
+    request.get(server.EMPTY_PAGE, RequestOptions.create().setData(mapOf("date", offsetDateTime)));
+    byte[] body = serverRequest.get().postBody;
+    assertEquals("{\"date\":\"2024-07-10T18:15:30.000Z\"}", new String(body));
   }
 
   @Test
@@ -572,6 +600,46 @@ public class TestBrowserContextFetch extends TestBase {
       "\r\n" +
       "var x = 10;\r\n" +
       ";console.log(x);"), body);
+    assertEquals(200, response.status());
+  }
+
+  @Test
+  public void shouldSupportRepeatingNamesInMultipartFormData() throws InterruptedException, ExecutionException {
+    Future<Server.Request> serverRequest = server.futureRequest("/empty.html");
+
+    FilePayload file1 = new FilePayload("f.js", "text/javascript",
+      "var x = 10;\r\n;console.log(x);".getBytes(StandardCharsets.UTF_8));
+    FilePayload file2 = new FilePayload("f2.txt", "text/plain",
+      "hello".getBytes(StandardCharsets.UTF_8));
+    APIResponse response = context.request().post(server.EMPTY_PAGE, RequestOptions.create().setMultipart(
+      FormData.create()
+        .set("name", "John")
+        .append("name", "Doe")
+        .append("file", file1)
+        .append("file", file2)));
+
+    assertEquals("POST", serverRequest.get().method);
+    List<String> contentType = serverRequest.get().headers.get("content-type");
+    assertNotNull(contentType);
+    assertEquals(1, contentType.size());
+    assertTrue(contentType.get(0).contains("multipart/form-data"), contentType.get(0));
+
+    String body = new String(serverRequest.get().postBody);
+    assertTrue(body.contains("content-disposition: form-data; name=\"name\"\r\n" +
+      "\r\n" +
+      "John"), body);
+    assertTrue(body.contains("content-disposition: form-data; name=\"name\"\r\n" +
+      "\r\n" +
+      "Doe"), body);
+    assertTrue(body.contains("content-disposition: form-data; name=\"file\"; filename=\"f.js\"\r\n" +
+      "content-type: text/javascript\r\n" +
+      "\r\n" +
+      "var x = 10;\r\n" +
+      ";console.log(x);"), body);
+    assertTrue(body.contains("content-disposition: form-data; name=\"file\"; filename=\"f2.txt\"\r\n" +
+      "content-type: text/plain\r\n" +
+      "\r\n" +
+      "hello"), body);
     assertEquals(200, response.status());
   }
 
@@ -739,5 +807,86 @@ public class TestBrowserContextFetch extends TestBase {
       APIResponse response = context.request().get(server.EMPTY_PAGE);
       assertEquals(401, response.status());
     }
+  }
+
+  @Test
+  void shouldSerializeNullValuesInPostData() throws ExecutionException, InterruptedException {
+    Future<Server.Request> req = server.futureRequest("/empty.html");
+    APIResponse response = context.request().post(server.EMPTY_PAGE, RequestOptions.create().setData(mapOf("foo", null)));
+    assertEquals(200, response.status());
+    assertEquals("{\"foo\":null}", new String(req.get().postBody));
+  }
+
+    @Test
+    void shouldSupportHTTPCredentialsSendImmediatelyForNewContext() throws ExecutionException, InterruptedException {
+      Browser.NewContextOptions options = new Browser.NewContextOptions().setHttpCredentials(
+          new HttpCredentials("user", "pass")
+            .setOrigin(server.PREFIX.toUpperCase())
+            .setSend(HttpCredentialsSend.ALWAYS));
+      try (BrowserContext context = browser.newContext(options)) {
+        Future<Server.Request> serverRequest = server.futureRequest("/empty.html");
+        APIResponse response = context.request().get(server.EMPTY_PAGE);
+        assertEquals("Basic " + java.util.Base64.getEncoder().encodeToString("user:pass".getBytes()),
+          serverRequest.get().headers.getFirst("authorization"));
+        assertEquals(200, response.status());
+
+        serverRequest = server.futureRequest("/empty.html");
+        response = context.request().get(server.CROSS_PROCESS_PREFIX + "/empty.html");
+        // Not sent to another origin.
+        assertNull(serverRequest.get().headers.get("authorization"));
+        assertEquals(200, response.status());
+      }
+    }
+
+    @Test
+    void shouldSupportHTTPCredentialsSendImmediatelyForBrowserNewPage() throws ExecutionException, InterruptedException {
+      Browser.NewPageOptions options = new Browser.NewPageOptions().setHttpCredentials(
+        new HttpCredentials("user", "pass")
+          .setOrigin(server.PREFIX.toUpperCase())
+          .setSend(HttpCredentialsSend.ALWAYS));
+      try (Page newPage = browser.newPage(options)) {
+        Future<Server.Request> serverRequest = server.futureRequest("/empty.html");
+        APIResponse response = newPage.request().get(server.EMPTY_PAGE);
+        assertEquals("Basic " + java.util.Base64.getEncoder().encodeToString("user:pass".getBytes()),
+          serverRequest.get().headers.getFirst("authorization"));
+        assertEquals(200, response.status());
+
+        serverRequest = server.futureRequest("/empty.html");
+        response = newPage.request().get(server.CROSS_PROCESS_PREFIX + "/empty.html");
+        // Not sent to another origin.
+        assertNull(serverRequest.get().headers.get("authorization"));
+        assertEquals(200, response.status());
+      }
+    }
+
+  @Test
+  void shouldNotWorkAfterContextDispose() {
+    context.close(new BrowserContext.CloseOptions().setReason("Test ended."));
+    PlaywrightException e = assertThrows(PlaywrightException.class, () -> context.request().get(server.EMPTY_PAGE));
+    assertTrue(e.getMessage().contains("Test ended."), e.getMessage());
+  }
+
+  @Test
+  public void shouldRetryECONNRESET() {
+    int[] requestCount = {0};
+    server.setRoute("/test", exchange -> {
+      if (requestCount[0]++ < 3) {
+        exchange.close();
+        return;
+      }
+      exchange.getResponseHeaders().add("Content-Type", "text/plain");
+      exchange.sendResponseHeaders(200, 0);
+      try (OutputStreamWriter writer = new OutputStreamWriter(exchange.getResponseBody())) {
+        writer.write("Hello!");
+      }
+    });
+
+    APIRequestContext requestContext = context.request();
+    APIResponse response = requestContext.get(server.PREFIX + "/test",
+      RequestOptions.create().setMaxRetries(3));
+
+    assertEquals(200, response.status());
+    assertEquals("Hello!", response.text());
+    assertEquals(4, requestCount[0]);
   }
 }

@@ -16,6 +16,12 @@
 
 package com.microsoft.playwright;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.microsoft.playwright.options.AriaRole;
+import com.microsoft.playwright.options.Location;
+import com.microsoft.playwright.options.MouseButton;
+
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -26,12 +32,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static java.util.Arrays.asList;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestTracing extends TestBase {
   @Override
@@ -154,4 +162,151 @@ public class TestTracing extends TestBase {
     }
   }
 
+  @Test
+  void canCallTracingGroupGroupEndAtAnyTimeAndAutoClose(@TempDir Path tempDir) throws Exception {
+    context.tracing().group("ignored");
+    context.tracing().groupEnd();
+    context.tracing().group("ignored2");
+
+    context.tracing().start(new Tracing.StartOptions());
+    context.tracing().group("actual");
+    page.navigate(server.EMPTY_PAGE);
+    Path traceFile1 = tempDir.resolve("trace1.zip");
+    context.tracing().stopChunk(new Tracing.StopChunkOptions().setPath(traceFile1));
+
+    context.tracing().group("ignored3");
+    context.tracing().groupEnd();
+    context.tracing().groupEnd();
+    context.tracing().groupEnd();
+
+    List<TraceEvent> events = parseTraceEvents(traceFile1);
+    List<TraceEvent> groups = events.stream().filter(e -> "tracingGroup".equals(e.method)).collect(Collectors.toList());
+    assertEquals(1, groups.size());
+    assertEquals("actual", groups.get(0).apiName);
+
+  }
+
+  @Test
+  void traceGroupGroupEnd(@TempDir Path tempDir) throws Exception {
+    context.tracing().start(new Tracing.StartOptions());
+    context.tracing().group("outer group");
+    page.navigate("data:text/html,<!DOCTYPE html><body><div>Hello world</div></body>");
+    context.tracing().group("inner group 1", new Tracing.GroupOptions().setLocation(new Location("foo.java").setLine(17).setColumn(1)));
+    page.locator("body").click();
+    context.tracing().groupEnd();
+    context.tracing().group("inner group 2");
+    assertTrue(page.locator("text=Hello").isVisible());
+    context.tracing().groupEnd();
+    context.tracing().groupEnd();
+
+    Path traceFile1 = tempDir.resolve("trace1.zip");
+    context.tracing().stop(new Tracing.StopOptions().setPath(traceFile1));
+
+    List<TraceEvent> events = parseTraceEvents(traceFile1);
+    List<String> calls = events.stream().filter(e -> e.apiName != null).map(e -> e.apiName).collect(Collectors.toList());
+    assertEquals(asList("outer group", "Page.navigate", "inner group 1", "Frame.click", "inner group 2", "Page.isVisible"), calls);
+  }
+
+  @Test
+  void shouldTraceVariousAPIs(@TempDir Path tempDir) throws Exception {
+    context.tracing().start(new Tracing.StartOptions());
+
+    page.clock().install();
+
+    page.setContent("<input type='text' />");
+    page.locator("input").click(new Locator.ClickOptions().setButton(MouseButton.RIGHT));
+    page.getByRole(AriaRole.TEXTBOX).click();
+    page.keyboard().type("Hello world this is a very long string what happens when it overflows?");
+    page.keyboard().press("Control+c");
+    page.keyboard().down("Shift");
+    page.keyboard().insertText("Hello world");
+    page.keyboard().up("Shift");
+    page.mouse().move(0, 0);
+    page.mouse().down();
+    page.mouse().move(100, 200);
+    page.mouse().wheel(5, 7);
+    page.mouse().up();
+    page.clock().fastForward(1000);
+    page.clock().fastForward("30:00");
+    page.clock().pauseAt("2050-02-02");
+    page.clock().runFor(10);
+    page.clock().setFixedTime("2050-02-02");
+    page.clock().setSystemTime("2050-02-02");
+
+    page.clock().resume();
+
+    page.locator("input").click(new Locator.ClickOptions().setButton(MouseButton.RIGHT));
+
+    Path traceFile1 = tempDir.resolve("trace1.zip");
+    context.tracing().stop(new Tracing.StopOptions().setPath(traceFile1));
+
+    List<TraceEvent> events = parseTraceEvents(traceFile1);
+    List<String> calls = events.stream().filter(e -> e.apiName != null).map(e -> e.apiName)
+        .collect(Collectors.toList());
+    assertEquals(asList(
+        "Clock.install",
+        "Page.setContent",
+        "Frame.click",
+        "Frame.click",
+        "Keyboard.type",
+        "Keyboard.press",
+        "Keyboard.down",
+        "Keyboard.insertText",
+        "Keyboard.up",
+        "Mouse.move",
+        "Mouse.down",
+        "Mouse.move",
+        "Mouse.wheel",
+        "Mouse.up",
+        "Clock.fastForward",
+        "Clock.fastForward",
+        "Clock.pauseAt",
+        "Clock.runFor",
+        "Clock.setFixedTime",
+        "Clock.setSystemTime",
+        "Clock.resume",
+        "Frame.click"),
+        calls);
+  }
+
+  @Test
+  public void shouldNotRecordNetworkActions(@TempDir Path tempDir) throws IOException {
+    context.tracing().start(new Tracing.StartOptions());
+
+    page.onRequest(request -> {
+      request.allHeaders();
+    });
+    page.onResponse(response -> {
+      response.text();
+    });
+    page.navigate(server.EMPTY_PAGE);
+
+    Path traceFile1 = tempDir.resolve("trace1.zip");
+    context.tracing().stop(new Tracing.StopOptions().setPath(traceFile1));
+
+    List<TraceEvent> events = parseTraceEvents(traceFile1);
+    List<String> calls = events.stream().filter(e -> e.apiName != null).map(e -> e.apiName)
+      .collect(Collectors.toList());
+    assertEquals(asList("Page.navigate"), calls);
+  }
+
+  private static class TraceEvent {
+    String type;
+    String name;
+    String apiName;
+    String method;
+    Double startTime;
+    Double endTime;
+    String callId;
+  }
+
+  private static List<TraceEvent> parseTraceEvents(Path traceFile) throws IOException {
+    Map<String, byte[]> files = Utils.parseZip(traceFile);
+    Map<String, byte[]> traces = files.entrySet().stream().filter(e -> e.getKey().endsWith(".trace")).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    assertNotNull(traces.get("trace.trace"));
+    return Arrays.stream(new String(traces.get("trace.trace"), UTF_8)
+        .split("\n"))
+        .map(s -> new Gson().fromJson(s, TraceEvent.class))
+        .collect(Collectors.toList());
+  }
 }

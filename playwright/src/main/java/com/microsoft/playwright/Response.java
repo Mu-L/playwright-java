@@ -56,22 +56,22 @@ public interface Response {
   boolean fromServiceWorker();
   /**
    * An object with the response HTTP headers. The header names are lower-cased. Note that this method does not return
-   * security-related headers, including cookie-related ones. You can use {@link Response#allHeaders Response.allHeaders()}
-   * for complete list of headers that include {@code cookie} information.
+   * security-related headers, including cookie-related ones. You can use {@link com.microsoft.playwright.Response#allHeaders
+   * Response.allHeaders()} for complete list of headers that include {@code cookie} information.
    *
    * @since v1.8
    */
   Map<String, String> headers();
   /**
-   * An array with all the request HTTP headers associated with this response. Unlike {@link Response#allHeaders
-   * Response.allHeaders()}, header names are NOT lower-cased. Headers with multiple entries, such as {@code Set-Cookie},
-   * appear in the array multiple times.
+   * An array with all the request HTTP headers associated with this response. Unlike {@link
+   * com.microsoft.playwright.Response#allHeaders Response.allHeaders()}, header names are NOT lower-cased. Headers with
+   * multiple entries, such as {@code Set-Cookie}, appear in the array multiple times.
    *
    * @since v1.15
    */
   List<HttpHeader> headersArray();
   /**
-   * Returns the value of the header matching the name. The name is case insensitive. If multiple headers have the same name
+   * Returns the value of the header matching the name. The name is case-insensitive. If multiple headers have the same name
    * (except {@code set-cookie}), they are returned as a list separated by {@code , }. For {@code set-cookie}, the {@code \n}
    * separator is used. If no headers are found, {@code null} is returned.
    *
@@ -80,7 +80,7 @@ public interface Response {
    */
   String headerValue(String name);
   /**
-   * Returns all values of the headers matching the name, for example {@code set-cookie}. The name is case insensitive.
+   * Returns all values of the headers matching the name, for example {@code set-cookie}. The name is case-insensitive.
    *
    * @param name Name of the header.
    * @since v1.15

@@ -80,11 +80,11 @@ public interface Page extends AutoCloseable {
 
   /**
    * Emitted when JavaScript within the page calls one of console API methods, e.g. {@code console.log} or {@code
-   * console.dir}. Also emitted if the page throws an error or a warning.
+   * console.dir}.
    *
    * <p> The arguments passed into {@code console.log} are available on the {@code ConsoleMessage} event handler argument.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.onConsoleMessage(msg -> {
    *   for (int i = 0; i < msg.args().size(); ++i)
@@ -123,20 +123,21 @@ public interface Page extends AutoCloseable {
 
   /**
    * Emitted when a JavaScript dialog appears, such as {@code alert}, {@code prompt}, {@code confirm} or {@code
-   * beforeunload}. Listener **must** either {@link Dialog#accept Dialog.accept()} or {@link Dialog#dismiss Dialog.dismiss()}
-   * the dialog - otherwise the page will <a
+   * beforeunload}. Listener **must** either {@link com.microsoft.playwright.Dialog#accept Dialog.accept()} or {@link
+   * com.microsoft.playwright.Dialog#dismiss Dialog.dismiss()} the dialog - otherwise the page will <a
    * href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#never_blocking">freeze</a> waiting for the
    * dialog, and actions like click will never finish.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.onDialog(dialog -> {
    *   dialog.accept();
    * });
    * }</pre>
    *
-   * <p> <strong>NOTE:</strong> When no {@link Page#onDialog Page.onDialog()} or {@link BrowserContext#onDialog BrowserContext.onDialog()} listeners are
-   * present, all dialogs are automatically dismissed.
+   * <p> <strong>NOTE:</strong> When no {@link com.microsoft.playwright.Page#onDialog Page.onDialog()} or {@link
+   * com.microsoft.playwright.BrowserContext#onDialog BrowserContext.onDialog()} listeners are present, all dialogs are
+   * automatically dismissed.
    */
   void onDialog(Consumer<Dialog> handler);
   /**
@@ -166,8 +167,8 @@ public interface Page extends AutoCloseable {
 
   /**
    * Emitted when a file chooser is supposed to appear, such as after clicking the  {@code <input type=file>}. Playwright can
-   * respond to it via setting the input files using {@link FileChooser#setFiles FileChooser.setFiles()} that can be uploaded
-   * after that.
+   * respond to it via setting the input files using {@link com.microsoft.playwright.FileChooser#setFiles
+   * FileChooser.setFiles()} that can be uploaded after that.
    * <pre>{@code
    * page.onFileChooser(fileChooser -> {
    *   fileChooser.setFiles(Paths.get("/tmp/myfile.pdf"));
@@ -236,12 +237,15 @@ public interface Page extends AutoCloseable {
   void offPageError(Consumer<String> handler);
 
   /**
-   * Emitted when the page opens a new tab or window. This event is emitted in addition to the {@link BrowserContext#onPage
-   * BrowserContext.onPage()}, but only for popups relevant to this page.
+   * Emitted when the page opens a new tab or window. This event is emitted in addition to the {@link
+   * com.microsoft.playwright.BrowserContext#onPage BrowserContext.onPage()}, but only for popups relevant to this page.
    *
    * <p> The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a
    * popup with {@code window.open('http://example.com')}, this event will fire when the network request to
-   * "http://example.com" is done and its response has started loading in the popup.
+   * "http://example.com" is done and its response has started loading in the popup. If you would like to route/listen to
+   * this network request, use {@link com.microsoft.playwright.BrowserContext#route BrowserContext.route()} and {@link
+   * com.microsoft.playwright.BrowserContext#onRequest BrowserContext.onRequest()} respectively instead of similar methods on
+   * the {@code Page}.
    * <pre>{@code
    * Page popup = page.waitForPopup(() -> {
    *   page.getByText("open the popup").click();
@@ -249,8 +253,8 @@ public interface Page extends AutoCloseable {
    * System.out.println(popup.evaluate("location.href"));
    * }</pre>
    *
-   * <p> <strong>NOTE:</strong> Use {@link Page#waitForLoadState Page.waitForLoadState()} to wait until the page gets to a particular state (you should
-   * not need it in most cases).
+   * <p> <strong>NOTE:</strong> Use {@link com.microsoft.playwright.Page#waitForLoadState Page.waitForLoadState()} to wait until the page gets to a
+   * particular state (you should not need it in most cases).
    */
   void onPopup(Consumer<Page> handler);
   /**
@@ -260,7 +264,8 @@ public interface Page extends AutoCloseable {
 
   /**
    * Emitted when a page issues a request. The [request] object is read-only. In order to intercept and mutate requests, see
-   * {@link Page#route Page.route()} or {@link BrowserContext#route BrowserContext.route()}.
+   * {@link com.microsoft.playwright.Page#route Page.route()} or {@link com.microsoft.playwright.BrowserContext#route
+   * BrowserContext.route()}.
    */
   void onRequest(Consumer<Request> handler);
   /**
@@ -277,9 +282,9 @@ public interface Page extends AutoCloseable {
    * }</pre>
    *
    * <p> <strong>NOTE:</strong> HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete
-   * with {@link Page#onRequestFinished Page.onRequestFinished()} event and not with {@link Page#onRequestFailed
-   * Page.onRequestFailed()}. A request will only be considered failed when the client cannot get an HTTP response from the
-   * server, e.g. due to network error net::ERR_FAILED.
+   * with {@link com.microsoft.playwright.Page#onRequestFinished Page.onRequestFinished()} event and not with {@link
+   * com.microsoft.playwright.Page#onRequestFailed Page.onRequestFailed()}. A request will only be considered failed when the
+   * client cannot get an HTTP response from the server, e.g. due to network error net::ERR_FAILED.
    */
   void onRequestFailed(Consumer<Request> handler);
   /**
@@ -337,7 +342,7 @@ public interface Page extends AutoCloseable {
      */
     public Path path;
     /**
-     * Script type. Use 'module' in order to load a Javascript ES6 module. See <a
+     * Script type. Use 'module' in order to load a JavaScript ES6 module. See <a
      * href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script">script</a> for more details.
      */
     public String type;
@@ -362,7 +367,7 @@ public interface Page extends AutoCloseable {
       return this;
     }
     /**
-     * Script type. Use 'module' in order to load a Javascript ES6 module. See <a
+     * Script type. Use 'module' in order to load a JavaScript ES6 module. See <a
      * href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script">script</a> for more details.
      */
     public AddScriptTagOptions setType(String type) {
@@ -422,9 +427,7 @@ public interface Page extends AutoCloseable {
      */
     public Boolean force;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public Boolean noWaitAfter;
     /**
@@ -439,8 +442,9 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
@@ -459,9 +463,7 @@ public interface Page extends AutoCloseable {
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public CheckOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -492,8 +494,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public CheckOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -529,13 +532,12 @@ public interface Page extends AutoCloseable {
     public Boolean force;
     /**
      * Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current
-     * modifiers back. If not specified, currently pressed modifiers are used.
+     * modifiers back. If not specified, currently pressed modifiers are used. "ControlOrMeta" resolves to "Control" on Windows
+     * and Linux and to "Meta" on macOS.
      */
     public List<KeyboardModifier> modifiers;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option will default to {@code true} in the future.
      */
     public Boolean noWaitAfter;
     /**
@@ -550,14 +552,16 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
      * When set, this method only performs the <a href="https://playwright.dev/java/docs/actionability">actionability</a>
      * checks and skips the action. Defaults to {@code false}. Useful to wait until the element is ready for the action without
-     * performing it.
+     * performing it. Note that keyboard {@code modifiers} will be pressed regardless of {@code trial} to allow testing
+     * elements which are only visible when those keys are pressed.
      */
     public Boolean trial;
 
@@ -592,16 +596,15 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current
-     * modifiers back. If not specified, currently pressed modifiers are used.
+     * modifiers back. If not specified, currently pressed modifiers are used. "ControlOrMeta" resolves to "Control" on Windows
+     * and Linux and to "Meta" on macOS.
      */
     public ClickOptions setModifiers(List<KeyboardModifier> modifiers) {
       this.modifiers = modifiers;
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option will default to {@code true} in the future.
      */
     public ClickOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -632,8 +635,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public ClickOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -642,7 +646,8 @@ public interface Page extends AutoCloseable {
     /**
      * When set, this method only performs the <a href="https://playwright.dev/java/docs/actionability">actionability</a>
      * checks and skips the action. Defaults to {@code false}. Useful to wait until the element is ready for the action without
-     * performing it.
+     * performing it. Note that keyboard {@code modifiers} will be pressed regardless of {@code trial} to allow testing
+     * elements which are only visible when those keys are pressed.
      */
     public ClickOptions setTrial(boolean trial) {
       this.trial = trial;
@@ -692,13 +697,12 @@ public interface Page extends AutoCloseable {
     public Boolean force;
     /**
      * Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current
-     * modifiers back. If not specified, currently pressed modifiers are used.
+     * modifiers back. If not specified, currently pressed modifiers are used. "ControlOrMeta" resolves to "Control" on Windows
+     * and Linux and to "Meta" on macOS.
      */
     public List<KeyboardModifier> modifiers;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public Boolean noWaitAfter;
     /**
@@ -713,14 +717,16 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
      * When set, this method only performs the <a href="https://playwright.dev/java/docs/actionability">actionability</a>
      * checks and skips the action. Defaults to {@code false}. Useful to wait until the element is ready for the action without
-     * performing it.
+     * performing it. Note that keyboard {@code modifiers} will be pressed regardless of {@code trial} to allow testing
+     * elements which are only visible when those keys are pressed.
      */
     public Boolean trial;
 
@@ -748,16 +754,15 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current
-     * modifiers back. If not specified, currently pressed modifiers are used.
+     * modifiers back. If not specified, currently pressed modifiers are used. "ControlOrMeta" resolves to "Control" on Windows
+     * and Linux and to "Meta" on macOS.
      */
     public DblclickOptions setModifiers(List<KeyboardModifier> modifiers) {
       this.modifiers = modifiers;
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public DblclickOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -788,8 +793,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public DblclickOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -798,7 +804,8 @@ public interface Page extends AutoCloseable {
     /**
      * When set, this method only performs the <a href="https://playwright.dev/java/docs/actionability">actionability</a>
      * checks and skips the action. Defaults to {@code false}. Useful to wait until the element is ready for the action without
-     * performing it.
+     * performing it. Note that keyboard {@code modifiers} will be pressed regardless of {@code trial} to allow testing
+     * elements which are only visible when those keys are pressed.
      */
     public DblclickOptions setTrial(boolean trial) {
       this.trial = trial;
@@ -813,8 +820,9 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -828,8 +836,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public DispatchEventOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -843,9 +852,7 @@ public interface Page extends AutoCloseable {
      */
     public Boolean force;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public Boolean noWaitAfter;
     /**
@@ -865,8 +872,9 @@ public interface Page extends AutoCloseable {
     public Position targetPosition;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
@@ -885,9 +893,7 @@ public interface Page extends AutoCloseable {
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public DragAndDropOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -933,8 +939,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public DragAndDropOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -952,8 +959,10 @@ public interface Page extends AutoCloseable {
   }
   class EmulateMediaOptions {
     /**
-     * Emulates {@code "prefers-colors-scheme"} media feature, supported values are {@code "light"}, {@code "dark"}, {@code
-     * "no-preference"}. Passing {@code null} disables color scheme emulation.
+     * Emulates <a
+     * href="https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme">prefers-colors-scheme</a> media
+     * feature, supported values are {@code "light"} and {@code "dark"}. Passing {@code null} disables color scheme emulation.
+     * {@code "no-preference"} is deprecated.
      */
     public Optional<ColorScheme> colorScheme;
     /**
@@ -973,8 +982,10 @@ public interface Page extends AutoCloseable {
     public Optional<ReducedMotion> reducedMotion;
 
     /**
-     * Emulates {@code "prefers-colors-scheme"} media feature, supported values are {@code "light"}, {@code "dark"}, {@code
-     * "no-preference"}. Passing {@code null} disables color scheme emulation.
+     * Emulates <a
+     * href="https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme">prefers-colors-scheme</a> media
+     * feature, supported values are {@code "light"} and {@code "dark"}. Passing {@code null} disables color scheme emulation.
+     * {@code "no-preference"} is deprecated.
      */
     public EmulateMediaOptions setColorScheme(ColorScheme colorScheme) {
       this.colorScheme = Optional.ofNullable(colorScheme);
@@ -1023,14 +1034,12 @@ public interface Page extends AutoCloseable {
   }
   class ExposeBindingOptions {
     /**
-     * Whether to pass the argument as a handle, instead of passing by value. When passing a handle, only one argument is
-     * supported. When passing by value, multiple arguments are supported.
+     * @deprecated This option will be removed in the future.
      */
     public Boolean handle;
 
     /**
-     * Whether to pass the argument as a handle, instead of passing by value. When passing a handle, only one argument is
-     * supported. When passing by value, multiple arguments are supported.
+     * @deprecated This option will be removed in the future.
      */
     public ExposeBindingOptions setHandle(boolean handle) {
       this.handle = handle;
@@ -1044,9 +1053,7 @@ public interface Page extends AutoCloseable {
      */
     public Boolean force;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public Boolean noWaitAfter;
     /**
@@ -1056,8 +1063,9 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -1070,9 +1078,7 @@ public interface Page extends AutoCloseable {
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public FillOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -1088,8 +1094,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public FillOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -1104,8 +1111,9 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -1119,8 +1127,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public FocusOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -1135,8 +1144,9 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -1150,8 +1160,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public GetAttributeOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -1395,9 +1406,11 @@ public interface Page extends AutoCloseable {
   class GoBackOptions {
     /**
      * Maximum operation time in milliseconds, defaults to 30 seconds, pass {@code 0} to disable timeout. The default value can
-     * be changed by using the {@link BrowserContext#setDefaultNavigationTimeout BrowserContext.setDefaultNavigationTimeout()},
-     * {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}, {@link Page#setDefaultNavigationTimeout
-     * Page.setDefaultNavigationTimeout()} or {@link Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultNavigationTimeout
+     * BrowserContext.setDefaultNavigationTimeout()}, {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}, {@link com.microsoft.playwright.Page#setDefaultNavigationTimeout
+     * Page.setDefaultNavigationTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
@@ -1414,9 +1427,11 @@ public interface Page extends AutoCloseable {
 
     /**
      * Maximum operation time in milliseconds, defaults to 30 seconds, pass {@code 0} to disable timeout. The default value can
-     * be changed by using the {@link BrowserContext#setDefaultNavigationTimeout BrowserContext.setDefaultNavigationTimeout()},
-     * {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}, {@link Page#setDefaultNavigationTimeout
-     * Page.setDefaultNavigationTimeout()} or {@link Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultNavigationTimeout
+     * BrowserContext.setDefaultNavigationTimeout()}, {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}, {@link com.microsoft.playwright.Page#setDefaultNavigationTimeout
+     * Page.setDefaultNavigationTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public GoBackOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -1440,9 +1455,11 @@ public interface Page extends AutoCloseable {
   class GoForwardOptions {
     /**
      * Maximum operation time in milliseconds, defaults to 30 seconds, pass {@code 0} to disable timeout. The default value can
-     * be changed by using the {@link BrowserContext#setDefaultNavigationTimeout BrowserContext.setDefaultNavigationTimeout()},
-     * {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}, {@link Page#setDefaultNavigationTimeout
-     * Page.setDefaultNavigationTimeout()} or {@link Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultNavigationTimeout
+     * BrowserContext.setDefaultNavigationTimeout()}, {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}, {@link com.microsoft.playwright.Page#setDefaultNavigationTimeout
+     * Page.setDefaultNavigationTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
@@ -1459,9 +1476,11 @@ public interface Page extends AutoCloseable {
 
     /**
      * Maximum operation time in milliseconds, defaults to 30 seconds, pass {@code 0} to disable timeout. The default value can
-     * be changed by using the {@link BrowserContext#setDefaultNavigationTimeout BrowserContext.setDefaultNavigationTimeout()},
-     * {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}, {@link Page#setDefaultNavigationTimeout
-     * Page.setDefaultNavigationTimeout()} or {@link Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultNavigationTimeout
+     * BrowserContext.setDefaultNavigationTimeout()}, {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}, {@link com.microsoft.playwright.Page#setDefaultNavigationTimeout
+     * Page.setDefaultNavigationTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public GoForwardOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -1485,14 +1504,16 @@ public interface Page extends AutoCloseable {
   class NavigateOptions {
     /**
      * Referer header value. If provided it will take preference over the referer header value set by {@link
-     * Page#setExtraHTTPHeaders Page.setExtraHTTPHeaders()}.
+     * com.microsoft.playwright.Page#setExtraHTTPHeaders Page.setExtraHTTPHeaders()}.
      */
     public String referer;
     /**
      * Maximum operation time in milliseconds, defaults to 30 seconds, pass {@code 0} to disable timeout. The default value can
-     * be changed by using the {@link BrowserContext#setDefaultNavigationTimeout BrowserContext.setDefaultNavigationTimeout()},
-     * {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}, {@link Page#setDefaultNavigationTimeout
-     * Page.setDefaultNavigationTimeout()} or {@link Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultNavigationTimeout
+     * BrowserContext.setDefaultNavigationTimeout()}, {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}, {@link com.microsoft.playwright.Page#setDefaultNavigationTimeout
+     * Page.setDefaultNavigationTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
@@ -1509,7 +1530,7 @@ public interface Page extends AutoCloseable {
 
     /**
      * Referer header value. If provided it will take preference over the referer header value set by {@link
-     * Page#setExtraHTTPHeaders Page.setExtraHTTPHeaders()}.
+     * com.microsoft.playwright.Page#setExtraHTTPHeaders Page.setExtraHTTPHeaders()}.
      */
     public NavigateOptions setReferer(String referer) {
       this.referer = referer;
@@ -1517,9 +1538,11 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum operation time in milliseconds, defaults to 30 seconds, pass {@code 0} to disable timeout. The default value can
-     * be changed by using the {@link BrowserContext#setDefaultNavigationTimeout BrowserContext.setDefaultNavigationTimeout()},
-     * {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}, {@link Page#setDefaultNavigationTimeout
-     * Page.setDefaultNavigationTimeout()} or {@link Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultNavigationTimeout
+     * BrowserContext.setDefaultNavigationTimeout()}, {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}, {@link com.microsoft.playwright.Page#setDefaultNavigationTimeout
+     * Page.setDefaultNavigationTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public NavigateOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -1548,13 +1571,12 @@ public interface Page extends AutoCloseable {
     public Boolean force;
     /**
      * Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current
-     * modifiers back. If not specified, currently pressed modifiers are used.
+     * modifiers back. If not specified, currently pressed modifiers are used. "ControlOrMeta" resolves to "Control" on Windows
+     * and Linux and to "Meta" on macOS.
      */
     public List<KeyboardModifier> modifiers;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public Boolean noWaitAfter;
     /**
@@ -1569,14 +1591,16 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
      * When set, this method only performs the <a href="https://playwright.dev/java/docs/actionability">actionability</a>
      * checks and skips the action. Defaults to {@code false}. Useful to wait until the element is ready for the action without
-     * performing it.
+     * performing it. Note that keyboard {@code modifiers} will be pressed regardless of {@code trial} to allow testing
+     * elements which are only visible when those keys are pressed.
      */
     public Boolean trial;
 
@@ -1590,16 +1614,15 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current
-     * modifiers back. If not specified, currently pressed modifiers are used.
+     * modifiers back. If not specified, currently pressed modifiers are used. "ControlOrMeta" resolves to "Control" on Windows
+     * and Linux and to "Meta" on macOS.
      */
     public HoverOptions setModifiers(List<KeyboardModifier> modifiers) {
       this.modifiers = modifiers;
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public HoverOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -1630,8 +1653,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public HoverOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -1640,7 +1664,8 @@ public interface Page extends AutoCloseable {
     /**
      * When set, this method only performs the <a href="https://playwright.dev/java/docs/actionability">actionability</a>
      * checks and skips the action. Defaults to {@code false}. Useful to wait until the element is ready for the action without
-     * performing it.
+     * performing it. Note that keyboard {@code modifiers} will be pressed regardless of {@code trial} to allow testing
+     * elements which are only visible when those keys are pressed.
      */
     public HoverOptions setTrial(boolean trial) {
       this.trial = trial;
@@ -1655,8 +1680,9 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -1670,8 +1696,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public InnerHTMLOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -1686,8 +1713,9 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -1701,8 +1729,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public InnerTextOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -1717,8 +1746,9 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -1732,8 +1762,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public InputValueOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -1748,8 +1779,9 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -1763,8 +1795,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public IsCheckedOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -1779,8 +1812,9 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -1794,8 +1828,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public IsDisabledOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -1810,8 +1845,9 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -1825,8 +1861,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public IsEditableOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -1841,8 +1878,9 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -1856,8 +1894,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public IsEnabledOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -1871,8 +1910,8 @@ public interface Page extends AutoCloseable {
      */
     public Boolean strict;
     /**
-     * @deprecated This option is ignored. {@link Page#isHidden Page.isHidden()} does not wait for the element to become hidden and returns
-     * immediately.
+     * @deprecated This option is ignored. {@link com.microsoft.playwright.Page#isHidden Page.isHidden()} does not wait for the element to
+     * become hidden and returns immediately.
      */
     public Double timeout;
 
@@ -1885,8 +1924,8 @@ public interface Page extends AutoCloseable {
       return this;
     }
     /**
-     * @deprecated This option is ignored. {@link Page#isHidden Page.isHidden()} does not wait for the element to become hidden and returns
-     * immediately.
+     * @deprecated This option is ignored. {@link com.microsoft.playwright.Page#isHidden Page.isHidden()} does not wait for the element to
+     * become hidden and returns immediately.
      */
     public IsHiddenOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -1900,8 +1939,8 @@ public interface Page extends AutoCloseable {
      */
     public Boolean strict;
     /**
-     * @deprecated This option is ignored. {@link Page#isVisible Page.isVisible()} does not wait for the element to become visible and
-     * returns immediately.
+     * @deprecated This option is ignored. {@link com.microsoft.playwright.Page#isVisible Page.isVisible()} does not wait for the element
+     * to become visible and returns immediately.
      */
     public Double timeout;
 
@@ -1914,8 +1953,8 @@ public interface Page extends AutoCloseable {
       return this;
     }
     /**
-     * @deprecated This option is ignored. {@link Page#isVisible Page.isVisible()} does not wait for the element to become visible and
-     * returns immediately.
+     * @deprecated This option is ignored. {@link com.microsoft.playwright.Page#isVisible Page.isVisible()} does not wait for the element
+     * to become visible and returns immediately.
      */
     public IsVisibleOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -2056,6 +2095,10 @@ public interface Page extends AutoCloseable {
      */
     public Margin margin;
     /**
+     * Whether or not to embed the document outline into the PDF. Defaults to {@code false}.
+     */
+    public Boolean outline;
+    /**
      * Paper ranges to print, e.g., '1-5, 8, 11-13'. Defaults to the empty string, which means print all pages.
      */
     public String pageRanges;
@@ -2077,6 +2120,10 @@ public interface Page extends AutoCloseable {
      * Scale of the webpage rendering. Defaults to {@code 1}. Scale amount must be between 0.1 and 2.
      */
     public Double scale;
+    /**
+     * Whether or not to generate tagged (accessible) PDF. Defaults to {@code false}.
+     */
+    public Boolean tagged;
     /**
      * Paper width, accepts values labeled with units.
      */
@@ -2140,6 +2187,13 @@ public interface Page extends AutoCloseable {
       return this;
     }
     /**
+     * Whether or not to embed the document outline into the PDF. Defaults to {@code false}.
+     */
+    public PdfOptions setOutline(boolean outline) {
+      this.outline = outline;
+      return this;
+    }
+    /**
      * Paper ranges to print, e.g., '1-5, 8, 11-13'. Defaults to the empty string, which means print all pages.
      */
     public PdfOptions setPageRanges(String pageRanges) {
@@ -2177,6 +2231,13 @@ public interface Page extends AutoCloseable {
       return this;
     }
     /**
+     * Whether or not to generate tagged (accessible) PDF. Defaults to {@code false}.
+     */
+    public PdfOptions setTagged(boolean tagged) {
+      this.tagged = tagged;
+      return this;
+    }
+    /**
      * Paper width, accepts values labeled with units.
      */
     public PdfOptions setWidth(String width) {
@@ -2190,9 +2251,7 @@ public interface Page extends AutoCloseable {
      */
     public Double delay;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option will default to {@code true} in the future.
      */
     public Boolean noWaitAfter;
     /**
@@ -2202,8 +2261,9 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -2215,9 +2275,7 @@ public interface Page extends AutoCloseable {
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option will default to {@code true} in the future.
      */
     public PressOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -2233,8 +2291,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public PressOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -2257,12 +2316,43 @@ public interface Page extends AutoCloseable {
       return this;
     }
   }
+  class AddLocatorHandlerOptions {
+    /**
+     * By default, after calling the handler Playwright will wait until the overlay becomes hidden, and only then Playwright
+     * will continue with the action/assertion that triggered the handler. This option allows to opt-out of this behavior, so
+     * that overlay can stay visible after the handler has run.
+     */
+    public Boolean noWaitAfter;
+    /**
+     * Specifies the maximum number of times this handler should be called. Unlimited by default.
+     */
+    public Integer times;
+
+    /**
+     * By default, after calling the handler Playwright will wait until the overlay becomes hidden, and only then Playwright
+     * will continue with the action/assertion that triggered the handler. This option allows to opt-out of this behavior, so
+     * that overlay can stay visible after the handler has run.
+     */
+    public AddLocatorHandlerOptions setNoWaitAfter(boolean noWaitAfter) {
+      this.noWaitAfter = noWaitAfter;
+      return this;
+    }
+    /**
+     * Specifies the maximum number of times this handler should be called. Unlimited by default.
+     */
+    public AddLocatorHandlerOptions setTimes(int times) {
+      this.times = times;
+      return this;
+    }
+  }
   class ReloadOptions {
     /**
      * Maximum operation time in milliseconds, defaults to 30 seconds, pass {@code 0} to disable timeout. The default value can
-     * be changed by using the {@link BrowserContext#setDefaultNavigationTimeout BrowserContext.setDefaultNavigationTimeout()},
-     * {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}, {@link Page#setDefaultNavigationTimeout
-     * Page.setDefaultNavigationTimeout()} or {@link Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultNavigationTimeout
+     * BrowserContext.setDefaultNavigationTimeout()}, {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}, {@link com.microsoft.playwright.Page#setDefaultNavigationTimeout
+     * Page.setDefaultNavigationTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
@@ -2279,9 +2369,11 @@ public interface Page extends AutoCloseable {
 
     /**
      * Maximum operation time in milliseconds, defaults to 30 seconds, pass {@code 0} to disable timeout. The default value can
-     * be changed by using the {@link BrowserContext#setDefaultNavigationTimeout BrowserContext.setDefaultNavigationTimeout()},
-     * {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}, {@link Page#setDefaultNavigationTimeout
-     * Page.setDefaultNavigationTimeout()} or {@link Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultNavigationTimeout
+     * BrowserContext.setDefaultNavigationTimeout()}, {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}, {@link com.microsoft.playwright.Page#setDefaultNavigationTimeout
+     * Page.setDefaultNavigationTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public ReloadOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -2328,7 +2420,7 @@ public interface Page extends AutoCloseable {
     public HarNotFound notFound;
     /**
      * If specified, updates the given HAR with the actual network information instead of serving from file. The file is
-     * written to disk when {@link BrowserContext#close BrowserContext.close()} is called.
+     * written to disk when {@link com.microsoft.playwright.BrowserContext#close BrowserContext.close()} is called.
      */
     public Boolean update;
     /**
@@ -2339,7 +2431,7 @@ public interface Page extends AutoCloseable {
     /**
      * When set to {@code minimal}, only record information necessary for routing from HAR. This omits sizes, timing, page,
      * cookies, security and other types of HAR information that are not used when replaying from HAR. Defaults to {@code
-     * full}.
+     * minimal}.
      */
     public HarMode updateMode;
     /**
@@ -2362,7 +2454,7 @@ public interface Page extends AutoCloseable {
     }
     /**
      * If specified, updates the given HAR with the actual network information instead of serving from file. The file is
-     * written to disk when {@link BrowserContext#close BrowserContext.close()} is called.
+     * written to disk when {@link com.microsoft.playwright.BrowserContext#close BrowserContext.close()} is called.
      */
     public RouteFromHAROptions setUpdate(boolean update) {
       this.update = update;
@@ -2379,7 +2471,7 @@ public interface Page extends AutoCloseable {
     /**
      * When set to {@code minimal}, only record information necessary for routing from HAR. This omits sizes, timing, page,
      * cookies, security and other types of HAR information that are not used when replaying from HAR. Defaults to {@code
-     * full}.
+     * minimal}.
      */
     public RouteFromHAROptions setUpdateMode(HarMode updateMode) {
       this.updateMode = updateMode;
@@ -2470,8 +2562,9 @@ public interface Page extends AutoCloseable {
     public String style;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
@@ -2585,8 +2678,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public ScreenshotOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -2607,9 +2701,7 @@ public interface Page extends AutoCloseable {
      */
     public Boolean force;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public Boolean noWaitAfter;
     /**
@@ -2619,8 +2711,9 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -2633,9 +2726,7 @@ public interface Page extends AutoCloseable {
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public SelectOptionOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -2651,8 +2742,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public SelectOptionOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -2666,9 +2758,7 @@ public interface Page extends AutoCloseable {
      */
     public Boolean force;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public Boolean noWaitAfter;
     /**
@@ -2683,8 +2773,9 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
@@ -2703,9 +2794,7 @@ public interface Page extends AutoCloseable {
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public SetCheckedOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -2736,8 +2825,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public SetCheckedOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -2756,9 +2846,11 @@ public interface Page extends AutoCloseable {
   class SetContentOptions {
     /**
      * Maximum operation time in milliseconds, defaults to 30 seconds, pass {@code 0} to disable timeout. The default value can
-     * be changed by using the {@link BrowserContext#setDefaultNavigationTimeout BrowserContext.setDefaultNavigationTimeout()},
-     * {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}, {@link Page#setDefaultNavigationTimeout
-     * Page.setDefaultNavigationTimeout()} or {@link Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultNavigationTimeout
+     * BrowserContext.setDefaultNavigationTimeout()}, {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}, {@link com.microsoft.playwright.Page#setDefaultNavigationTimeout
+     * Page.setDefaultNavigationTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
@@ -2775,9 +2867,11 @@ public interface Page extends AutoCloseable {
 
     /**
      * Maximum operation time in milliseconds, defaults to 30 seconds, pass {@code 0} to disable timeout. The default value can
-     * be changed by using the {@link BrowserContext#setDefaultNavigationTimeout BrowserContext.setDefaultNavigationTimeout()},
-     * {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}, {@link Page#setDefaultNavigationTimeout
-     * Page.setDefaultNavigationTimeout()} or {@link Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultNavigationTimeout
+     * BrowserContext.setDefaultNavigationTimeout()}, {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}, {@link com.microsoft.playwright.Page#setDefaultNavigationTimeout
+     * Page.setDefaultNavigationTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public SetContentOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -2800,9 +2894,7 @@ public interface Page extends AutoCloseable {
   }
   class SetInputFilesOptions {
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public Boolean noWaitAfter;
     /**
@@ -2812,15 +2904,14 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public SetInputFilesOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -2836,8 +2927,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public SetInputFilesOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -2852,13 +2944,12 @@ public interface Page extends AutoCloseable {
     public Boolean force;
     /**
      * Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current
-     * modifiers back. If not specified, currently pressed modifiers are used.
+     * modifiers back. If not specified, currently pressed modifiers are used. "ControlOrMeta" resolves to "Control" on Windows
+     * and Linux and to "Meta" on macOS.
      */
     public List<KeyboardModifier> modifiers;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public Boolean noWaitAfter;
     /**
@@ -2873,14 +2964,16 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
      * When set, this method only performs the <a href="https://playwright.dev/java/docs/actionability">actionability</a>
      * checks and skips the action. Defaults to {@code false}. Useful to wait until the element is ready for the action without
-     * performing it.
+     * performing it. Note that keyboard {@code modifiers} will be pressed regardless of {@code trial} to allow testing
+     * elements which are only visible when those keys are pressed.
      */
     public Boolean trial;
 
@@ -2894,16 +2987,15 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current
-     * modifiers back. If not specified, currently pressed modifiers are used.
+     * modifiers back. If not specified, currently pressed modifiers are used. "ControlOrMeta" resolves to "Control" on Windows
+     * and Linux and to "Meta" on macOS.
      */
     public TapOptions setModifiers(List<KeyboardModifier> modifiers) {
       this.modifiers = modifiers;
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public TapOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -2934,8 +3026,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public TapOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -2944,7 +3037,8 @@ public interface Page extends AutoCloseable {
     /**
      * When set, this method only performs the <a href="https://playwright.dev/java/docs/actionability">actionability</a>
      * checks and skips the action. Defaults to {@code false}. Useful to wait until the element is ready for the action without
-     * performing it.
+     * performing it. Note that keyboard {@code modifiers} will be pressed regardless of {@code trial} to allow testing
+     * elements which are only visible when those keys are pressed.
      */
     public TapOptions setTrial(boolean trial) {
       this.trial = trial;
@@ -2959,8 +3053,9 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -2974,8 +3069,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public TextContentOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -2988,9 +3084,7 @@ public interface Page extends AutoCloseable {
      */
     public Double delay;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public Boolean noWaitAfter;
     /**
@@ -3000,8 +3094,9 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -3013,9 +3108,7 @@ public interface Page extends AutoCloseable {
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public TypeOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -3031,8 +3124,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public TypeOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -3046,9 +3140,7 @@ public interface Page extends AutoCloseable {
      */
     public Boolean force;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public Boolean noWaitAfter;
     /**
@@ -3063,8 +3155,9 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
@@ -3083,9 +3176,7 @@ public interface Page extends AutoCloseable {
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public UncheckOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -3116,8 +3207,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public UncheckOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -3136,13 +3228,15 @@ public interface Page extends AutoCloseable {
   class WaitForCloseOptions {
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}.
      */
     public Double timeout;
 
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}.
      */
     public WaitForCloseOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -3156,7 +3250,8 @@ public interface Page extends AutoCloseable {
     public Predicate<ConsoleMessage> predicate;
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}.
      */
     public Double timeout;
 
@@ -3169,7 +3264,8 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}.
      */
     public WaitForConsoleMessageOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -3183,7 +3279,8 @@ public interface Page extends AutoCloseable {
     public Predicate<Download> predicate;
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}.
      */
     public Double timeout;
 
@@ -3196,7 +3293,8 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}.
      */
     public WaitForDownloadOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -3210,7 +3308,8 @@ public interface Page extends AutoCloseable {
     public Predicate<FileChooser> predicate;
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}.
      */
     public Double timeout;
 
@@ -3223,7 +3322,8 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}.
      */
     public WaitForFileChooserOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -3238,8 +3338,9 @@ public interface Page extends AutoCloseable {
     public Double pollingInterval;
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or
-     * {@link Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -3253,8 +3354,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or
-     * {@link Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public WaitForFunctionOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -3264,17 +3366,21 @@ public interface Page extends AutoCloseable {
   class WaitForLoadStateOptions {
     /**
      * Maximum operation time in milliseconds, defaults to 30 seconds, pass {@code 0} to disable timeout. The default value can
-     * be changed by using the {@link BrowserContext#setDefaultNavigationTimeout BrowserContext.setDefaultNavigationTimeout()},
-     * {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}, {@link Page#setDefaultNavigationTimeout
-     * Page.setDefaultNavigationTimeout()} or {@link Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultNavigationTimeout
+     * BrowserContext.setDefaultNavigationTimeout()}, {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}, {@link com.microsoft.playwright.Page#setDefaultNavigationTimeout
+     * Page.setDefaultNavigationTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
     /**
      * Maximum operation time in milliseconds, defaults to 30 seconds, pass {@code 0} to disable timeout. The default value can
-     * be changed by using the {@link BrowserContext#setDefaultNavigationTimeout BrowserContext.setDefaultNavigationTimeout()},
-     * {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}, {@link Page#setDefaultNavigationTimeout
-     * Page.setDefaultNavigationTimeout()} or {@link Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultNavigationTimeout
+     * BrowserContext.setDefaultNavigationTimeout()}, {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}, {@link com.microsoft.playwright.Page#setDefaultNavigationTimeout
+     * Page.setDefaultNavigationTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public WaitForLoadStateOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -3284,9 +3390,11 @@ public interface Page extends AutoCloseable {
   class WaitForNavigationOptions {
     /**
      * Maximum operation time in milliseconds, defaults to 30 seconds, pass {@code 0} to disable timeout. The default value can
-     * be changed by using the {@link BrowserContext#setDefaultNavigationTimeout BrowserContext.setDefaultNavigationTimeout()},
-     * {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}, {@link Page#setDefaultNavigationTimeout
-     * Page.setDefaultNavigationTimeout()} or {@link Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultNavigationTimeout
+     * BrowserContext.setDefaultNavigationTimeout()}, {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}, {@link com.microsoft.playwright.Page#setDefaultNavigationTimeout
+     * Page.setDefaultNavigationTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
@@ -3309,9 +3417,11 @@ public interface Page extends AutoCloseable {
 
     /**
      * Maximum operation time in milliseconds, defaults to 30 seconds, pass {@code 0} to disable timeout. The default value can
-     * be changed by using the {@link BrowserContext#setDefaultNavigationTimeout BrowserContext.setDefaultNavigationTimeout()},
-     * {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}, {@link Page#setDefaultNavigationTimeout
-     * Page.setDefaultNavigationTimeout()} or {@link Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultNavigationTimeout
+     * BrowserContext.setDefaultNavigationTimeout()}, {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}, {@link com.microsoft.playwright.Page#setDefaultNavigationTimeout
+     * Page.setDefaultNavigationTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public WaitForNavigationOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -3366,7 +3476,8 @@ public interface Page extends AutoCloseable {
     public Predicate<Page> predicate;
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}.
      */
     public Double timeout;
 
@@ -3379,7 +3490,8 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}.
      */
     public WaitForPopupOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -3389,13 +3501,13 @@ public interface Page extends AutoCloseable {
   class WaitForRequestOptions {
     /**
      * Maximum wait time in milliseconds, defaults to 30 seconds, pass {@code 0} to disable the timeout. The default value can
-     * be changed by using the {@link Page#setDefaultTimeout Page.setDefaultTimeout()} method.
+     * be changed by using the {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()} method.
      */
     public Double timeout;
 
     /**
      * Maximum wait time in milliseconds, defaults to 30 seconds, pass {@code 0} to disable the timeout. The default value can
-     * be changed by using the {@link Page#setDefaultTimeout Page.setDefaultTimeout()} method.
+     * be changed by using the {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()} method.
      */
     public WaitForRequestOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -3409,7 +3521,8 @@ public interface Page extends AutoCloseable {
     public Predicate<Request> predicate;
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}.
      */
     public Double timeout;
 
@@ -3422,7 +3535,8 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}.
      */
     public WaitForRequestFinishedOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -3432,15 +3546,17 @@ public interface Page extends AutoCloseable {
   class WaitForResponseOptions {
     /**
      * Maximum wait time in milliseconds, defaults to 30 seconds, pass {@code 0} to disable the timeout. The default value can
-     * be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
     /**
      * Maximum wait time in milliseconds, defaults to 30 seconds, pass {@code 0} to disable the timeout. The default value can
-     * be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public WaitForResponseOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -3467,8 +3583,9 @@ public interface Page extends AutoCloseable {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -3497,8 +3614,9 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public WaitForSelectorOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -3508,15 +3626,17 @@ public interface Page extends AutoCloseable {
   class WaitForConditionOptions {
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or
-     * {@link Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or
-     * {@link Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public WaitForConditionOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -3526,9 +3646,11 @@ public interface Page extends AutoCloseable {
   class WaitForURLOptions {
     /**
      * Maximum operation time in milliseconds, defaults to 30 seconds, pass {@code 0} to disable timeout. The default value can
-     * be changed by using the {@link BrowserContext#setDefaultNavigationTimeout BrowserContext.setDefaultNavigationTimeout()},
-     * {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}, {@link Page#setDefaultNavigationTimeout
-     * Page.setDefaultNavigationTimeout()} or {@link Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultNavigationTimeout
+     * BrowserContext.setDefaultNavigationTimeout()}, {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}, {@link com.microsoft.playwright.Page#setDefaultNavigationTimeout
+     * Page.setDefaultNavigationTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
@@ -3545,9 +3667,11 @@ public interface Page extends AutoCloseable {
 
     /**
      * Maximum operation time in milliseconds, defaults to 30 seconds, pass {@code 0} to disable timeout. The default value can
-     * be changed by using the {@link BrowserContext#setDefaultNavigationTimeout BrowserContext.setDefaultNavigationTimeout()},
-     * {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}, {@link Page#setDefaultNavigationTimeout
-     * Page.setDefaultNavigationTimeout()} or {@link Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultNavigationTimeout
+     * BrowserContext.setDefaultNavigationTimeout()}, {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}, {@link com.microsoft.playwright.Page#setDefaultNavigationTimeout
+     * Page.setDefaultNavigationTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public WaitForURLOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -3575,7 +3699,8 @@ public interface Page extends AutoCloseable {
     public Predicate<WebSocket> predicate;
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}.
      */
     public Double timeout;
 
@@ -3588,7 +3713,8 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}.
      */
     public WaitForWebSocketOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -3602,7 +3728,8 @@ public interface Page extends AutoCloseable {
     public Predicate<Worker> predicate;
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}.
      */
     public Double timeout;
 
@@ -3615,13 +3742,20 @@ public interface Page extends AutoCloseable {
     }
     /**
      * Maximum time to wait for in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The
-     * default value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()}.
+     * default value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()}.
      */
     public WaitForWorkerOptions setTimeout(double timeout) {
       this.timeout = timeout;
       return this;
     }
   }
+  /**
+   * Playwright has ability to mock clock and passage of time.
+   *
+   * @since v1.45
+   */
+  Clock clock();
   /**
    * Adds a script which would be evaluated in one of the following scenarios:
    * <ul>
@@ -3633,7 +3767,7 @@ public interface Page extends AutoCloseable {
    * <p> The script is evaluated after the document was created but before any of its scripts were run. This is useful to amend
    * the JavaScript environment, e.g. to seed {@code Math.random}.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of overriding {@code Math.random} before the page loads:
    * <pre>{@code
@@ -3641,8 +3775,9 @@ public interface Page extends AutoCloseable {
    * page.addInitScript(Paths.get("./preload.js"));
    * }</pre>
    *
-   * <p> <strong>NOTE:</strong> The order of evaluation of multiple scripts installed via {@link BrowserContext#addInitScript
-   * BrowserContext.addInitScript()} and {@link Page#addInitScript Page.addInitScript()} is not defined.
+   * <p> <strong>NOTE:</strong> The order of evaluation of multiple scripts installed via {@link com.microsoft.playwright.BrowserContext#addInitScript
+   * BrowserContext.addInitScript()} and {@link com.microsoft.playwright.Page#addInitScript Page.addInitScript()} is not
+   * defined.
    *
    * @param script Script to be evaluated in all pages in the browser context.
    * @since v1.8
@@ -3659,7 +3794,7 @@ public interface Page extends AutoCloseable {
    * <p> The script is evaluated after the document was created but before any of its scripts were run. This is useful to amend
    * the JavaScript environment, e.g. to seed {@code Math.random}.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of overriding {@code Math.random} before the page loads:
    * <pre>{@code
@@ -3667,8 +3802,9 @@ public interface Page extends AutoCloseable {
    * page.addInitScript(Paths.get("./preload.js"));
    * }</pre>
    *
-   * <p> <strong>NOTE:</strong> The order of evaluation of multiple scripts installed via {@link BrowserContext#addInitScript
-   * BrowserContext.addInitScript()} and {@link Page#addInitScript Page.addInitScript()} is not defined.
+   * <p> <strong>NOTE:</strong> The order of evaluation of multiple scripts installed via {@link com.microsoft.playwright.BrowserContext#addInitScript
+   * BrowserContext.addInitScript()} and {@link com.microsoft.playwright.Page#addInitScript Page.addInitScript()} is not
+   * defined.
    *
    * @param script Script to be evaluated in all pages in the browser context.
    * @since v1.8
@@ -3723,8 +3859,7 @@ public interface Page extends AutoCloseable {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the matched element,
    * unless {@code force} option is set. If the element is detached during the checks, the whole action is retried.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to click in the center of the element.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to click in the center of the element.</li>
    * <li> Ensure that the element is now checked. If not, this method throws.</li>
    * </ol>
    *
@@ -3746,8 +3881,7 @@ public interface Page extends AutoCloseable {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the matched element,
    * unless {@code force} option is set. If the element is detached during the checks, the whole action is retried.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to click in the center of the element.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to click in the center of the element.</li>
    * <li> Ensure that the element is now checked. If not, this method throws.</li>
    * </ol>
    *
@@ -3765,7 +3899,8 @@ public interface Page extends AutoCloseable {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the matched element,
    * unless {@code force} option is set. If the element is detached during the checks, the whole action is retried.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to click in the center of the element, or the specified {@code position}.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to click in the center of the element, or the specified
+   * {@code position}.</li>
    * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
    * </ol>
    *
@@ -3785,7 +3920,8 @@ public interface Page extends AutoCloseable {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the matched element,
    * unless {@code force} option is set. If the element is detached during the checks, the whole action is retried.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to click in the center of the element, or the specified {@code position}.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to click in the center of the element, or the specified
+   * {@code position}.</li>
    * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
    * </ol>
    *
@@ -3804,7 +3940,7 @@ public interface Page extends AutoCloseable {
    * <p> By default, {@code page.close()} **does not** run {@code beforeunload} handlers.
    *
    * <p> <strong>NOTE:</strong> if {@code runBeforeUnload} is passed as true, a {@code beforeunload} dialog might be summoned and should be handled
-   * manually via {@link Page#onDialog Page.onDialog()} event.
+   * manually via {@link com.microsoft.playwright.Page#onDialog Page.onDialog()} event.
    *
    * @since v1.8
    */
@@ -3819,7 +3955,7 @@ public interface Page extends AutoCloseable {
    * <p> By default, {@code page.close()} **does not** run {@code beforeunload} handlers.
    *
    * <p> <strong>NOTE:</strong> if {@code runBeforeUnload} is passed as true, a {@code beforeunload} dialog might be summoned and should be handled
-   * manually via {@link Page#onDialog Page.onDialog()} event.
+   * manually via {@link com.microsoft.playwright.Page#onDialog Page.onDialog()} event.
    *
    * @since v1.8
    */
@@ -3843,9 +3979,8 @@ public interface Page extends AutoCloseable {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the matched element,
    * unless {@code force} option is set. If the element is detached during the checks, the whole action is retried.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to double click in the center of the element, or the specified {@code position}.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set. Note that if the
-   * first click of the {@code dblclick()} triggers a navigation event, this method will throw.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to double click in the center of the element, or the
+   * specified {@code position}.</li>
    * </ol>
    *
    * <p> When all steps combined have not finished during the specified {@code timeout}, this method throws a {@code
@@ -3866,9 +4001,8 @@ public interface Page extends AutoCloseable {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the matched element,
    * unless {@code force} option is set. If the element is detached during the checks, the whole action is retried.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to double click in the center of the element, or the specified {@code position}.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set. Note that if the
-   * first click of the {@code dblclick()} triggers a navigation event, this method will throw.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to double click in the center of the element, or the
+   * specified {@code position}.</li>
    * </ol>
    *
    * <p> When all steps combined have not finished during the specified {@code timeout}, this method throws a {@code
@@ -3885,7 +4019,7 @@ public interface Page extends AutoCloseable {
    * {@code click} is dispatched. This is equivalent to calling <a
    * href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click">element.click()</a>.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.dispatchEvent("button#submit", "click");
    * }</pre>
@@ -3931,7 +4065,7 @@ public interface Page extends AutoCloseable {
    * {@code click} is dispatched. This is equivalent to calling <a
    * href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click">element.click()</a>.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.dispatchEvent("button#submit", "click");
    * }</pre>
@@ -3976,7 +4110,7 @@ public interface Page extends AutoCloseable {
    * {@code click} is dispatched. This is equivalent to calling <a
    * href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click">element.click()</a>.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.dispatchEvent("button#submit", "click");
    * }</pre>
@@ -4019,11 +4153,11 @@ public interface Page extends AutoCloseable {
    * This method drags the source element to the target element. It will first move to the source element, perform a {@code
    * mousedown}, then move to the target element and perform a {@code mouseup}.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
-   * page.dragAndDrop("#source", '#target');
+   * page.dragAndDrop("#source", "#target");
    * // or specify exact positions relative to the top-left corners of the elements:
-   * page.dragAndDrop("#source", '#target', new Page.DragAndDropOptions()
+   * page.dragAndDrop("#source", "#target", new Page.DragAndDropOptions()
    *   .setSourcePosition(34, 7).setTargetPosition(10, 20));
    * }</pre>
    *
@@ -4040,11 +4174,11 @@ public interface Page extends AutoCloseable {
    * This method drags the source element to the target element. It will first move to the source element, perform a {@code
    * mousedown}, then move to the target element and perform a {@code mouseup}.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
-   * page.dragAndDrop("#source", '#target');
+   * page.dragAndDrop("#source", "#target");
    * // or specify exact positions relative to the top-left corners of the elements:
-   * page.dragAndDrop("#source", '#target', new Page.DragAndDropOptions()
+   * page.dragAndDrop("#source", "#target", new Page.DragAndDropOptions()
    *   .setSourcePosition(34, 7).setTargetPosition(10, 20));
    * }</pre>
    *
@@ -4059,7 +4193,7 @@ public interface Page extends AutoCloseable {
    * This method changes the {@code CSS media type} through the {@code media} argument, and/or the {@code
    * "prefers-colors-scheme"} media feature, using the {@code colorScheme} argument.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.evaluate("() => matchMedia('screen').matches");
    * // → true
@@ -4083,8 +4217,6 @@ public interface Page extends AutoCloseable {
    * page.evaluate("() => matchMedia('(prefers-color-scheme: dark)').matches");
    * // → true
    * page.evaluate("() => matchMedia('(prefers-color-scheme: light)').matches");
-   * // → false
-   * page.evaluate("() => matchMedia('(prefers-color-scheme: no-preference)').matches");
    * // → false
    * }</pre>
    *
@@ -4097,7 +4229,7 @@ public interface Page extends AutoCloseable {
    * This method changes the {@code CSS media type} through the {@code media} argument, and/or the {@code
    * "prefers-colors-scheme"} media feature, using the {@code colorScheme} argument.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.evaluate("() => matchMedia('screen').matches");
    * // → true
@@ -4122,8 +4254,6 @@ public interface Page extends AutoCloseable {
    * // → true
    * page.evaluate("() => matchMedia('(prefers-color-scheme: light)').matches");
    * // → false
-   * page.evaluate("() => matchMedia('(prefers-color-scheme: no-preference)').matches");
-   * // → false
    * }</pre>
    *
    * @since v1.8
@@ -4135,9 +4265,10 @@ public interface Page extends AutoCloseable {
    *
    * <p> If {@code expression} returns a <a
    * href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise'>Promise</a>, then {@link
-   * Page#evalOnSelector Page.evalOnSelector()} would wait for the promise to resolve and return its value.
+   * com.microsoft.playwright.Page#evalOnSelector Page.evalOnSelector()} would wait for the promise to resolve and return its
+   * value.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * String searchValue = (String) page.evalOnSelector("#search", "el => el.value");
    * String preloadHref = (String) page.evalOnSelector("link[rel=preload]", "el => el.href");
@@ -4159,9 +4290,10 @@ public interface Page extends AutoCloseable {
    *
    * <p> If {@code expression} returns a <a
    * href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise'>Promise</a>, then {@link
-   * Page#evalOnSelector Page.evalOnSelector()} would wait for the promise to resolve and return its value.
+   * com.microsoft.playwright.Page#evalOnSelector Page.evalOnSelector()} would wait for the promise to resolve and return its
+   * value.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * String searchValue = (String) page.evalOnSelector("#search", "el => el.value");
    * String preloadHref = (String) page.evalOnSelector("link[rel=preload]", "el => el.href");
@@ -4182,9 +4314,10 @@ public interface Page extends AutoCloseable {
    *
    * <p> If {@code expression} returns a <a
    * href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise'>Promise</a>, then {@link
-   * Page#evalOnSelector Page.evalOnSelector()} would wait for the promise to resolve and return its value.
+   * com.microsoft.playwright.Page#evalOnSelector Page.evalOnSelector()} would wait for the promise to resolve and return its
+   * value.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * String searchValue = (String) page.evalOnSelector("#search", "el => el.value");
    * String preloadHref = (String) page.evalOnSelector("link[rel=preload]", "el => el.href");
@@ -4204,9 +4337,10 @@ public interface Page extends AutoCloseable {
    *
    * <p> If {@code expression} returns a <a
    * href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise'>Promise</a>, then {@link
-   * Page#evalOnSelectorAll Page.evalOnSelectorAll()} would wait for the promise to resolve and return its value.
+   * com.microsoft.playwright.Page#evalOnSelectorAll Page.evalOnSelectorAll()} would wait for the promise to resolve and
+   * return its value.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * boolean divCounts = (boolean) page.evalOnSelectorAll("div", "(divs, min) => divs.length >= min", 10);
    * }</pre>
@@ -4225,9 +4359,10 @@ public interface Page extends AutoCloseable {
    *
    * <p> If {@code expression} returns a <a
    * href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise'>Promise</a>, then {@link
-   * Page#evalOnSelectorAll Page.evalOnSelectorAll()} would wait for the promise to resolve and return its value.
+   * com.microsoft.playwright.Page#evalOnSelectorAll Page.evalOnSelectorAll()} would wait for the promise to resolve and
+   * return its value.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * boolean divCounts = (boolean) page.evalOnSelectorAll("div", "(divs, min) => divs.length >= min", 10);
    * }</pre>
@@ -4242,15 +4377,16 @@ public interface Page extends AutoCloseable {
   /**
    * Returns the value of the {@code expression} invocation.
    *
-   * <p> If the function passed to the {@link Page#evaluate Page.evaluate()} returns a <a
+   * <p> If the function passed to the {@link com.microsoft.playwright.Page#evaluate Page.evaluate()} returns a <a
    * href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise'>Promise</a>, then {@link
-   * Page#evaluate Page.evaluate()} would wait for the promise to resolve and return its value.
+   * com.microsoft.playwright.Page#evaluate Page.evaluate()} would wait for the promise to resolve and return its value.
    *
-   * <p> If the function passed to the {@link Page#evaluate Page.evaluate()} returns a non-[Serializable] value, then {@link
-   * Page#evaluate Page.evaluate()} resolves to {@code undefined}. Playwright also supports transferring some additional
-   * values that are not serializable by {@code JSON}: {@code -0}, {@code NaN}, {@code Infinity}, {@code -Infinity}.
+   * <p> If the function passed to the {@link com.microsoft.playwright.Page#evaluate Page.evaluate()} returns a
+   * non-[Serializable] value, then {@link com.microsoft.playwright.Page#evaluate Page.evaluate()} resolves to {@code
+   * undefined}. Playwright also supports transferring some additional values that are not serializable by {@code JSON}:
+   * {@code -0}, {@code NaN}, {@code Infinity}, {@code -Infinity}.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> Passing argument to {@code expression}:
    * <pre>{@code
@@ -4265,7 +4401,8 @@ public interface Page extends AutoCloseable {
    * System.out.println(page.evaluate("1 + 2")); // prints "3"
    * }</pre>
    *
-   * <p> {@code ElementHandle} instances can be passed as an argument to the {@link Page#evaluate Page.evaluate()}:
+   * <p> {@code ElementHandle} instances can be passed as an argument to the {@link com.microsoft.playwright.Page#evaluate
+   * Page.evaluate()}:
    * <pre>{@code
    * ElementHandle bodyHandle = page.evaluate("document.body");
    * String html = (String) page.evaluate("([body, suffix]) => body.innerHTML + suffix", Arrays.asList(bodyHandle, "hello"));
@@ -4282,15 +4419,16 @@ public interface Page extends AutoCloseable {
   /**
    * Returns the value of the {@code expression} invocation.
    *
-   * <p> If the function passed to the {@link Page#evaluate Page.evaluate()} returns a <a
+   * <p> If the function passed to the {@link com.microsoft.playwright.Page#evaluate Page.evaluate()} returns a <a
    * href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise'>Promise</a>, then {@link
-   * Page#evaluate Page.evaluate()} would wait for the promise to resolve and return its value.
+   * com.microsoft.playwright.Page#evaluate Page.evaluate()} would wait for the promise to resolve and return its value.
    *
-   * <p> If the function passed to the {@link Page#evaluate Page.evaluate()} returns a non-[Serializable] value, then {@link
-   * Page#evaluate Page.evaluate()} resolves to {@code undefined}. Playwright also supports transferring some additional
-   * values that are not serializable by {@code JSON}: {@code -0}, {@code NaN}, {@code Infinity}, {@code -Infinity}.
+   * <p> If the function passed to the {@link com.microsoft.playwright.Page#evaluate Page.evaluate()} returns a
+   * non-[Serializable] value, then {@link com.microsoft.playwright.Page#evaluate Page.evaluate()} resolves to {@code
+   * undefined}. Playwright also supports transferring some additional values that are not serializable by {@code JSON}:
+   * {@code -0}, {@code NaN}, {@code Infinity}, {@code -Infinity}.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> Passing argument to {@code expression}:
    * <pre>{@code
@@ -4305,7 +4443,8 @@ public interface Page extends AutoCloseable {
    * System.out.println(page.evaluate("1 + 2")); // prints "3"
    * }</pre>
    *
-   * <p> {@code ElementHandle} instances can be passed as an argument to the {@link Page#evaluate Page.evaluate()}:
+   * <p> {@code ElementHandle} instances can be passed as an argument to the {@link com.microsoft.playwright.Page#evaluate
+   * Page.evaluate()}:
    * <pre>{@code
    * ElementHandle bodyHandle = page.evaluate("document.body");
    * String html = (String) page.evaluate("([body, suffix]) => body.innerHTML + suffix", Arrays.asList(bodyHandle, "hello"));
@@ -4321,14 +4460,16 @@ public interface Page extends AutoCloseable {
   /**
    * Returns the value of the {@code expression} invocation as a {@code JSHandle}.
    *
-   * <p> The only difference between {@link Page#evaluate Page.evaluate()} and {@link Page#evaluateHandle Page.evaluateHandle()}
-   * is that {@link Page#evaluateHandle Page.evaluateHandle()} returns {@code JSHandle}.
+   * <p> The only difference between {@link com.microsoft.playwright.Page#evaluate Page.evaluate()} and {@link
+   * com.microsoft.playwright.Page#evaluateHandle Page.evaluateHandle()} is that {@link
+   * com.microsoft.playwright.Page#evaluateHandle Page.evaluateHandle()} returns {@code JSHandle}.
    *
-   * <p> If the function passed to the {@link Page#evaluateHandle Page.evaluateHandle()} returns a <a
+   * <p> If the function passed to the {@link com.microsoft.playwright.Page#evaluateHandle Page.evaluateHandle()} returns a <a
    * href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise'>Promise</a>, then {@link
-   * Page#evaluateHandle Page.evaluateHandle()} would wait for the promise to resolve and return its value.
+   * com.microsoft.playwright.Page#evaluateHandle Page.evaluateHandle()} would wait for the promise to resolve and return its
+   * value.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Handle for the window object.
    * JSHandle aWindowHandle = page.evaluateHandle("() => Promise.resolve(window)");
@@ -4339,7 +4480,8 @@ public interface Page extends AutoCloseable {
    * JSHandle aHandle = page.evaluateHandle("document"); // Handle for the "document".
    * }</pre>
    *
-   * <p> {@code JSHandle} instances can be passed as an argument to the {@link Page#evaluateHandle Page.evaluateHandle()}:
+   * <p> {@code JSHandle} instances can be passed as an argument to the {@link com.microsoft.playwright.Page#evaluateHandle
+   * Page.evaluateHandle()}:
    * <pre>{@code
    * JSHandle aHandle = page.evaluateHandle("() => document.body");
    * JSHandle resultHandle = page.evaluateHandle("([body, suffix]) => body.innerHTML + suffix", Arrays.asList(aHandle, "hello"));
@@ -4357,14 +4499,16 @@ public interface Page extends AutoCloseable {
   /**
    * Returns the value of the {@code expression} invocation as a {@code JSHandle}.
    *
-   * <p> The only difference between {@link Page#evaluate Page.evaluate()} and {@link Page#evaluateHandle Page.evaluateHandle()}
-   * is that {@link Page#evaluateHandle Page.evaluateHandle()} returns {@code JSHandle}.
+   * <p> The only difference between {@link com.microsoft.playwright.Page#evaluate Page.evaluate()} and {@link
+   * com.microsoft.playwright.Page#evaluateHandle Page.evaluateHandle()} is that {@link
+   * com.microsoft.playwright.Page#evaluateHandle Page.evaluateHandle()} returns {@code JSHandle}.
    *
-   * <p> If the function passed to the {@link Page#evaluateHandle Page.evaluateHandle()} returns a <a
+   * <p> If the function passed to the {@link com.microsoft.playwright.Page#evaluateHandle Page.evaluateHandle()} returns a <a
    * href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise'>Promise</a>, then {@link
-   * Page#evaluateHandle Page.evaluateHandle()} would wait for the promise to resolve and return its value.
+   * com.microsoft.playwright.Page#evaluateHandle Page.evaluateHandle()} would wait for the promise to resolve and return its
+   * value.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Handle for the window object.
    * JSHandle aWindowHandle = page.evaluateHandle("() => Promise.resolve(window)");
@@ -4375,7 +4519,8 @@ public interface Page extends AutoCloseable {
    * JSHandle aHandle = page.evaluateHandle("document"); // Handle for the "document".
    * }</pre>
    *
-   * <p> {@code JSHandle} instances can be passed as an argument to the {@link Page#evaluateHandle Page.evaluateHandle()}:
+   * <p> {@code JSHandle} instances can be passed as an argument to the {@link com.microsoft.playwright.Page#evaluateHandle
+   * Page.evaluateHandle()}:
    * <pre>{@code
    * JSHandle aHandle = page.evaluateHandle("() => document.body");
    * JSHandle resultHandle = page.evaluateHandle("([body, suffix]) => body.innerHTML + suffix", Arrays.asList(aHandle, "hello"));
@@ -4400,11 +4545,12 @@ public interface Page extends AutoCloseable {
    * <p> The first argument of the {@code callback} function contains information about the caller: {@code { browserContext:
    * BrowserContext, page: Page, frame: Frame }}.
    *
-   * <p> See {@link BrowserContext#exposeBinding BrowserContext.exposeBinding()} for the context-wide version.
+   * <p> See {@link com.microsoft.playwright.BrowserContext#exposeBinding BrowserContext.exposeBinding()} for the context-wide
+   * version.
    *
-   * <p> <strong>NOTE:</strong> Functions installed via {@link Page#exposeBinding Page.exposeBinding()} survive navigations.
+   * <p> <strong>NOTE:</strong> Functions installed via {@link com.microsoft.playwright.Page#exposeBinding Page.exposeBinding()} survive navigations.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of exposing page URL to all frames in a page:
    * <pre>{@code
@@ -4414,7 +4560,7 @@ public interface Page extends AutoCloseable {
    *   public static void main(String[] args) {
    *     try (Playwright playwright = Playwright.create()) {
    *       BrowserType webkit = playwright.webkit();
-   *       Browser browser = webkit.launch({ headless: false });
+   *       Browser browser = webkit.launch(new BrowserType.LaunchOptions().setHeadless(false));
    *       BrowserContext context = browser.newContext();
    *       Page page = context.newPage();
    *       page.exposeBinding("pageURL", (source, args) -> source.page().url());
@@ -4429,21 +4575,6 @@ public interface Page extends AutoCloseable {
    *     }
    *   }
    * }
-   * }</pre>
-   *
-   * <p> An example of passing an element handle:
-   * <pre>{@code
-   * page.exposeBinding("clicked", (source, args) -> {
-   *   ElementHandle element = (ElementHandle) args[0];
-   *   System.out.println(element.textContent());
-   *   return null;
-   * }, new Page.ExposeBindingOptions().setHandle(true));
-   * page.setContent("" +
-   *   "<script>\n" +
-   *   "  document.addEventListener('click', event => window.clicked(event.target));\n" +
-   *   "</script>\n" +
-   *   "<div>Click me</div>\n" +
-   *   "<div>Or click me</div>\n");
    * }</pre>
    *
    * @param name Name of the function on the window object.
@@ -4464,11 +4595,12 @@ public interface Page extends AutoCloseable {
    * <p> The first argument of the {@code callback} function contains information about the caller: {@code { browserContext:
    * BrowserContext, page: Page, frame: Frame }}.
    *
-   * <p> See {@link BrowserContext#exposeBinding BrowserContext.exposeBinding()} for the context-wide version.
+   * <p> See {@link com.microsoft.playwright.BrowserContext#exposeBinding BrowserContext.exposeBinding()} for the context-wide
+   * version.
    *
-   * <p> <strong>NOTE:</strong> Functions installed via {@link Page#exposeBinding Page.exposeBinding()} survive navigations.
+   * <p> <strong>NOTE:</strong> Functions installed via {@link com.microsoft.playwright.Page#exposeBinding Page.exposeBinding()} survive navigations.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of exposing page URL to all frames in a page:
    * <pre>{@code
@@ -4478,7 +4610,7 @@ public interface Page extends AutoCloseable {
    *   public static void main(String[] args) {
    *     try (Playwright playwright = Playwright.create()) {
    *       BrowserType webkit = playwright.webkit();
-   *       Browser browser = webkit.launch({ headless: false });
+   *       Browser browser = webkit.launch(new BrowserType.LaunchOptions().setHeadless(false));
    *       BrowserContext context = browser.newContext();
    *       Page page = context.newPage();
    *       page.exposeBinding("pageURL", (source, args) -> source.page().url());
@@ -4493,21 +4625,6 @@ public interface Page extends AutoCloseable {
    *     }
    *   }
    * }
-   * }</pre>
-   *
-   * <p> An example of passing an element handle:
-   * <pre>{@code
-   * page.exposeBinding("clicked", (source, args) -> {
-   *   ElementHandle element = (ElementHandle) args[0];
-   *   System.out.println(element.textContent());
-   *   return null;
-   * }, new Page.ExposeBindingOptions().setHandle(true));
-   * page.setContent("" +
-   *   "<script>\n" +
-   *   "  document.addEventListener('click', event => window.clicked(event.target));\n" +
-   *   "</script>\n" +
-   *   "<div>Click me</div>\n" +
-   *   "<div>Or click me</div>\n");
    * }</pre>
    *
    * @param name Name of the function on the window object.
@@ -4525,11 +4642,12 @@ public interface Page extends AutoCloseable {
    * href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise'>Promise</a>, it will be
    * awaited.
    *
-   * <p> See {@link BrowserContext#exposeFunction BrowserContext.exposeFunction()} for context-wide exposed function.
+   * <p> See {@link com.microsoft.playwright.BrowserContext#exposeFunction BrowserContext.exposeFunction()} for context-wide
+   * exposed function.
    *
-   * <p> <strong>NOTE:</strong> Functions installed via {@link Page#exposeFunction Page.exposeFunction()} survive navigations.
+   * <p> <strong>NOTE:</strong> Functions installed via {@link com.microsoft.playwright.Page#exposeFunction Page.exposeFunction()} survive navigations.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of adding a {@code sha256} function to the page:
    * <pre>{@code
@@ -4544,26 +4662,27 @@ public interface Page extends AutoCloseable {
    *   public static void main(String[] args) {
    *     try (Playwright playwright = Playwright.create()) {
    *       BrowserType webkit = playwright.webkit();
-   *       Browser browser = webkit.launch({ headless: false });
+   *       Browser browser = webkit.launch(new BrowserType.LaunchOptions().setHeadless(false));
    *       Page page = browser.newPage();
    *       page.exposeFunction("sha256", args -> {
-   *         String text = (String) args[0];
-   *         MessageDigest crypto;
    *         try {
-   *           crypto = MessageDigest.getInstance("SHA-256");
+   *           String text = (String) args[0];
+   *           MessageDigest crypto = MessageDigest.getInstance("SHA-256");
+   *           byte[] token = crypto.digest(text.getBytes(StandardCharsets.UTF_8));
+   *           return Base64.getEncoder().encodeToString(token);
    *         } catch (NoSuchAlgorithmException e) {
    *           return null;
    *         }
-   *         byte[] token = crypto.digest(text.getBytes(StandardCharsets.UTF_8));
-   *         return Base64.getEncoder().encodeToString(token);
    *       });
-   *       page.setContent("<script>\n" +
+   *       page.setContent(
+   *         "<script>\n" +
    *         "  async function onClick() {\n" +
    *         "    document.querySelector('div').textContent = await window.sha256('PLAYWRIGHT');\n" +
    *         "  }\n" +
    *         "</script>\n" +
    *         "<button onclick=\"onClick()\">Click me</button>\n" +
-   *         "<div></div>\n");
+   *         "<div></div>"
+   *       );
    *       page.click("button");
    *     }
    *   }
@@ -4585,7 +4704,8 @@ public interface Page extends AutoCloseable {
    * href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control">control</a>, the control will be filled
    * instead.
    *
-   * <p> To send fine-grained keyboard events, use {@link Locator#pressSequentially Locator.pressSequentially()}.
+   * <p> To send fine-grained keyboard events, use {@link com.microsoft.playwright.Locator#pressSequentially
+   * Locator.pressSequentially()}.
    *
    * @param selector A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used.
    * @param value Value to fill for the {@code <input>}, {@code <textarea>} or {@code [contenteditable]} element.
@@ -4604,7 +4724,8 @@ public interface Page extends AutoCloseable {
    * href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control">control</a>, the control will be filled
    * instead.
    *
-   * <p> To send fine-grained keyboard events, use {@link Locator#pressSequentially Locator.pressSequentially()}.
+   * <p> To send fine-grained keyboard events, use {@link com.microsoft.playwright.Locator#pressSequentially
+   * Locator.pressSequentially()}.
    *
    * @param selector A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used.
    * @param value Value to fill for the {@code <input>}, {@code <textarea>} or {@code [contenteditable]} element.
@@ -4632,12 +4753,12 @@ public interface Page extends AutoCloseable {
   /**
    * Returns frame matching the specified criteria. Either {@code name} or {@code url} must be specified.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * Frame frame = page.frame("frame-name");
    * }</pre>
    * <pre>{@code
-   * Frame frame = page.frameByUrl(Pattern.compile(".*domain.*");
+   * Frame frame = page.frameByUrl(Pattern.compile(".*domain.*"));
    * }</pre>
    *
    * @param name Frame name specified in the {@code iframe}'s {@code name} attribute.
@@ -4669,7 +4790,7 @@ public interface Page extends AutoCloseable {
    * When working with iframes, you can create a frame locator that will enter the iframe and allow selecting elements in
    * that iframe.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> Following snippet locates element with text "Submit" in the iframe with id {@code my-frame}, like {@code <iframe
    * id="my-frame">}:
@@ -4709,7 +4830,7 @@ public interface Page extends AutoCloseable {
   /**
    * Allows locating elements by their alt text.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> For example, this method will find the image by alt text "Playwright logo":
    * <pre>{@code
@@ -4725,7 +4846,7 @@ public interface Page extends AutoCloseable {
   /**
    * Allows locating elements by their alt text.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> For example, this method will find the image by alt text "Playwright logo":
    * <pre>{@code
@@ -4739,7 +4860,7 @@ public interface Page extends AutoCloseable {
   /**
    * Allows locating elements by their alt text.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> For example, this method will find the image by alt text "Playwright logo":
    * <pre>{@code
@@ -4755,7 +4876,7 @@ public interface Page extends AutoCloseable {
   /**
    * Allows locating elements by their alt text.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> For example, this method will find the image by alt text "Playwright logo":
    * <pre>{@code
@@ -4770,7 +4891,7 @@ public interface Page extends AutoCloseable {
    * Allows locating input elements by the text of the associated {@code <label>} or {@code aria-labelledby} element, or by
    * the {@code aria-label} attribute.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> For example, this method will find inputs by label "Username" and "Password" in the following DOM:
    * <pre>{@code
@@ -4788,7 +4909,7 @@ public interface Page extends AutoCloseable {
    * Allows locating input elements by the text of the associated {@code <label>} or {@code aria-labelledby} element, or by
    * the {@code aria-label} attribute.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> For example, this method will find inputs by label "Username" and "Password" in the following DOM:
    * <pre>{@code
@@ -4804,7 +4925,7 @@ public interface Page extends AutoCloseable {
    * Allows locating input elements by the text of the associated {@code <label>} or {@code aria-labelledby} element, or by
    * the {@code aria-label} attribute.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> For example, this method will find inputs by label "Username" and "Password" in the following DOM:
    * <pre>{@code
@@ -4822,7 +4943,7 @@ public interface Page extends AutoCloseable {
    * Allows locating input elements by the text of the associated {@code <label>} or {@code aria-labelledby} element, or by
    * the {@code aria-label} attribute.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> For example, this method will find inputs by label "Username" and "Password" in the following DOM:
    * <pre>{@code
@@ -4837,7 +4958,7 @@ public interface Page extends AutoCloseable {
   /**
    * Allows locating input elements by the placeholder text.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> For example, consider the following DOM structure.
    *
@@ -4855,7 +4976,7 @@ public interface Page extends AutoCloseable {
   /**
    * Allows locating input elements by the placeholder text.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> For example, consider the following DOM structure.
    *
@@ -4871,7 +4992,7 @@ public interface Page extends AutoCloseable {
   /**
    * Allows locating input elements by the placeholder text.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> For example, consider the following DOM structure.
    *
@@ -4889,7 +5010,7 @@ public interface Page extends AutoCloseable {
   /**
    * Allows locating input elements by the placeholder text.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> For example, consider the following DOM structure.
    *
@@ -4907,7 +5028,7 @@ public interface Page extends AutoCloseable {
    * href="https://www.w3.org/TR/wai-aria-1.2/#aria-attributes">ARIA attributes</a> and <a
    * href="https://w3c.github.io/accname/#dfn-accessible-name">accessible name</a>.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> Consider the following DOM structure.
    *
@@ -4928,7 +5049,7 @@ public interface Page extends AutoCloseable {
    *     .click();
    * }</pre>
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> Role selector **does not replace** accessibility audits and conformance tests, but rather gives early feedback about the
    * ARIA guidelines.
@@ -4950,7 +5071,7 @@ public interface Page extends AutoCloseable {
    * href="https://www.w3.org/TR/wai-aria-1.2/#aria-attributes">ARIA attributes</a> and <a
    * href="https://w3c.github.io/accname/#dfn-accessible-name">accessible name</a>.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> Consider the following DOM structure.
    *
@@ -4971,7 +5092,7 @@ public interface Page extends AutoCloseable {
    *     .click();
    * }</pre>
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> Role selector **does not replace** accessibility audits and conformance tests, but rather gives early feedback about the
    * ARIA guidelines.
@@ -4989,7 +5110,7 @@ public interface Page extends AutoCloseable {
   /**
    * Locate element by the test id.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> Consider the following DOM structure.
    *
@@ -4998,10 +5119,11 @@ public interface Page extends AutoCloseable {
    * page.getByTestId("directions").click();
    * }</pre>
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
-   * <p> By default, the {@code data-testid} attribute is used as a test id. Use {@link Selectors#setTestIdAttribute
-   * Selectors.setTestIdAttribute()} to configure a different test id attribute if necessary.
+   * <p> By default, the {@code data-testid} attribute is used as a test id. Use {@link
+   * com.microsoft.playwright.Selectors#setTestIdAttribute Selectors.setTestIdAttribute()} to configure a different test id
+   * attribute if necessary.
    *
    * @param testId Id to locate the element by.
    * @since v1.27
@@ -5010,7 +5132,7 @@ public interface Page extends AutoCloseable {
   /**
    * Locate element by the test id.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> Consider the following DOM structure.
    *
@@ -5019,10 +5141,11 @@ public interface Page extends AutoCloseable {
    * page.getByTestId("directions").click();
    * }</pre>
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
-   * <p> By default, the {@code data-testid} attribute is used as a test id. Use {@link Selectors#setTestIdAttribute
-   * Selectors.setTestIdAttribute()} to configure a different test id attribute if necessary.
+   * <p> By default, the {@code data-testid} attribute is used as a test id. Use {@link
+   * com.microsoft.playwright.Selectors#setTestIdAttribute Selectors.setTestIdAttribute()} to configure a different test id
+   * attribute if necessary.
    *
    * @param testId Id to locate the element by.
    * @since v1.27
@@ -5031,32 +5154,32 @@ public interface Page extends AutoCloseable {
   /**
    * Allows locating elements that contain given text.
    *
-   * <p> See also {@link Locator#filter Locator.filter()} that allows to match by another criteria, like an accessible role, and
-   * then filter by the text content.
+   * <p> See also {@link com.microsoft.playwright.Locator#filter Locator.filter()} that allows to match by another criteria, like
+   * an accessible role, and then filter by the text content.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> Consider the following DOM structure:
    *
    * <p> You can locate by text substring, exact string, or a regular expression:
    * <pre>{@code
    * // Matches <span>
-   * page.getByText("world")
+   * page.getByText("world");
    *
    * // Matches first <div>
-   * page.getByText("Hello world")
+   * page.getByText("Hello world");
    *
    * // Matches second <div>
-   * page.getByText("Hello", new Page.GetByTextOptions().setExact(true))
+   * page.getByText("Hello", new Page.GetByTextOptions().setExact(true));
    *
    * // Matches both <div>s
-   * page.getByText(Pattern.compile("Hello"))
+   * page.getByText(Pattern.compile("Hello"));
    *
    * // Matches second <div>
-   * page.getByText(Pattern.compile("^hello$", Pattern.CASE_INSENSITIVE))
+   * page.getByText(Pattern.compile("^hello$", Pattern.CASE_INSENSITIVE));
    * }</pre>
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one,
    * turns line breaks into spaces and ignores leading and trailing whitespace.
@@ -5073,32 +5196,32 @@ public interface Page extends AutoCloseable {
   /**
    * Allows locating elements that contain given text.
    *
-   * <p> See also {@link Locator#filter Locator.filter()} that allows to match by another criteria, like an accessible role, and
-   * then filter by the text content.
+   * <p> See also {@link com.microsoft.playwright.Locator#filter Locator.filter()} that allows to match by another criteria, like
+   * an accessible role, and then filter by the text content.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> Consider the following DOM structure:
    *
    * <p> You can locate by text substring, exact string, or a regular expression:
    * <pre>{@code
    * // Matches <span>
-   * page.getByText("world")
+   * page.getByText("world");
    *
    * // Matches first <div>
-   * page.getByText("Hello world")
+   * page.getByText("Hello world");
    *
    * // Matches second <div>
-   * page.getByText("Hello", new Page.GetByTextOptions().setExact(true))
+   * page.getByText("Hello", new Page.GetByTextOptions().setExact(true));
    *
    * // Matches both <div>s
-   * page.getByText(Pattern.compile("Hello"))
+   * page.getByText(Pattern.compile("Hello"));
    *
    * // Matches second <div>
-   * page.getByText(Pattern.compile("^hello$", Pattern.CASE_INSENSITIVE))
+   * page.getByText(Pattern.compile("^hello$", Pattern.CASE_INSENSITIVE));
    * }</pre>
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one,
    * turns line breaks into spaces and ignores leading and trailing whitespace.
@@ -5113,32 +5236,32 @@ public interface Page extends AutoCloseable {
   /**
    * Allows locating elements that contain given text.
    *
-   * <p> See also {@link Locator#filter Locator.filter()} that allows to match by another criteria, like an accessible role, and
-   * then filter by the text content.
+   * <p> See also {@link com.microsoft.playwright.Locator#filter Locator.filter()} that allows to match by another criteria, like
+   * an accessible role, and then filter by the text content.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> Consider the following DOM structure:
    *
    * <p> You can locate by text substring, exact string, or a regular expression:
    * <pre>{@code
    * // Matches <span>
-   * page.getByText("world")
+   * page.getByText("world");
    *
    * // Matches first <div>
-   * page.getByText("Hello world")
+   * page.getByText("Hello world");
    *
    * // Matches second <div>
-   * page.getByText("Hello", new Page.GetByTextOptions().setExact(true))
+   * page.getByText("Hello", new Page.GetByTextOptions().setExact(true));
    *
    * // Matches both <div>s
-   * page.getByText(Pattern.compile("Hello"))
+   * page.getByText(Pattern.compile("Hello"));
    *
    * // Matches second <div>
-   * page.getByText(Pattern.compile("^hello$", Pattern.CASE_INSENSITIVE))
+   * page.getByText(Pattern.compile("^hello$", Pattern.CASE_INSENSITIVE));
    * }</pre>
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one,
    * turns line breaks into spaces and ignores leading and trailing whitespace.
@@ -5155,32 +5278,32 @@ public interface Page extends AutoCloseable {
   /**
    * Allows locating elements that contain given text.
    *
-   * <p> See also {@link Locator#filter Locator.filter()} that allows to match by another criteria, like an accessible role, and
-   * then filter by the text content.
+   * <p> See also {@link com.microsoft.playwright.Locator#filter Locator.filter()} that allows to match by another criteria, like
+   * an accessible role, and then filter by the text content.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> Consider the following DOM structure:
    *
    * <p> You can locate by text substring, exact string, or a regular expression:
    * <pre>{@code
    * // Matches <span>
-   * page.getByText("world")
+   * page.getByText("world");
    *
    * // Matches first <div>
-   * page.getByText("Hello world")
+   * page.getByText("Hello world");
    *
    * // Matches second <div>
-   * page.getByText("Hello", new Page.GetByTextOptions().setExact(true))
+   * page.getByText("Hello", new Page.GetByTextOptions().setExact(true));
    *
    * // Matches both <div>s
-   * page.getByText(Pattern.compile("Hello"))
+   * page.getByText(Pattern.compile("Hello"));
    *
    * // Matches second <div>
-   * page.getByText(Pattern.compile("^hello$", Pattern.CASE_INSENSITIVE))
+   * page.getByText(Pattern.compile("^hello$", Pattern.CASE_INSENSITIVE));
    * }</pre>
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one,
    * turns line breaks into spaces and ignores leading and trailing whitespace.
@@ -5195,7 +5318,7 @@ public interface Page extends AutoCloseable {
   /**
    * Allows locating elements by their title attribute.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> Consider the following DOM structure.
    *
@@ -5213,7 +5336,7 @@ public interface Page extends AutoCloseable {
   /**
    * Allows locating elements by their title attribute.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> Consider the following DOM structure.
    *
@@ -5229,7 +5352,7 @@ public interface Page extends AutoCloseable {
   /**
    * Allows locating elements by their title attribute.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> Consider the following DOM structure.
    *
@@ -5247,7 +5370,7 @@ public interface Page extends AutoCloseable {
   /**
    * Allows locating elements by their title attribute.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> Consider the following DOM structure.
    *
@@ -5262,7 +5385,7 @@ public interface Page extends AutoCloseable {
   Locator getByTitle(Pattern text, GetByTitleOptions options);
   /**
    * Returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the
-   * last redirect. If can not go back, returns {@code null}.
+   * last redirect. If cannot go back, returns {@code null}.
    *
    * <p> Navigate to the previous page in history.
    *
@@ -5273,7 +5396,7 @@ public interface Page extends AutoCloseable {
   }
   /**
    * Returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the
-   * last redirect. If can not go back, returns {@code null}.
+   * last redirect. If cannot go back, returns {@code null}.
    *
    * <p> Navigate to the previous page in history.
    *
@@ -5282,7 +5405,7 @@ public interface Page extends AutoCloseable {
   Response goBack(GoBackOptions options);
   /**
    * Returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the
-   * last redirect. If can not go forward, returns {@code null}.
+   * last redirect. If cannot go forward, returns {@code null}.
    *
    * <p> Navigate to the next page in history.
    *
@@ -5293,13 +5416,32 @@ public interface Page extends AutoCloseable {
   }
   /**
    * Returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the
-   * last redirect. If can not go forward, returns {@code null}.
+   * last redirect. If cannot go forward, returns {@code null}.
    *
    * <p> Navigate to the next page in history.
    *
    * @since v1.8
    */
   Response goForward(GoForwardOptions options);
+  /**
+   * Request the page to perform garbage collection. Note that there is no guarantee that all unreachable objects will be
+   * collected.
+   *
+   * <p> This is useful to help detect memory leaks. For example, if your page has a large object {@code "suspect"} that might be
+   * leaked, you can check that it does not leak by using a <a
+   * href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakRef">{@code WeakRef}</a>.
+   * <pre>{@code
+   * // 1. In your page, save a WeakRef for the "suspect".
+   * page.evaluate("globalThis.suspectWeakRef = new WeakRef(suspect)");
+   * // 2. Request garbage collection.
+   * page.requestGC();
+   * // 3. Check that weak ref does not deref to the original object.
+   * assertTrue(page.evaluate("!globalThis.suspectWeakRef.deref()"));
+   * }</pre>
+   *
+   * @since v1.48
+   */
+  void requestGC();
   /**
    * Returns the main resource response. In case of multiple redirects, the navigation will resolve with the first
    * non-redirect response.
@@ -5315,7 +5457,7 @@ public interface Page extends AutoCloseable {
    *
    * <p> The method will not throw an error when any valid HTTP status code is returned by the remote server, including 404 "Not
    * Found" and 500 "Internal Server Error".  The status code for such responses can be retrieved by calling {@link
-   * Response#status Response.status()}.
+   * com.microsoft.playwright.Response#status Response.status()}.
    *
    * <p> <strong>NOTE:</strong> The method either throws an error or returns a main resource response. The only exceptions are navigation to {@code
    * about:blank} or navigation to the same URL with a different hash, which would succeed and return {@code null}.
@@ -5346,7 +5488,7 @@ public interface Page extends AutoCloseable {
    *
    * <p> The method will not throw an error when any valid HTTP status code is returned by the remote server, including 404 "Not
    * Found" and 500 "Internal Server Error".  The status code for such responses can be retrieved by calling {@link
-   * Response#status Response.status()}.
+   * com.microsoft.playwright.Response#status Response.status()}.
    *
    * <p> <strong>NOTE:</strong> The method either throws an error or returns a main resource response. The only exceptions are navigation to {@code
    * about:blank} or navigation to the same URL with a different hash, which would succeed and return {@code null}.
@@ -5367,8 +5509,8 @@ public interface Page extends AutoCloseable {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the matched element,
    * unless {@code force} option is set. If the element is detached during the checks, the whole action is retried.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to hover over the center of the element, or the specified {@code position}.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to hover over the center of the element, or the specified
+   * {@code position}.</li>
    * </ol>
    *
    * <p> When all steps combined have not finished during the specified {@code timeout}, this method throws a {@code
@@ -5387,8 +5529,8 @@ public interface Page extends AutoCloseable {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the matched element,
    * unless {@code force} option is set. If the element is detached during the checks, the whole action is retried.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to hover over the center of the element, or the specified {@code position}.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to hover over the center of the element, or the specified
+   * {@code position}.</li>
    * </ol>
    *
    * <p> When all steps combined have not finished during the specified {@code timeout}, this method throws a {@code
@@ -5638,8 +5780,8 @@ public interface Page extends AutoCloseable {
    * System.out.println(page.evaluate("prompt('Enter string:')"));
    * }</pre>
    *
-   * @param handler Receives the {@code Dialog} object, it **must** either {@link Dialog#accept Dialog.accept()} or {@link Dialog#dismiss
-   * Dialog.dismiss()} the dialog - otherwise the page will <a
+   * @param handler Receives the {@code Dialog} object, it **must** either {@link com.microsoft.playwright.Dialog#accept Dialog.accept()} or
+   * {@link com.microsoft.playwright.Dialog#dismiss Dialog.dismiss()} the dialog - otherwise the page will <a
    * href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#never_blocking">freeze</a> waiting for the
    * dialog, and actions like click will never finish.
    * @since v1.10
@@ -5659,8 +5801,7 @@ public interface Page extends AutoCloseable {
    * <p> User can inspect selectors or perform manual steps while paused. Resume will continue running the original script from
    * the place it was paused.
    *
-   * <p> <strong>NOTE:</strong> This method requires Playwright to be started in a headed mode, with a falsy {@code headless} value in the {@link
-   * BrowserType#launch BrowserType.launch()}.
+   * <p> <strong>NOTE:</strong> This method requires Playwright to be started in a headed mode, with a falsy {@code headless} option.
    *
    * @since v1.9
    */
@@ -5668,16 +5809,14 @@ public interface Page extends AutoCloseable {
   /**
    * Returns the PDF buffer.
    *
-   * <p> <strong>NOTE:</strong> Generating a pdf is currently only supported in Chromium headless.
-   *
    * <p> {@code page.pdf()} generates a pdf of the page with {@code print} css media. To generate a pdf with {@code screen}
-   * media, call {@link Page#emulateMedia Page.emulateMedia()} before calling {@code page.pdf()}:
+   * media, call {@link com.microsoft.playwright.Page#emulateMedia Page.emulateMedia()} before calling {@code page.pdf()}:
    *
    * <p> <strong>NOTE:</strong> By default, {@code page.pdf()} generates a pdf with modified colors for printing. Use the <a
    * href="https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-print-color-adjust">{@code
    * -webkit-print-color-adjust}</a> property to force rendering of exact colors.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Generates a PDF with "screen" media type.
    * page.emulateMedia(new Page.EmulateMediaOptions().setMedia(Media.SCREEN));
@@ -5728,16 +5867,14 @@ public interface Page extends AutoCloseable {
   /**
    * Returns the PDF buffer.
    *
-   * <p> <strong>NOTE:</strong> Generating a pdf is currently only supported in Chromium headless.
-   *
    * <p> {@code page.pdf()} generates a pdf of the page with {@code print} css media. To generate a pdf with {@code screen}
-   * media, call {@link Page#emulateMedia Page.emulateMedia()} before calling {@code page.pdf()}:
+   * media, call {@link com.microsoft.playwright.Page#emulateMedia Page.emulateMedia()} before calling {@code page.pdf()}:
    *
    * <p> <strong>NOTE:</strong> By default, {@code page.pdf()} generates a pdf with modified colors for printing. Use the <a
    * href="https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-print-color-adjust">{@code
    * -webkit-print-color-adjust}</a> property to force rendering of exact colors.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Generates a PDF with "screen" media type.
    * page.emulateMedia(new Page.EmulateMediaOptions().setMedia(Media.SCREEN));
@@ -5784,7 +5921,8 @@ public interface Page extends AutoCloseable {
    */
   byte[] pdf(PdfOptions options);
   /**
-   * Focuses the element, and then uses {@link Keyboard#down Keyboard.down()} and {@link Keyboard#up Keyboard.up()}.
+   * Focuses the element, and then uses {@link com.microsoft.playwright.Keyboard#down Keyboard.down()} and {@link
+   * com.microsoft.playwright.Keyboard#up Keyboard.up()}.
    *
    * <p> {@code key} can specify the intended <a
    * href="https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key">keyboardEvent.key</a> value or a single
@@ -5797,17 +5935,18 @@ public interface Page extends AutoCloseable {
    * ArrowUp}, etc.
    *
    * <p> Following modification shortcuts are also supported: {@code Shift}, {@code Control}, {@code Alt}, {@code Meta}, {@code
-   * ShiftLeft}.
+   * ShiftLeft}, {@code ControlOrMeta}. {@code ControlOrMeta} resolves to {@code Control} on Windows and Linux and to {@code
+   * Meta} on macOS.
    *
    * <p> Holding down {@code Shift} will type the text that corresponds to the {@code key} in the upper case.
    *
    * <p> If {@code key} is a single character, it is case-sensitive, so the values {@code a} and {@code A} will generate
    * different respective texts.
    *
-   * <p> Shortcuts such as {@code key: "Control+o"} or {@code key: "Control+Shift+T"} are supported as well. When specified with
-   * the modifier, modifier is pressed and being held while the subsequent key is being pressed.
+   * <p> Shortcuts such as {@code key: "Control+o"}, {@code key: "Control++} or {@code key: "Control+Shift+T"} are supported as
+   * well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * Page page = browser.newPage();
    * page.navigate("https://keycode.info");
@@ -5827,7 +5966,8 @@ public interface Page extends AutoCloseable {
     press(selector, key, null);
   }
   /**
-   * Focuses the element, and then uses {@link Keyboard#down Keyboard.down()} and {@link Keyboard#up Keyboard.up()}.
+   * Focuses the element, and then uses {@link com.microsoft.playwright.Keyboard#down Keyboard.down()} and {@link
+   * com.microsoft.playwright.Keyboard#up Keyboard.up()}.
    *
    * <p> {@code key} can specify the intended <a
    * href="https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key">keyboardEvent.key</a> value or a single
@@ -5840,17 +5980,18 @@ public interface Page extends AutoCloseable {
    * ArrowUp}, etc.
    *
    * <p> Following modification shortcuts are also supported: {@code Shift}, {@code Control}, {@code Alt}, {@code Meta}, {@code
-   * ShiftLeft}.
+   * ShiftLeft}, {@code ControlOrMeta}. {@code ControlOrMeta} resolves to {@code Control} on Windows and Linux and to {@code
+   * Meta} on macOS.
    *
    * <p> Holding down {@code Shift} will type the text that corresponds to the {@code key} in the upper case.
    *
    * <p> If {@code key} is a single character, it is case-sensitive, so the values {@code a} and {@code A} will generate
    * different respective texts.
    *
-   * <p> Shortcuts such as {@code key: "Control+o"} or {@code key: "Control+Shift+T"} are supported as well. When specified with
-   * the modifier, modifier is pressed and being held while the subsequent key is being pressed.
+   * <p> Shortcuts such as {@code key: "Control+o"}, {@code key: "Control++} or {@code key: "Control+Shift+T"} are supported as
+   * well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * Page page = browser.newPage();
    * page.navigate("https://keycode.info");
@@ -5869,8 +6010,8 @@ public interface Page extends AutoCloseable {
   void press(String selector, String key, PressOptions options);
   /**
    * The method finds an element matching the specified selector within the page. If no elements match the selector, the
-   * return value resolves to {@code null}. To wait for an element on the page, use {@link Locator#waitFor
-   * Locator.waitFor()}.
+   * return value resolves to {@code null}. To wait for an element on the page, use {@link
+   * com.microsoft.playwright.Locator#waitFor Locator.waitFor()}.
    *
    * @param selector A selector to query for.
    * @since v1.9
@@ -5880,8 +6021,8 @@ public interface Page extends AutoCloseable {
   }
   /**
    * The method finds an element matching the specified selector within the page. If no elements match the selector, the
-   * return value resolves to {@code null}. To wait for an element on the page, use {@link Locator#waitFor
-   * Locator.waitFor()}.
+   * return value resolves to {@code null}. To wait for an element on the page, use {@link
+   * com.microsoft.playwright.Locator#waitFor Locator.waitFor()}.
    *
    * @param selector A selector to query for.
    * @since v1.9
@@ -5895,6 +6036,196 @@ public interface Page extends AutoCloseable {
    * @since v1.9
    */
   List<ElementHandle> querySelectorAll(String selector);
+  /**
+   * When testing a web page, sometimes unexpected overlays like a "Sign up" dialog appear and block actions you want to
+   * automate, e.g. clicking a button. These overlays don't always show up in the same way or at the same time, making them
+   * tricky to handle in automated tests.
+   *
+   * <p> This method lets you set up a special function, called a handler, that activates when it detects that overlay is
+   * visible. The handler's job is to remove the overlay, allowing your test to continue as if the overlay wasn't there.
+   *
+   * <p> Things to keep in mind:
+   * <ul>
+   * <li> When an overlay is shown predictably, we recommend explicitly waiting for it in your test and dismissing it as a part of
+   * your normal test flow, instead of using {@link com.microsoft.playwright.Page#addLocatorHandler
+   * Page.addLocatorHandler()}.</li>
+   * <li> Playwright checks for the overlay every time before executing or retrying an action that requires an <a
+   * href="https://playwright.dev/java/docs/actionability">actionability check</a>, or before performing an auto-waiting
+   * assertion check. When overlay is visible, Playwright calls the handler first, and then proceeds with the
+   * action/assertion. Note that the handler is only called when you perform an action/assertion - if the overlay becomes
+   * visible but you don't perform any actions, the handler will not be triggered.</li>
+   * <li> After executing the handler, Playwright will ensure that overlay that triggered the handler is not visible anymore. You
+   * can opt-out of this behavior with {@code noWaitAfter}.</li>
+   * <li> The execution time of the handler counts towards the timeout of the action/assertion that executed the handler. If your
+   * handler takes too long, it might cause timeouts.</li>
+   * <li> You can register multiple handlers. However, only a single handler will be running at a time. Make sure the actions
+   * within a handler don't depend on another handler.</li>
+   * </ul>
+   *
+   * <p> <strong>NOTE:</strong> Running the handler will alter your page state mid-test. For example it will change the currently focused element and
+   * move the mouse. Make sure that actions that run after the handler are self-contained and do not rely on the focus and
+   * mouse state being unchanged.For example, consider a test that calls {@link com.microsoft.playwright.Locator#focus Locator.focus()} followed by
+   * {@link com.microsoft.playwright.Keyboard#press Keyboard.press()}. If your handler clicks a button between these two
+   * actions, the focused element most likely will be wrong, and key press will happen on the unexpected element. Use {@link
+   * com.microsoft.playwright.Locator#press Locator.press()} instead to avoid this problem.Another example is a series of mouse actions, where {@link com.microsoft.playwright.Mouse#move Mouse.move()} is followed
+   * by {@link com.microsoft.playwright.Mouse#down Mouse.down()}. Again, when the handler runs between these two actions, the
+   * mouse position will be wrong during the mouse down. Prefer self-contained actions like {@link
+   * com.microsoft.playwright.Locator#click Locator.click()} that do not rely on the state being unchanged by a handler.
+   *
+   * <p> <strong>Usage</strong>
+   *
+   * <p> An example that closes a "Sign up to the newsletter" dialog when it appears:
+   * <pre>{@code
+   * // Setup the handler.
+   * page.addLocatorHandler(page.getByText("Sign up to the newsletter"), () -> {
+   *   page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("No thanks")).click();
+   * });
+   *
+   * // Write the test as usual.
+   * page.navigate("https://example.com");
+   * page.getByRole("button", Page.GetByRoleOptions().setName("Start here")).click();
+   * }</pre>
+   *
+   * <p> An example that skips the "Confirm your security details" page when it is shown:
+   * <pre>{@code
+   * // Setup the handler.
+   * page.addLocatorHandler(page.getByText("Confirm your security details"), () -> {
+   *   page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Remind me later")).click();
+   * });
+   *
+   * // Write the test as usual.
+   * page.navigate("https://example.com");
+   * page.getByRole("button", Page.GetByRoleOptions().setName("Start here")).click();
+   * }</pre>
+   *
+   * <p> An example with a custom callback on every actionability check. It uses a {@code <body>} locator that is always visible,
+   * so the handler is called before every actionability check. It is important to specify {@code noWaitAfter}, because the
+   * handler does not hide the {@code <body>} element.
+   * <pre>{@code
+   * // Setup the handler.
+   * page.addLocatorHandler(page.locator("body"), () -> {
+   *   page.evaluate("window.removeObstructionsForTestIfNeeded()");
+   * }, new Page.AddLocatorHandlerOptions().setNoWaitAfter(true));
+   *
+   * // Write the test as usual.
+   * page.navigate("https://example.com");
+   * page.getByRole("button", Page.GetByRoleOptions().setName("Start here")).click();
+   * }</pre>
+   *
+   * <p> Handler takes the original locator as an argument. You can also automatically remove the handler after a number of
+   * invocations by setting {@code times}:
+   * <pre>{@code
+   * page.addLocatorHandler(page.getByLabel("Close"), locator -> {
+   *   locator.click();
+   * }, new Page.AddLocatorHandlerOptions().setTimes(1));
+   * }</pre>
+   *
+   * @param locator Locator that triggers the handler.
+   * @param handler Function that should be run once {@code locator} appears. This function should get rid of the element that blocks
+   * actions like click.
+   * @since v1.42
+   */
+  default void addLocatorHandler(Locator locator, Consumer<Locator> handler) {
+    addLocatorHandler(locator, handler, null);
+  }
+  /**
+   * When testing a web page, sometimes unexpected overlays like a "Sign up" dialog appear and block actions you want to
+   * automate, e.g. clicking a button. These overlays don't always show up in the same way or at the same time, making them
+   * tricky to handle in automated tests.
+   *
+   * <p> This method lets you set up a special function, called a handler, that activates when it detects that overlay is
+   * visible. The handler's job is to remove the overlay, allowing your test to continue as if the overlay wasn't there.
+   *
+   * <p> Things to keep in mind:
+   * <ul>
+   * <li> When an overlay is shown predictably, we recommend explicitly waiting for it in your test and dismissing it as a part of
+   * your normal test flow, instead of using {@link com.microsoft.playwright.Page#addLocatorHandler
+   * Page.addLocatorHandler()}.</li>
+   * <li> Playwright checks for the overlay every time before executing or retrying an action that requires an <a
+   * href="https://playwright.dev/java/docs/actionability">actionability check</a>, or before performing an auto-waiting
+   * assertion check. When overlay is visible, Playwright calls the handler first, and then proceeds with the
+   * action/assertion. Note that the handler is only called when you perform an action/assertion - if the overlay becomes
+   * visible but you don't perform any actions, the handler will not be triggered.</li>
+   * <li> After executing the handler, Playwright will ensure that overlay that triggered the handler is not visible anymore. You
+   * can opt-out of this behavior with {@code noWaitAfter}.</li>
+   * <li> The execution time of the handler counts towards the timeout of the action/assertion that executed the handler. If your
+   * handler takes too long, it might cause timeouts.</li>
+   * <li> You can register multiple handlers. However, only a single handler will be running at a time. Make sure the actions
+   * within a handler don't depend on another handler.</li>
+   * </ul>
+   *
+   * <p> <strong>NOTE:</strong> Running the handler will alter your page state mid-test. For example it will change the currently focused element and
+   * move the mouse. Make sure that actions that run after the handler are self-contained and do not rely on the focus and
+   * mouse state being unchanged.For example, consider a test that calls {@link com.microsoft.playwright.Locator#focus Locator.focus()} followed by
+   * {@link com.microsoft.playwright.Keyboard#press Keyboard.press()}. If your handler clicks a button between these two
+   * actions, the focused element most likely will be wrong, and key press will happen on the unexpected element. Use {@link
+   * com.microsoft.playwright.Locator#press Locator.press()} instead to avoid this problem.Another example is a series of mouse actions, where {@link com.microsoft.playwright.Mouse#move Mouse.move()} is followed
+   * by {@link com.microsoft.playwright.Mouse#down Mouse.down()}. Again, when the handler runs between these two actions, the
+   * mouse position will be wrong during the mouse down. Prefer self-contained actions like {@link
+   * com.microsoft.playwright.Locator#click Locator.click()} that do not rely on the state being unchanged by a handler.
+   *
+   * <p> <strong>Usage</strong>
+   *
+   * <p> An example that closes a "Sign up to the newsletter" dialog when it appears:
+   * <pre>{@code
+   * // Setup the handler.
+   * page.addLocatorHandler(page.getByText("Sign up to the newsletter"), () -> {
+   *   page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("No thanks")).click();
+   * });
+   *
+   * // Write the test as usual.
+   * page.navigate("https://example.com");
+   * page.getByRole("button", Page.GetByRoleOptions().setName("Start here")).click();
+   * }</pre>
+   *
+   * <p> An example that skips the "Confirm your security details" page when it is shown:
+   * <pre>{@code
+   * // Setup the handler.
+   * page.addLocatorHandler(page.getByText("Confirm your security details"), () -> {
+   *   page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Remind me later")).click();
+   * });
+   *
+   * // Write the test as usual.
+   * page.navigate("https://example.com");
+   * page.getByRole("button", Page.GetByRoleOptions().setName("Start here")).click();
+   * }</pre>
+   *
+   * <p> An example with a custom callback on every actionability check. It uses a {@code <body>} locator that is always visible,
+   * so the handler is called before every actionability check. It is important to specify {@code noWaitAfter}, because the
+   * handler does not hide the {@code <body>} element.
+   * <pre>{@code
+   * // Setup the handler.
+   * page.addLocatorHandler(page.locator("body"), () -> {
+   *   page.evaluate("window.removeObstructionsForTestIfNeeded()");
+   * }, new Page.AddLocatorHandlerOptions().setNoWaitAfter(true));
+   *
+   * // Write the test as usual.
+   * page.navigate("https://example.com");
+   * page.getByRole("button", Page.GetByRoleOptions().setName("Start here")).click();
+   * }</pre>
+   *
+   * <p> Handler takes the original locator as an argument. You can also automatically remove the handler after a number of
+   * invocations by setting {@code times}:
+   * <pre>{@code
+   * page.addLocatorHandler(page.getByLabel("Close"), locator -> {
+   *   locator.click();
+   * }, new Page.AddLocatorHandlerOptions().setTimes(1));
+   * }</pre>
+   *
+   * @param locator Locator that triggers the handler.
+   * @param handler Function that should be run once {@code locator} appears. This function should get rid of the element that blocks
+   * actions like click.
+   * @since v1.42
+   */
+  void addLocatorHandler(Locator locator, Consumer<Locator> handler, AddLocatorHandlerOptions options);
+  /**
+   * Removes all locator handlers added by {@link com.microsoft.playwright.Page#addLocatorHandler Page.addLocatorHandler()}
+   * for a specific locator.
+   *
+   * @param locator Locator passed to {@link com.microsoft.playwright.Page#addLocatorHandler Page.addLocatorHandler()}.
+   * @since v1.44
+   */
+  void removeLocatorHandler(Locator locator);
   /**
    * This method reloads the current page, in the same way as if the user had triggered a browser refresh. Returns the main
    * resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect.
@@ -5912,9 +6243,9 @@ public interface Page extends AutoCloseable {
    */
   Response reload(ReloadOptions options);
   /**
-   * API testing helper associated with this page. This method returns the same instance as {@link BrowserContext#request
-   * BrowserContext.request()} on the page's context. See {@link BrowserContext#request BrowserContext.request()} for more
-   * details.
+   * API testing helper associated with this page. This method returns the same instance as {@link
+   * com.microsoft.playwright.BrowserContext#request BrowserContext.request()} on the page's context. See {@link
+   * com.microsoft.playwright.BrowserContext#request BrowserContext.request()} for more details.
    *
    * @since v1.16
    */
@@ -5926,11 +6257,14 @@ public interface Page extends AutoCloseable {
    *
    * <p> <strong>NOTE:</strong> The handler will only be called for the first url if the response is a redirect.
    *
-   * <p> <strong>NOTE:</strong> {@link Page#route Page.route()} will not intercept requests intercepted by Service Worker. See <a
-   * href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling Service Workers when
-   * using request interception by setting {@code Browser.newContext.serviceWorkers} to {@code "block"}.
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.Page#route Page.route()} will not intercept requests intercepted by Service Worker. See
+   * <a href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling Service Workers
+   * when using request interception by setting {@code serviceWorkers} to {@code "block"}.
    *
-   * <p> **Usage**
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.Page#route Page.route()} will not intercept the first request of a popup page. Use
+   * {@link com.microsoft.playwright.BrowserContext#route BrowserContext.route()} instead.
+   *
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of a naive handler that aborts all image requests:
    * <pre>{@code
@@ -5959,10 +6293,10 @@ public interface Page extends AutoCloseable {
    * });
    * }</pre>
    *
-   * <p> Page routes take precedence over browser context routes (set up with {@link BrowserContext#route
-   * BrowserContext.route()}) when request matches both handlers.
+   * <p> Page routes take precedence over browser context routes (set up with {@link
+   * com.microsoft.playwright.BrowserContext#route BrowserContext.route()}) when request matches both handlers.
    *
-   * <p> To remove a route with its handler you can use {@link Page#unroute Page.unroute()}.
+   * <p> To remove a route with its handler you can use {@link com.microsoft.playwright.Page#unroute Page.unroute()}.
    *
    * <p> <strong>NOTE:</strong> Enabling routing disables http cache.
    *
@@ -5982,11 +6316,14 @@ public interface Page extends AutoCloseable {
    *
    * <p> <strong>NOTE:</strong> The handler will only be called for the first url if the response is a redirect.
    *
-   * <p> <strong>NOTE:</strong> {@link Page#route Page.route()} will not intercept requests intercepted by Service Worker. See <a
-   * href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling Service Workers when
-   * using request interception by setting {@code Browser.newContext.serviceWorkers} to {@code "block"}.
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.Page#route Page.route()} will not intercept requests intercepted by Service Worker. See
+   * <a href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling Service Workers
+   * when using request interception by setting {@code serviceWorkers} to {@code "block"}.
    *
-   * <p> **Usage**
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.Page#route Page.route()} will not intercept the first request of a popup page. Use
+   * {@link com.microsoft.playwright.BrowserContext#route BrowserContext.route()} instead.
+   *
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of a naive handler that aborts all image requests:
    * <pre>{@code
@@ -6015,10 +6352,10 @@ public interface Page extends AutoCloseable {
    * });
    * }</pre>
    *
-   * <p> Page routes take precedence over browser context routes (set up with {@link BrowserContext#route
-   * BrowserContext.route()}) when request matches both handlers.
+   * <p> Page routes take precedence over browser context routes (set up with {@link
+   * com.microsoft.playwright.BrowserContext#route BrowserContext.route()}) when request matches both handlers.
    *
-   * <p> To remove a route with its handler you can use {@link Page#unroute Page.unroute()}.
+   * <p> To remove a route with its handler you can use {@link com.microsoft.playwright.Page#unroute Page.unroute()}.
    *
    * <p> <strong>NOTE:</strong> Enabling routing disables http cache.
    *
@@ -6036,11 +6373,14 @@ public interface Page extends AutoCloseable {
    *
    * <p> <strong>NOTE:</strong> The handler will only be called for the first url if the response is a redirect.
    *
-   * <p> <strong>NOTE:</strong> {@link Page#route Page.route()} will not intercept requests intercepted by Service Worker. See <a
-   * href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling Service Workers when
-   * using request interception by setting {@code Browser.newContext.serviceWorkers} to {@code "block"}.
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.Page#route Page.route()} will not intercept requests intercepted by Service Worker. See
+   * <a href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling Service Workers
+   * when using request interception by setting {@code serviceWorkers} to {@code "block"}.
    *
-   * <p> **Usage**
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.Page#route Page.route()} will not intercept the first request of a popup page. Use
+   * {@link com.microsoft.playwright.BrowserContext#route BrowserContext.route()} instead.
+   *
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of a naive handler that aborts all image requests:
    * <pre>{@code
@@ -6069,10 +6409,10 @@ public interface Page extends AutoCloseable {
    * });
    * }</pre>
    *
-   * <p> Page routes take precedence over browser context routes (set up with {@link BrowserContext#route
-   * BrowserContext.route()}) when request matches both handlers.
+   * <p> Page routes take precedence over browser context routes (set up with {@link
+   * com.microsoft.playwright.BrowserContext#route BrowserContext.route()}) when request matches both handlers.
    *
-   * <p> To remove a route with its handler you can use {@link Page#unroute Page.unroute()}.
+   * <p> To remove a route with its handler you can use {@link com.microsoft.playwright.Page#unroute Page.unroute()}.
    *
    * <p> <strong>NOTE:</strong> Enabling routing disables http cache.
    *
@@ -6092,11 +6432,14 @@ public interface Page extends AutoCloseable {
    *
    * <p> <strong>NOTE:</strong> The handler will only be called for the first url if the response is a redirect.
    *
-   * <p> <strong>NOTE:</strong> {@link Page#route Page.route()} will not intercept requests intercepted by Service Worker. See <a
-   * href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling Service Workers when
-   * using request interception by setting {@code Browser.newContext.serviceWorkers} to {@code "block"}.
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.Page#route Page.route()} will not intercept requests intercepted by Service Worker. See
+   * <a href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling Service Workers
+   * when using request interception by setting {@code serviceWorkers} to {@code "block"}.
    *
-   * <p> **Usage**
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.Page#route Page.route()} will not intercept the first request of a popup page. Use
+   * {@link com.microsoft.playwright.BrowserContext#route BrowserContext.route()} instead.
+   *
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of a naive handler that aborts all image requests:
    * <pre>{@code
@@ -6125,10 +6468,10 @@ public interface Page extends AutoCloseable {
    * });
    * }</pre>
    *
-   * <p> Page routes take precedence over browser context routes (set up with {@link BrowserContext#route
-   * BrowserContext.route()}) when request matches both handlers.
+   * <p> Page routes take precedence over browser context routes (set up with {@link
+   * com.microsoft.playwright.BrowserContext#route BrowserContext.route()}) when request matches both handlers.
    *
-   * <p> To remove a route with its handler you can use {@link Page#unroute Page.unroute()}.
+   * <p> To remove a route with its handler you can use {@link com.microsoft.playwright.Page#unroute Page.unroute()}.
    *
    * <p> <strong>NOTE:</strong> Enabling routing disables http cache.
    *
@@ -6146,11 +6489,14 @@ public interface Page extends AutoCloseable {
    *
    * <p> <strong>NOTE:</strong> The handler will only be called for the first url if the response is a redirect.
    *
-   * <p> <strong>NOTE:</strong> {@link Page#route Page.route()} will not intercept requests intercepted by Service Worker. See <a
-   * href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling Service Workers when
-   * using request interception by setting {@code Browser.newContext.serviceWorkers} to {@code "block"}.
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.Page#route Page.route()} will not intercept requests intercepted by Service Worker. See
+   * <a href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling Service Workers
+   * when using request interception by setting {@code serviceWorkers} to {@code "block"}.
    *
-   * <p> **Usage**
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.Page#route Page.route()} will not intercept the first request of a popup page. Use
+   * {@link com.microsoft.playwright.BrowserContext#route BrowserContext.route()} instead.
+   *
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of a naive handler that aborts all image requests:
    * <pre>{@code
@@ -6179,10 +6525,10 @@ public interface Page extends AutoCloseable {
    * });
    * }</pre>
    *
-   * <p> Page routes take precedence over browser context routes (set up with {@link BrowserContext#route
-   * BrowserContext.route()}) when request matches both handlers.
+   * <p> Page routes take precedence over browser context routes (set up with {@link
+   * com.microsoft.playwright.BrowserContext#route BrowserContext.route()}) when request matches both handlers.
    *
-   * <p> To remove a route with its handler you can use {@link Page#unroute Page.unroute()}.
+   * <p> To remove a route with its handler you can use {@link com.microsoft.playwright.Page#unroute Page.unroute()}.
    *
    * <p> <strong>NOTE:</strong> Enabling routing disables http cache.
    *
@@ -6202,11 +6548,14 @@ public interface Page extends AutoCloseable {
    *
    * <p> <strong>NOTE:</strong> The handler will only be called for the first url if the response is a redirect.
    *
-   * <p> <strong>NOTE:</strong> {@link Page#route Page.route()} will not intercept requests intercepted by Service Worker. See <a
-   * href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling Service Workers when
-   * using request interception by setting {@code Browser.newContext.serviceWorkers} to {@code "block"}.
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.Page#route Page.route()} will not intercept requests intercepted by Service Worker. See
+   * <a href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling Service Workers
+   * when using request interception by setting {@code serviceWorkers} to {@code "block"}.
    *
-   * <p> **Usage**
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.Page#route Page.route()} will not intercept the first request of a popup page. Use
+   * {@link com.microsoft.playwright.BrowserContext#route BrowserContext.route()} instead.
+   *
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of a naive handler that aborts all image requests:
    * <pre>{@code
@@ -6235,10 +6584,10 @@ public interface Page extends AutoCloseable {
    * });
    * }</pre>
    *
-   * <p> Page routes take precedence over browser context routes (set up with {@link BrowserContext#route
-   * BrowserContext.route()}) when request matches both handlers.
+   * <p> Page routes take precedence over browser context routes (set up with {@link
+   * com.microsoft.playwright.BrowserContext#route BrowserContext.route()}) when request matches both handlers.
    *
-   * <p> To remove a route with its handler you can use {@link Page#unroute Page.unroute()}.
+   * <p> To remove a route with its handler you can use {@link com.microsoft.playwright.Page#unroute Page.unroute()}.
    *
    * <p> <strong>NOTE:</strong> Enabling routing disables http cache.
    *
@@ -6255,7 +6604,7 @@ public interface Page extends AutoCloseable {
    *
    * <p> Playwright will not serve requests intercepted by Service Worker from the HAR file. See <a
    * href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling Service Workers when
-   * using request interception by setting {@code Browser.newContext.serviceWorkers} to {@code "block"}.
+   * using request interception by setting {@code serviceWorkers} to {@code "block"}.
    *
    * @param har Path to a <a href="http://www.softwareishard.com/blog/har-12-spec">HAR</a> file with prerecorded network data. If {@code
    * path} is a relative path, then it is resolved relative to the current working directory.
@@ -6270,13 +6619,88 @@ public interface Page extends AutoCloseable {
    *
    * <p> Playwright will not serve requests intercepted by Service Worker from the HAR file. See <a
    * href="https://github.com/microsoft/playwright/issues/1090">this</a> issue. We recommend disabling Service Workers when
-   * using request interception by setting {@code Browser.newContext.serviceWorkers} to {@code "block"}.
+   * using request interception by setting {@code serviceWorkers} to {@code "block"}.
    *
    * @param har Path to a <a href="http://www.softwareishard.com/blog/har-12-spec">HAR</a> file with prerecorded network data. If {@code
    * path} is a relative path, then it is resolved relative to the current working directory.
    * @since v1.23
    */
   void routeFromHAR(Path har, RouteFromHAROptions options);
+  /**
+   * This method allows to modify websocket connections that are made by the page.
+   *
+   * <p> Note that only {@code WebSocket}s created after this method was called will be routed. It is recommended to call this
+   * method before navigating the page.
+   *
+   * <p> <strong>Usage</strong>
+   *
+   * <p> Below is an example of a simple mock that responds to a single message. See {@code WebSocketRoute} for more details and
+   * examples.
+   * <pre>{@code
+   * page.routeWebSocket("/ws", ws -> {
+   *   ws.onMessage(frame -> {
+   *     if ("request".equals(frame.text()))
+   *       ws.send("response");
+   *   });
+   * });
+   * }</pre>
+   *
+   * @param url Only WebSockets with the url matching this pattern will be routed. A string pattern can be relative to the {@code
+   * baseURL} context option.
+   * @param handler Handler function to route the WebSocket.
+   * @since v1.48
+   */
+  void routeWebSocket(String url, Consumer<WebSocketRoute> handler);
+  /**
+   * This method allows to modify websocket connections that are made by the page.
+   *
+   * <p> Note that only {@code WebSocket}s created after this method was called will be routed. It is recommended to call this
+   * method before navigating the page.
+   *
+   * <p> <strong>Usage</strong>
+   *
+   * <p> Below is an example of a simple mock that responds to a single message. See {@code WebSocketRoute} for more details and
+   * examples.
+   * <pre>{@code
+   * page.routeWebSocket("/ws", ws -> {
+   *   ws.onMessage(frame -> {
+   *     if ("request".equals(frame.text()))
+   *       ws.send("response");
+   *   });
+   * });
+   * }</pre>
+   *
+   * @param url Only WebSockets with the url matching this pattern will be routed. A string pattern can be relative to the {@code
+   * baseURL} context option.
+   * @param handler Handler function to route the WebSocket.
+   * @since v1.48
+   */
+  void routeWebSocket(Pattern url, Consumer<WebSocketRoute> handler);
+  /**
+   * This method allows to modify websocket connections that are made by the page.
+   *
+   * <p> Note that only {@code WebSocket}s created after this method was called will be routed. It is recommended to call this
+   * method before navigating the page.
+   *
+   * <p> <strong>Usage</strong>
+   *
+   * <p> Below is an example of a simple mock that responds to a single message. See {@code WebSocketRoute} for more details and
+   * examples.
+   * <pre>{@code
+   * page.routeWebSocket("/ws", ws -> {
+   *   ws.onMessage(frame -> {
+   *     if ("request".equals(frame.text()))
+   *       ws.send("response");
+   *   });
+   * });
+   * }</pre>
+   *
+   * @param url Only WebSockets with the url matching this pattern will be routed. A string pattern can be relative to the {@code
+   * baseURL} context option.
+   * @param handler Handler function to route the WebSocket.
+   * @since v1.48
+   */
+  void routeWebSocket(Predicate<String> url, Consumer<WebSocketRoute> handler);
   /**
    * Returns the buffer with the captured screenshot.
    *
@@ -6305,7 +6729,7 @@ public interface Page extends AutoCloseable {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * page.selectOption("select#colors", "blue");
@@ -6338,7 +6762,7 @@ public interface Page extends AutoCloseable {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * page.selectOption("select#colors", "blue");
@@ -6369,7 +6793,7 @@ public interface Page extends AutoCloseable {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * page.selectOption("select#colors", "blue");
@@ -6402,7 +6826,7 @@ public interface Page extends AutoCloseable {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * page.selectOption("select#colors", "blue");
@@ -6433,7 +6857,7 @@ public interface Page extends AutoCloseable {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * page.selectOption("select#colors", "blue");
@@ -6466,7 +6890,7 @@ public interface Page extends AutoCloseable {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * page.selectOption("select#colors", "blue");
@@ -6497,7 +6921,7 @@ public interface Page extends AutoCloseable {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * page.selectOption("select#colors", "blue");
@@ -6530,7 +6954,7 @@ public interface Page extends AutoCloseable {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * page.selectOption("select#colors", "blue");
@@ -6561,7 +6985,7 @@ public interface Page extends AutoCloseable {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * page.selectOption("select#colors", "blue");
@@ -6594,7 +7018,7 @@ public interface Page extends AutoCloseable {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * page.selectOption("select#colors", "blue");
@@ -6625,7 +7049,7 @@ public interface Page extends AutoCloseable {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * page.selectOption("select#colors", "blue");
@@ -6658,7 +7082,7 @@ public interface Page extends AutoCloseable {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * page.selectOption("select#colors", "blue");
@@ -6684,8 +7108,7 @@ public interface Page extends AutoCloseable {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the matched element,
    * unless {@code force} option is set. If the element is detached during the checks, the whole action is retried.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to click in the center of the element.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to click in the center of the element.</li>
    * <li> Ensure that the element is now checked or unchecked. If not, this method throws.</li>
    * </ol>
    *
@@ -6708,8 +7131,7 @@ public interface Page extends AutoCloseable {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the matched element,
    * unless {@code force} option is set. If the element is detached during the checks, the whole action is retried.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to click in the center of the element.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to click in the center of the element.</li>
    * <li> Ensure that the element is now checked or unchecked. If not, this method throws.</li>
    * </ol>
    *
@@ -6744,19 +7166,19 @@ public interface Page extends AutoCloseable {
   /**
    * This setting will change the default maximum navigation time for the following methods and related shortcuts:
    * <ul>
-   * <li> {@link Page#goBack Page.goBack()}</li>
-   * <li> {@link Page#goForward Page.goForward()}</li>
-   * <li> {@link Page#navigate Page.navigate()}</li>
-   * <li> {@link Page#reload Page.reload()}</li>
-   * <li> {@link Page#setContent Page.setContent()}</li>
-   * <li> {@link Page#waitForNavigation Page.waitForNavigation()}</li>
-   * <li> {@link Page#waitForURL Page.waitForURL()}</li>
+   * <li> {@link com.microsoft.playwright.Page#goBack Page.goBack()}</li>
+   * <li> {@link com.microsoft.playwright.Page#goForward Page.goForward()}</li>
+   * <li> {@link com.microsoft.playwright.Page#navigate Page.navigate()}</li>
+   * <li> {@link com.microsoft.playwright.Page#reload Page.reload()}</li>
+   * <li> {@link com.microsoft.playwright.Page#setContent Page.setContent()}</li>
+   * <li> {@link com.microsoft.playwright.Page#waitForNavigation Page.waitForNavigation()}</li>
+   * <li> {@link com.microsoft.playwright.Page#waitForURL Page.waitForURL()}</li>
    * </ul>
    *
-   * <p> <strong>NOTE:</strong> {@link Page#setDefaultNavigationTimeout Page.setDefaultNavigationTimeout()} takes priority over {@link
-   * Page#setDefaultTimeout Page.setDefaultTimeout()}, {@link BrowserContext#setDefaultTimeout
-   * BrowserContext.setDefaultTimeout()} and {@link BrowserContext#setDefaultNavigationTimeout
-   * BrowserContext.setDefaultNavigationTimeout()}.
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.Page#setDefaultNavigationTimeout Page.setDefaultNavigationTimeout()} takes priority over
+   * {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}, {@link
+   * com.microsoft.playwright.BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} and {@link
+   * com.microsoft.playwright.BrowserContext#setDefaultNavigationTimeout BrowserContext.setDefaultNavigationTimeout()}.
    *
    * @param timeout Maximum navigation time in milliseconds
    * @since v1.8
@@ -6765,18 +7187,18 @@ public interface Page extends AutoCloseable {
   /**
    * This setting will change the default maximum time for all the methods accepting {@code timeout} option.
    *
-   * <p> <strong>NOTE:</strong> {@link Page#setDefaultNavigationTimeout Page.setDefaultNavigationTimeout()} takes priority over {@link
-   * Page#setDefaultTimeout Page.setDefaultTimeout()}.
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.Page#setDefaultNavigationTimeout Page.setDefaultNavigationTimeout()} takes priority over
+   * {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}.
    *
-   * @param timeout Maximum time in milliseconds
+   * @param timeout Maximum time in milliseconds. Pass {@code 0} to disable timeout.
    * @since v1.8
    */
   void setDefaultTimeout(double timeout);
   /**
    * The extra HTTP headers will be sent with every request the page initiates.
    *
-   * <p> <strong>NOTE:</strong> {@link Page#setExtraHTTPHeaders Page.setExtraHTTPHeaders()} does not guarantee the order of headers in the outgoing
-   * requests.
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.Page#setExtraHTTPHeaders Page.setExtraHTTPHeaders()} does not guarantee the order of
+   * headers in the outgoing requests.
    *
    * @param headers An object containing additional HTTP headers to be sent with every request. All header values must be strings.
    * @since v1.8
@@ -6784,7 +7206,8 @@ public interface Page extends AutoCloseable {
   void setExtraHTTPHeaders(Map<String, String> headers);
   /**
    * Sets the value of the file input to these file paths or files. If some of the {@code filePaths} are relative paths, then
-   * they are resolved relative to the current working directory. For empty array, clears the selected files.
+   * they are resolved relative to the current working directory. For empty array, clears the selected files. For inputs with
+   * a {@code [webkitdirectory]} attribute, only a single directory path is supported.
    *
    * <p> This method expects {@code selector} to point to an <a
    * href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input">input element</a>. However, if the element is
@@ -6800,7 +7223,8 @@ public interface Page extends AutoCloseable {
   }
   /**
    * Sets the value of the file input to these file paths or files. If some of the {@code filePaths} are relative paths, then
-   * they are resolved relative to the current working directory. For empty array, clears the selected files.
+   * they are resolved relative to the current working directory. For empty array, clears the selected files. For inputs with
+   * a {@code [webkitdirectory]} attribute, only a single directory path is supported.
    *
    * <p> This method expects {@code selector} to point to an <a
    * href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input">input element</a>. However, if the element is
@@ -6814,7 +7238,8 @@ public interface Page extends AutoCloseable {
   void setInputFiles(String selector, Path files, SetInputFilesOptions options);
   /**
    * Sets the value of the file input to these file paths or files. If some of the {@code filePaths} are relative paths, then
-   * they are resolved relative to the current working directory. For empty array, clears the selected files.
+   * they are resolved relative to the current working directory. For empty array, clears the selected files. For inputs with
+   * a {@code [webkitdirectory]} attribute, only a single directory path is supported.
    *
    * <p> This method expects {@code selector} to point to an <a
    * href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input">input element</a>. However, if the element is
@@ -6830,7 +7255,8 @@ public interface Page extends AutoCloseable {
   }
   /**
    * Sets the value of the file input to these file paths or files. If some of the {@code filePaths} are relative paths, then
-   * they are resolved relative to the current working directory. For empty array, clears the selected files.
+   * they are resolved relative to the current working directory. For empty array, clears the selected files. For inputs with
+   * a {@code [webkitdirectory]} attribute, only a single directory path is supported.
    *
    * <p> This method expects {@code selector} to point to an <a
    * href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input">input element</a>. However, if the element is
@@ -6844,7 +7270,8 @@ public interface Page extends AutoCloseable {
   void setInputFiles(String selector, Path[] files, SetInputFilesOptions options);
   /**
    * Sets the value of the file input to these file paths or files. If some of the {@code filePaths} are relative paths, then
-   * they are resolved relative to the current working directory. For empty array, clears the selected files.
+   * they are resolved relative to the current working directory. For empty array, clears the selected files. For inputs with
+   * a {@code [webkitdirectory]} attribute, only a single directory path is supported.
    *
    * <p> This method expects {@code selector} to point to an <a
    * href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input">input element</a>. However, if the element is
@@ -6860,7 +7287,8 @@ public interface Page extends AutoCloseable {
   }
   /**
    * Sets the value of the file input to these file paths or files. If some of the {@code filePaths} are relative paths, then
-   * they are resolved relative to the current working directory. For empty array, clears the selected files.
+   * they are resolved relative to the current working directory. For empty array, clears the selected files. For inputs with
+   * a {@code [webkitdirectory]} attribute, only a single directory path is supported.
    *
    * <p> This method expects {@code selector} to point to an <a
    * href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input">input element</a>. However, if the element is
@@ -6874,7 +7302,8 @@ public interface Page extends AutoCloseable {
   void setInputFiles(String selector, FilePayload files, SetInputFilesOptions options);
   /**
    * Sets the value of the file input to these file paths or files. If some of the {@code filePaths} are relative paths, then
-   * they are resolved relative to the current working directory. For empty array, clears the selected files.
+   * they are resolved relative to the current working directory. For empty array, clears the selected files. For inputs with
+   * a {@code [webkitdirectory]} attribute, only a single directory path is supported.
    *
    * <p> This method expects {@code selector} to point to an <a
    * href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input">input element</a>. However, if the element is
@@ -6890,7 +7319,8 @@ public interface Page extends AutoCloseable {
   }
   /**
    * Sets the value of the file input to these file paths or files. If some of the {@code filePaths} are relative paths, then
-   * they are resolved relative to the current working directory. For empty array, clears the selected files.
+   * they are resolved relative to the current working directory. For empty array, clears the selected files. For inputs with
+   * a {@code [webkitdirectory]} attribute, only a single directory path is supported.
    *
    * <p> This method expects {@code selector} to point to an <a
    * href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input">input element</a>. However, if the element is
@@ -6904,20 +7334,24 @@ public interface Page extends AutoCloseable {
   void setInputFiles(String selector, FilePayload[] files, SetInputFilesOptions options);
   /**
    * In the case of multiple pages in a single browser, each page can have its own viewport size. However, {@link
-   * Browser#newContext Browser.newContext()} allows to set viewport size (and more) for all pages in the context at once.
+   * com.microsoft.playwright.Browser#newContext Browser.newContext()} allows to set viewport size (and more) for all pages
+   * in the context at once.
    *
-   * <p> {@link Page#setViewportSize Page.setViewportSize()} will resize the page. A lot of websites don't expect phones to
-   * change size, so you should set the viewport size before navigating to the page. {@link Page#setViewportSize
-   * Page.setViewportSize()} will also reset {@code screen} size, use {@link Browser#newContext Browser.newContext()} with
-   * {@code screen} and {@code viewport} parameters if you need better control of these properties.
+   * <p> {@link com.microsoft.playwright.Page#setViewportSize Page.setViewportSize()} will resize the page. A lot of websites
+   * don't expect phones to change size, so you should set the viewport size before navigating to the page. {@link
+   * com.microsoft.playwright.Page#setViewportSize Page.setViewportSize()} will also reset {@code screen} size, use {@link
+   * com.microsoft.playwright.Browser#newContext Browser.newContext()} with {@code screen} and {@code viewport} parameters if
+   * you need better control of these properties.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * Page page = browser.newPage();
    * page.setViewportSize(640, 480);
    * page.navigate("https://example.com");
    * }</pre>
    *
+   * @param width Page width in pixels.
+   * @param height Page height in pixels.
    * @since v1.8
    */
   void setViewportSize(int width, int height);
@@ -6928,14 +7362,15 @@ public interface Page extends AutoCloseable {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the matched element,
    * unless {@code force} option is set. If the element is detached during the checks, the whole action is retried.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#touchscreen Page.touchscreen()} to tap the center of the element, or the specified {@code position}.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#touchscreen Page.touchscreen()} to tap the center of the element, or the
+   * specified {@code position}.</li>
    * </ol>
    *
    * <p> When all steps combined have not finished during the specified {@code timeout}, this method throws a {@code
    * TimeoutError}. Passing zero timeout disables this.
    *
-   * <p> <strong>NOTE:</strong> {@link Page#tap Page.tap()} the method will throw if {@code hasTouch} option of the browser context is false.
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.Page#tap Page.tap()} the method will throw if {@code hasTouch} option of the browser
+   * context is false.
    *
    * @param selector A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used.
    * @since v1.8
@@ -6950,14 +7385,15 @@ public interface Page extends AutoCloseable {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the matched element,
    * unless {@code force} option is set. If the element is detached during the checks, the whole action is retried.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#touchscreen Page.touchscreen()} to tap the center of the element, or the specified {@code position}.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#touchscreen Page.touchscreen()} to tap the center of the element, or the
+   * specified {@code position}.</li>
    * </ol>
    *
    * <p> When all steps combined have not finished during the specified {@code timeout}, this method throws a {@code
    * TimeoutError}. Passing zero timeout disables this.
    *
-   * <p> <strong>NOTE:</strong> {@link Page#tap Page.tap()} the method will throw if {@code hasTouch} option of the browser context is false.
+   * <p> <strong>NOTE:</strong> {@link com.microsoft.playwright.Page#tap Page.tap()} the method will throw if {@code hasTouch} option of the browser
+   * context is false.
    *
    * @param selector A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used.
    * @since v1.8
@@ -6992,9 +7428,9 @@ public interface Page extends AutoCloseable {
    */
   Touchscreen touchscreen();
   /**
-   * @deprecated In most cases, you should use {@link Locator#fill Locator.fill()} instead. You only need to press keys one by one if
-   * there is special keyboard handling on the page - in this case use {@link Locator#pressSequentially
-   * Locator.pressSequentially()}.
+   * @deprecated In most cases, you should use {@link com.microsoft.playwright.Locator#fill Locator.fill()} instead. You only need to
+   * press keys one by one if there is special keyboard handling on the page - in this case use {@link
+   * com.microsoft.playwright.Locator#pressSequentially Locator.pressSequentially()}.
    *
    * @param selector A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used.
    * @param text A text to type into a focused element.
@@ -7004,9 +7440,9 @@ public interface Page extends AutoCloseable {
     type(selector, text, null);
   }
   /**
-   * @deprecated In most cases, you should use {@link Locator#fill Locator.fill()} instead. You only need to press keys one by one if
-   * there is special keyboard handling on the page - in this case use {@link Locator#pressSequentially
-   * Locator.pressSequentially()}.
+   * @deprecated In most cases, you should use {@link com.microsoft.playwright.Locator#fill Locator.fill()} instead. You only need to
+   * press keys one by one if there is special keyboard handling on the page - in this case use {@link
+   * com.microsoft.playwright.Locator#pressSequentially Locator.pressSequentially()}.
    *
    * @param selector A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used.
    * @param text A text to type into a focused element.
@@ -7022,8 +7458,7 @@ public interface Page extends AutoCloseable {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the matched element,
    * unless {@code force} option is set. If the element is detached during the checks, the whole action is retried.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to click in the center of the element.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to click in the center of the element.</li>
    * <li> Ensure that the element is now unchecked. If not, this method throws.</li>
    * </ol>
    *
@@ -7045,8 +7480,7 @@ public interface Page extends AutoCloseable {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the matched element,
    * unless {@code force} option is set. If the element is detached during the checks, the whole action is retried.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to click in the center of the element.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to click in the center of the element.</li>
    * <li> Ensure that the element is now unchecked. If not, this method throws.</li>
    * </ol>
    *
@@ -7058,14 +7492,15 @@ public interface Page extends AutoCloseable {
    */
   void uncheck(String selector, UncheckOptions options);
   /**
-   * Removes all routes created with {@link Page#route Page.route()} and {@link Page#routeFromHAR Page.routeFromHAR()}.
+   * Removes all routes created with {@link com.microsoft.playwright.Page#route Page.route()} and {@link
+   * com.microsoft.playwright.Page#routeFromHAR Page.routeFromHAR()}.
    *
    * @since v1.41
    */
   void unrouteAll();
   /**
-   * Removes a route created with {@link Page#route Page.route()}. When {@code handler} is not specified, removes all routes
-   * for the {@code url}.
+   * Removes a route created with {@link com.microsoft.playwright.Page#route Page.route()}. When {@code handler} is not
+   * specified, removes all routes for the {@code url}.
    *
    * @param url A glob pattern, regex pattern or predicate receiving [URL] to match while routing.
    * @since v1.8
@@ -7074,8 +7509,8 @@ public interface Page extends AutoCloseable {
     unroute(url, null);
   }
   /**
-   * Removes a route created with {@link Page#route Page.route()}. When {@code handler} is not specified, removes all routes
-   * for the {@code url}.
+   * Removes a route created with {@link com.microsoft.playwright.Page#route Page.route()}. When {@code handler} is not
+   * specified, removes all routes for the {@code url}.
    *
    * @param url A glob pattern, regex pattern or predicate receiving [URL] to match while routing.
    * @param handler Optional handler function to route the request.
@@ -7083,8 +7518,8 @@ public interface Page extends AutoCloseable {
    */
   void unroute(String url, Consumer<Route> handler);
   /**
-   * Removes a route created with {@link Page#route Page.route()}. When {@code handler} is not specified, removes all routes
-   * for the {@code url}.
+   * Removes a route created with {@link com.microsoft.playwright.Page#route Page.route()}. When {@code handler} is not
+   * specified, removes all routes for the {@code url}.
    *
    * @param url A glob pattern, regex pattern or predicate receiving [URL] to match while routing.
    * @since v1.8
@@ -7093,8 +7528,8 @@ public interface Page extends AutoCloseable {
     unroute(url, null);
   }
   /**
-   * Removes a route created with {@link Page#route Page.route()}. When {@code handler} is not specified, removes all routes
-   * for the {@code url}.
+   * Removes a route created with {@link com.microsoft.playwright.Page#route Page.route()}. When {@code handler} is not
+   * specified, removes all routes for the {@code url}.
    *
    * @param url A glob pattern, regex pattern or predicate receiving [URL] to match while routing.
    * @param handler Optional handler function to route the request.
@@ -7102,8 +7537,8 @@ public interface Page extends AutoCloseable {
    */
   void unroute(Pattern url, Consumer<Route> handler);
   /**
-   * Removes a route created with {@link Page#route Page.route()}. When {@code handler} is not specified, removes all routes
-   * for the {@code url}.
+   * Removes a route created with {@link com.microsoft.playwright.Page#route Page.route()}. When {@code handler} is not
+   * specified, removes all routes for the {@code url}.
    *
    * @param url A glob pattern, regex pattern or predicate receiving [URL] to match while routing.
    * @since v1.8
@@ -7112,8 +7547,8 @@ public interface Page extends AutoCloseable {
     unroute(url, null);
   }
   /**
-   * Removes a route created with {@link Page#route Page.route()}. When {@code handler} is not specified, removes all routes
-   * for the {@code url}.
+   * Removes a route created with {@link com.microsoft.playwright.Page#route Page.route()}. When {@code handler} is not
+   * specified, removes all routes for the {@code url}.
    *
    * @param url A glob pattern, regex pattern or predicate receiving [URL] to match while routing.
    * @param handler Optional handler function to route the request.
@@ -7157,8 +7592,8 @@ public interface Page extends AutoCloseable {
   /**
    * Performs action and waits for a {@code ConsoleMessage} to be logged by in the page. If predicate is provided, it passes
    * {@code ConsoleMessage} value into the {@code predicate} function and waits for {@code predicate(message)} to return a
-   * truthy value. Will throw an error if the page is closed before the {@link Page#onConsoleMessage Page.onConsoleMessage()}
-   * event is fired.
+   * truthy value. Will throw an error if the page is closed before the {@link com.microsoft.playwright.Page#onConsoleMessage
+   * Page.onConsoleMessage()} event is fired.
    *
    * @param callback Callback that performs the action triggering the event.
    * @since v1.9
@@ -7169,8 +7604,8 @@ public interface Page extends AutoCloseable {
   /**
    * Performs action and waits for a {@code ConsoleMessage} to be logged by in the page. If predicate is provided, it passes
    * {@code ConsoleMessage} value into the {@code predicate} function and waits for {@code predicate(message)} to return a
-   * truthy value. Will throw an error if the page is closed before the {@link Page#onConsoleMessage Page.onConsoleMessage()}
-   * event is fired.
+   * truthy value. Will throw an error if the page is closed before the {@link com.microsoft.playwright.Page#onConsoleMessage
+   * Page.onConsoleMessage()} event is fired.
    *
    * @param callback Callback that performs the action triggering the event.
    * @since v1.9
@@ -7219,9 +7654,10 @@ public interface Page extends AutoCloseable {
   /**
    * Returns when the {@code expression} returns a truthy value. It resolves to a JSHandle of the truthy value.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
-   * <p> The {@link Page#waitForFunction Page.waitForFunction()} can be used to observe viewport size change:
+   * <p> The {@link com.microsoft.playwright.Page#waitForFunction Page.waitForFunction()} can be used to observe viewport size
+   * change:
    * <pre>{@code
    * import com.microsoft.playwright.*;
    *
@@ -7239,7 +7675,8 @@ public interface Page extends AutoCloseable {
    * }
    * }</pre>
    *
-   * <p> To pass an argument to the predicate of {@link Page#waitForFunction Page.waitForFunction()} function:
+   * <p> To pass an argument to the predicate of {@link com.microsoft.playwright.Page#waitForFunction Page.waitForFunction()}
+   * function:
    * <pre>{@code
    * String selector = ".foo";
    * page.waitForFunction("selector => !!document.querySelector(selector)", selector);
@@ -7256,9 +7693,10 @@ public interface Page extends AutoCloseable {
   /**
    * Returns when the {@code expression} returns a truthy value. It resolves to a JSHandle of the truthy value.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
-   * <p> The {@link Page#waitForFunction Page.waitForFunction()} can be used to observe viewport size change:
+   * <p> The {@link com.microsoft.playwright.Page#waitForFunction Page.waitForFunction()} can be used to observe viewport size
+   * change:
    * <pre>{@code
    * import com.microsoft.playwright.*;
    *
@@ -7276,7 +7714,8 @@ public interface Page extends AutoCloseable {
    * }
    * }</pre>
    *
-   * <p> To pass an argument to the predicate of {@link Page#waitForFunction Page.waitForFunction()} function:
+   * <p> To pass an argument to the predicate of {@link com.microsoft.playwright.Page#waitForFunction Page.waitForFunction()}
+   * function:
    * <pre>{@code
    * String selector = ".foo";
    * page.waitForFunction("selector => !!document.querySelector(selector)", selector);
@@ -7292,9 +7731,10 @@ public interface Page extends AutoCloseable {
   /**
    * Returns when the {@code expression} returns a truthy value. It resolves to a JSHandle of the truthy value.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
-   * <p> The {@link Page#waitForFunction Page.waitForFunction()} can be used to observe viewport size change:
+   * <p> The {@link com.microsoft.playwright.Page#waitForFunction Page.waitForFunction()} can be used to observe viewport size
+   * change:
    * <pre>{@code
    * import com.microsoft.playwright.*;
    *
@@ -7312,7 +7752,8 @@ public interface Page extends AutoCloseable {
    * }
    * }</pre>
    *
-   * <p> To pass an argument to the predicate of {@link Page#waitForFunction Page.waitForFunction()} function:
+   * <p> To pass an argument to the predicate of {@link com.microsoft.playwright.Page#waitForFunction Page.waitForFunction()}
+   * function:
    * <pre>{@code
    * String selector = ".foo";
    * page.waitForFunction("selector => !!document.querySelector(selector)", selector);
@@ -7330,7 +7771,10 @@ public interface Page extends AutoCloseable {
    * <p> This resolves when the page reaches a required load state, {@code load} by default. The navigation must have been
    * committed when this method is called. If current document has already reached the required state, resolves immediately.
    *
-   * <p> **Usage**
+   * <p> <strong>NOTE:</strong> Most of the time, this method is not needed because Playwright <a
+   * href="https://playwright.dev/java/docs/actionability">auto-waits before every action</a>.
+   *
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.getByRole(AriaRole.BUTTON).click(); // Click triggers navigation.
    * page.waitForLoadState(); // The promise resolves after "load" event.
@@ -7363,7 +7807,10 @@ public interface Page extends AutoCloseable {
    * <p> This resolves when the page reaches a required load state, {@code load} by default. The navigation must have been
    * committed when this method is called. If current document has already reached the required state, resolves immediately.
    *
-   * <p> **Usage**
+   * <p> <strong>NOTE:</strong> Most of the time, this method is not needed because Playwright <a
+   * href="https://playwright.dev/java/docs/actionability">auto-waits before every action</a>.
+   *
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.getByRole(AriaRole.BUTTON).click(); // Click triggers navigation.
    * page.waitForLoadState(); // The promise resolves after "load" event.
@@ -7388,7 +7835,10 @@ public interface Page extends AutoCloseable {
    * <p> This resolves when the page reaches a required load state, {@code load} by default. The navigation must have been
    * committed when this method is called. If current document has already reached the required state, resolves immediately.
    *
-   * <p> **Usage**
+   * <p> <strong>NOTE:</strong> Most of the time, this method is not needed because Playwright <a
+   * href="https://playwright.dev/java/docs/actionability">auto-waits before every action</a>.
+   *
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.getByRole(AriaRole.BUTTON).click(); // Click triggers navigation.
    * page.waitForLoadState(); // The promise resolves after "load" event.
@@ -7414,7 +7864,7 @@ public interface Page extends AutoCloseable {
    */
   void waitForLoadState(LoadState state, WaitForLoadStateOptions options);
   /**
-   * @deprecated This method is inherently racy, please use {@link Page#waitForURL Page.waitForURL()} instead.
+   * @deprecated This method is inherently racy, please use {@link com.microsoft.playwright.Page#waitForURL Page.waitForURL()} instead.
    *
    * @param callback Callback that performs the action triggering the event.
    * @since v1.8
@@ -7423,7 +7873,7 @@ public interface Page extends AutoCloseable {
     return waitForNavigation(null, callback);
   }
   /**
-   * @deprecated This method is inherently racy, please use {@link Page#waitForURL Page.waitForURL()} instead.
+   * @deprecated This method is inherently racy, please use {@link com.microsoft.playwright.Page#waitForURL Page.waitForURL()} instead.
    *
    * @param callback Callback that performs the action triggering the event.
    * @since v1.8
@@ -7453,7 +7903,7 @@ public interface Page extends AutoCloseable {
    * Waits for the matching request and returns it. See <a
    * href="https://playwright.dev/java/docs/events#waiting-for-event">waiting for event</a> for more details about events.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Waits for the next request with the specified url
    * Request request = page.waitForRequest("https://example.com/resource", () -> {
@@ -7481,7 +7931,7 @@ public interface Page extends AutoCloseable {
    * Waits for the matching request and returns it. See <a
    * href="https://playwright.dev/java/docs/events#waiting-for-event">waiting for event</a> for more details about events.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Waits for the next request with the specified url
    * Request request = page.waitForRequest("https://example.com/resource", () -> {
@@ -7507,7 +7957,7 @@ public interface Page extends AutoCloseable {
    * Waits for the matching request and returns it. See <a
    * href="https://playwright.dev/java/docs/events#waiting-for-event">waiting for event</a> for more details about events.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Waits for the next request with the specified url
    * Request request = page.waitForRequest("https://example.com/resource", () -> {
@@ -7535,7 +7985,7 @@ public interface Page extends AutoCloseable {
    * Waits for the matching request and returns it. See <a
    * href="https://playwright.dev/java/docs/events#waiting-for-event">waiting for event</a> for more details about events.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Waits for the next request with the specified url
    * Request request = page.waitForRequest("https://example.com/resource", () -> {
@@ -7561,7 +8011,7 @@ public interface Page extends AutoCloseable {
    * Waits for the matching request and returns it. See <a
    * href="https://playwright.dev/java/docs/events#waiting-for-event">waiting for event</a> for more details about events.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Waits for the next request with the specified url
    * Request request = page.waitForRequest("https://example.com/resource", () -> {
@@ -7589,7 +8039,7 @@ public interface Page extends AutoCloseable {
    * Waits for the matching request and returns it. See <a
    * href="https://playwright.dev/java/docs/events#waiting-for-event">waiting for event</a> for more details about events.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Waits for the next request with the specified url
    * Request request = page.waitForRequest("https://example.com/resource", () -> {
@@ -7614,7 +8064,8 @@ public interface Page extends AutoCloseable {
   /**
    * Performs action and waits for a {@code Request} to finish loading. If predicate is provided, it passes {@code Request}
    * value into the {@code predicate} function and waits for {@code predicate(request)} to return a truthy value. Will throw
-   * an error if the page is closed before the {@link Page#onRequestFinished Page.onRequestFinished()} event is fired.
+   * an error if the page is closed before the {@link com.microsoft.playwright.Page#onRequestFinished
+   * Page.onRequestFinished()} event is fired.
    *
    * @param callback Callback that performs the action triggering the event.
    * @since v1.12
@@ -7625,7 +8076,8 @@ public interface Page extends AutoCloseable {
   /**
    * Performs action and waits for a {@code Request} to finish loading. If predicate is provided, it passes {@code Request}
    * value into the {@code predicate} function and waits for {@code predicate(request)} to return a truthy value. Will throw
-   * an error if the page is closed before the {@link Page#onRequestFinished Page.onRequestFinished()} event is fired.
+   * an error if the page is closed before the {@link com.microsoft.playwright.Page#onRequestFinished
+   * Page.onRequestFinished()} event is fired.
    *
    * @param callback Callback that performs the action triggering the event.
    * @since v1.12
@@ -7635,7 +8087,7 @@ public interface Page extends AutoCloseable {
    * Returns the matched response. See <a href="https://playwright.dev/java/docs/events#waiting-for-event">waiting for
    * event</a> for more details about events.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Waits for the next response with the specified url
    * Response response = page.waitForResponse("https://example.com/resource", () -> {
@@ -7644,7 +8096,7 @@ public interface Page extends AutoCloseable {
    * });
    *
    * // Waits for the next response matching some conditions
-   * Response response = page.waitForResponse(response -> "https://example.com".equals(response.url()) && response.status() == 200, () -> {
+   * Response response = page.waitForResponse(response -> "https://example.com".equals(response.url()) && response.status() == 200 && "GET".equals(response.request().method()), () -> {
    *   // Triggers the response
    *   page.getByText("trigger response").click();
    * });
@@ -7663,7 +8115,7 @@ public interface Page extends AutoCloseable {
    * Returns the matched response. See <a href="https://playwright.dev/java/docs/events#waiting-for-event">waiting for
    * event</a> for more details about events.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Waits for the next response with the specified url
    * Response response = page.waitForResponse("https://example.com/resource", () -> {
@@ -7672,7 +8124,7 @@ public interface Page extends AutoCloseable {
    * });
    *
    * // Waits for the next response matching some conditions
-   * Response response = page.waitForResponse(response -> "https://example.com".equals(response.url()) && response.status() == 200, () -> {
+   * Response response = page.waitForResponse(response -> "https://example.com".equals(response.url()) && response.status() == 200 && "GET".equals(response.request().method()), () -> {
    *   // Triggers the response
    *   page.getByText("trigger response").click();
    * });
@@ -7689,7 +8141,7 @@ public interface Page extends AutoCloseable {
    * Returns the matched response. See <a href="https://playwright.dev/java/docs/events#waiting-for-event">waiting for
    * event</a> for more details about events.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Waits for the next response with the specified url
    * Response response = page.waitForResponse("https://example.com/resource", () -> {
@@ -7698,7 +8150,7 @@ public interface Page extends AutoCloseable {
    * });
    *
    * // Waits for the next response matching some conditions
-   * Response response = page.waitForResponse(response -> "https://example.com".equals(response.url()) && response.status() == 200, () -> {
+   * Response response = page.waitForResponse(response -> "https://example.com".equals(response.url()) && response.status() == 200 && "GET".equals(response.request().method()), () -> {
    *   // Triggers the response
    *   page.getByText("trigger response").click();
    * });
@@ -7717,7 +8169,7 @@ public interface Page extends AutoCloseable {
    * Returns the matched response. See <a href="https://playwright.dev/java/docs/events#waiting-for-event">waiting for
    * event</a> for more details about events.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Waits for the next response with the specified url
    * Response response = page.waitForResponse("https://example.com/resource", () -> {
@@ -7726,7 +8178,7 @@ public interface Page extends AutoCloseable {
    * });
    *
    * // Waits for the next response matching some conditions
-   * Response response = page.waitForResponse(response -> "https://example.com".equals(response.url()) && response.status() == 200, () -> {
+   * Response response = page.waitForResponse(response -> "https://example.com".equals(response.url()) && response.status() == 200 && "GET".equals(response.request().method()), () -> {
    *   // Triggers the response
    *   page.getByText("trigger response").click();
    * });
@@ -7743,7 +8195,7 @@ public interface Page extends AutoCloseable {
    * Returns the matched response. See <a href="https://playwright.dev/java/docs/events#waiting-for-event">waiting for
    * event</a> for more details about events.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Waits for the next response with the specified url
    * Response response = page.waitForResponse("https://example.com/resource", () -> {
@@ -7752,7 +8204,7 @@ public interface Page extends AutoCloseable {
    * });
    *
    * // Waits for the next response matching some conditions
-   * Response response = page.waitForResponse(response -> "https://example.com".equals(response.url()) && response.status() == 200, () -> {
+   * Response response = page.waitForResponse(response -> "https://example.com".equals(response.url()) && response.status() == 200 && "GET".equals(response.request().method()), () -> {
    *   // Triggers the response
    *   page.getByText("trigger response").click();
    * });
@@ -7771,7 +8223,7 @@ public interface Page extends AutoCloseable {
    * Returns the matched response. See <a href="https://playwright.dev/java/docs/events#waiting-for-event">waiting for
    * event</a> for more details about events.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Waits for the next response with the specified url
    * Response response = page.waitForResponse("https://example.com/resource", () -> {
@@ -7780,7 +8232,7 @@ public interface Page extends AutoCloseable {
    * });
    *
    * // Waits for the next response matching some conditions
-   * Response response = page.waitForResponse(response -> "https://example.com".equals(response.url()) && response.status() == 200, () -> {
+   * Response response = page.waitForResponse(response -> "https://example.com".equals(response.url()) && response.status() == 200 && "GET".equals(response.request().method()), () -> {
    *   // Triggers the response
    *   page.getByText("trigger response").click();
    * });
@@ -7805,7 +8257,7 @@ public interface Page extends AutoCloseable {
    * will return immediately. If the selector doesn't satisfy the condition for the {@code timeout} milliseconds, the
    * function will throw.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> This method works across navigations:
    * <pre>{@code
@@ -7846,7 +8298,7 @@ public interface Page extends AutoCloseable {
    * will return immediately. If the selector doesn't satisfy the condition for the {@code timeout} milliseconds, the
    * function will throw.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> This method works across navigations:
    * <pre>{@code
@@ -7877,7 +8329,7 @@ public interface Page extends AutoCloseable {
    * The method will block until the condition returns true. All Playwright events will be dispatched while the method is
    * waiting for the condition.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> Use the method to wait for a condition that depends on page events:
    * <pre>{@code
@@ -7897,7 +8349,7 @@ public interface Page extends AutoCloseable {
    * The method will block until the condition returns true. All Playwright events will be dispatched while the method is
    * waiting for the condition.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> Use the method to wait for a condition that depends on page events:
    * <pre>{@code
@@ -7917,7 +8369,7 @@ public interface Page extends AutoCloseable {
    * <p> Note that {@code page.waitForTimeout()} should only be used for debugging. Tests using the timer in production are going
    * to be flaky. Use signals such as network events, selectors becoming visible and others instead.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // wait for 1 second
    * page.waitForTimeout(1000);
@@ -7930,7 +8382,7 @@ public interface Page extends AutoCloseable {
   /**
    * Waits for the main frame to navigate to the given URL.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.click("a.delayed-navigation"); // Clicking the link will indirectly cause a navigation
    * page.waitForURL("**\/target.html");
@@ -7947,7 +8399,7 @@ public interface Page extends AutoCloseable {
   /**
    * Waits for the main frame to navigate to the given URL.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.click("a.delayed-navigation"); // Clicking the link will indirectly cause a navigation
    * page.waitForURL("**\/target.html");
@@ -7962,7 +8414,7 @@ public interface Page extends AutoCloseable {
   /**
    * Waits for the main frame to navigate to the given URL.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.click("a.delayed-navigation"); // Clicking the link will indirectly cause a navigation
    * page.waitForURL("**\/target.html");
@@ -7979,7 +8431,7 @@ public interface Page extends AutoCloseable {
   /**
    * Waits for the main frame to navigate to the given URL.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.click("a.delayed-navigation"); // Clicking the link will indirectly cause a navigation
    * page.waitForURL("**\/target.html");
@@ -7994,7 +8446,7 @@ public interface Page extends AutoCloseable {
   /**
    * Waits for the main frame to navigate to the given URL.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.click("a.delayed-navigation"); // Clicking the link will indirectly cause a navigation
    * page.waitForURL("**\/target.html");
@@ -8011,7 +8463,7 @@ public interface Page extends AutoCloseable {
   /**
    * Waits for the main frame to navigate to the given URL.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.click("a.delayed-navigation"); // Clicking the link will indirectly cause a navigation
    * page.waitForURL("**\/target.html");

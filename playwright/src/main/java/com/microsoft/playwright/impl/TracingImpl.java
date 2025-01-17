@@ -33,6 +33,7 @@ class TracingImpl extends ChannelOwner implements Tracing {
 
   TracingImpl(ChannelOwner parent, String type, String guid, JsonObject initializer) {
     super(parent, type, guid, initializer);
+    markAsInternalType();
   }
 
   private void stopChunkImpl(Path path) {
@@ -83,6 +84,25 @@ class TracingImpl extends ChannelOwner implements Tracing {
       options = new StartChunkOptions();
     }
     tracingStartChunk(options.name, options.title);
+  }
+
+  @Override
+  public void group(String name, GroupOptions options) {
+    withLogging("Tracing.group", () -> groupImpl(name, options));
+  }
+
+  private void groupImpl(String name, GroupOptions options) {
+    if (options == null) {
+      options = new GroupOptions();
+    }
+    JsonObject params = gson().toJsonTree(options).getAsJsonObject();
+    params.addProperty("name", name);
+    sendMessage("tracingGroup", params);
+  }
+
+  @Override
+  public void groupEnd() {
+    withLogging("Tracing.groupEnd", () -> sendMessage("tracingGroupEnd"));
   }
 
   private void tracingStartChunk(String name, String title) {

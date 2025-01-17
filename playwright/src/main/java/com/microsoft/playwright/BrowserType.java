@@ -172,9 +172,14 @@ public interface BrowserType {
      */
     public List<String> args;
     /**
-     * Browser distribution channel.  Supported values are "chrome", "chrome-beta", "chrome-dev", "chrome-canary", "msedge",
-     * "msedge-beta", "msedge-dev", "msedge-canary". Read more about using <a
-     * href="https://playwright.dev/java/docs/browsers#google-chrome--microsoft-edge">Google Chrome and Microsoft Edge</a>.
+     * Browser distribution channel.
+     *
+     * <p> Use "chromium" to <a href="https://playwright.dev/java/docs/browsers#chromium-new-headless-mode">opt in to new headless
+     * mode</a>.
+     *
+     * <p> Use "chrome", "chrome-beta", "chrome-dev", "chrome-canary", "msedge", "msedge-beta", "msedge-dev", or "msedge-canary" to
+     * use branded <a href="https://playwright.dev/java/docs/browsers#google-chrome--microsoft-edge">Google Chrome and
+     * Microsoft Edge</a>.
      */
     public Object channel;
     /**
@@ -182,8 +187,7 @@ public interface BrowserType {
      */
     public Boolean chromiumSandbox;
     /**
-     * **Chromium-only** Whether to auto-open a Developer Tools panel for each tab. If this option is {@code true}, the {@code
-     * headless} option will be set {@code false}.
+     * @deprecated Use <a href="https://playwright.dev/java/docs/debug">debugging tools</a> instead.
      */
     public Boolean devtools;
     /**
@@ -266,18 +270,28 @@ public interface BrowserType {
     }
     @Deprecated
     /**
-     * Browser distribution channel.  Supported values are "chrome", "chrome-beta", "chrome-dev", "chrome-canary", "msedge",
-     * "msedge-beta", "msedge-dev", "msedge-canary". Read more about using <a
-     * href="https://playwright.dev/java/docs/browsers#google-chrome--microsoft-edge">Google Chrome and Microsoft Edge</a>.
+     * Browser distribution channel.
+     *
+     * <p> Use "chromium" to <a href="https://playwright.dev/java/docs/browsers#chromium-new-headless-mode">opt in to new headless
+     * mode</a>.
+     *
+     * <p> Use "chrome", "chrome-beta", "chrome-dev", "chrome-canary", "msedge", "msedge-beta", "msedge-dev", or "msedge-canary" to
+     * use branded <a href="https://playwright.dev/java/docs/browsers#google-chrome--microsoft-edge">Google Chrome and
+     * Microsoft Edge</a>.
      */
     public LaunchOptions setChannel(BrowserChannel channel) {
       this.channel = channel;
       return this;
     }
     /**
-     * Browser distribution channel.  Supported values are "chrome", "chrome-beta", "chrome-dev", "chrome-canary", "msedge",
-     * "msedge-beta", "msedge-dev", "msedge-canary". Read more about using <a
-     * href="https://playwright.dev/java/docs/browsers#google-chrome--microsoft-edge">Google Chrome and Microsoft Edge</a>.
+     * Browser distribution channel.
+     *
+     * <p> Use "chromium" to <a href="https://playwright.dev/java/docs/browsers#chromium-new-headless-mode">opt in to new headless
+     * mode</a>.
+     *
+     * <p> Use "chrome", "chrome-beta", "chrome-dev", "chrome-canary", "msedge", "msedge-beta", "msedge-dev", or "msedge-canary" to
+     * use branded <a href="https://playwright.dev/java/docs/browsers#google-chrome--microsoft-edge">Google Chrome and
+     * Microsoft Edge</a>.
      */
     public LaunchOptions setChannel(String channel) {
       this.channel = channel;
@@ -291,8 +305,7 @@ public interface BrowserType {
       return this;
     }
     /**
-     * **Chromium-only** Whether to auto-open a Developer Tools panel for each tab. If this option is {@code true}, the {@code
-     * headless} option will be set {@code false}.
+     * @deprecated Use <a href="https://playwright.dev/java/docs/debug">debugging tools</a> instead.
      */
     public LaunchOptions setDevtools(boolean devtools) {
       this.devtools = devtools;
@@ -427,10 +440,11 @@ public interface BrowserType {
      */
     public List<String> args;
     /**
-     * When using {@link Page#navigate Page.navigate()}, {@link Page#route Page.route()}, {@link Page#waitForURL
-     * Page.waitForURL()}, {@link Page#waitForRequest Page.waitForRequest()}, or {@link Page#waitForResponse
-     * Page.waitForResponse()} it takes the base URL in consideration by using the <a
-     * href="https://developer.mozilla.org/en-US/docs/Web/API/URL/URL">{@code URL()}</a> constructor for building the
+     * When using {@link com.microsoft.playwright.Page#navigate Page.navigate()}, {@link com.microsoft.playwright.Page#route
+     * Page.route()}, {@link com.microsoft.playwright.Page#waitForURL Page.waitForURL()}, {@link
+     * com.microsoft.playwright.Page#waitForRequest Page.waitForRequest()}, or {@link
+     * com.microsoft.playwright.Page#waitForResponse Page.waitForResponse()} it takes the base URL in consideration by using
+     * the <a href="https://developer.mozilla.org/en-US/docs/Web/API/URL/URL">{@code URL()}</a> constructor for building the
      * corresponding URL. Unset by default. Examples:
      * <ul>
      * <li> baseURL: {@code http://localhost:3000} and navigating to {@code /bar.html} results in {@code
@@ -447,9 +461,14 @@ public interface BrowserType {
      */
     public Boolean bypassCSP;
     /**
-     * Browser distribution channel.  Supported values are "chrome", "chrome-beta", "chrome-dev", "chrome-canary", "msedge",
-     * "msedge-beta", "msedge-dev", "msedge-canary". Read more about using <a
-     * href="https://playwright.dev/java/docs/browsers#google-chrome--microsoft-edge">Google Chrome and Microsoft Edge</a>.
+     * Browser distribution channel.
+     *
+     * <p> Use "chromium" to <a href="https://playwright.dev/java/docs/browsers#chromium-new-headless-mode">opt in to new headless
+     * mode</a>.
+     *
+     * <p> Use "chrome", "chrome-beta", "chrome-dev", "chrome-canary", "msedge", "msedge-beta", "msedge-dev", or "msedge-canary" to
+     * use branded <a href="https://playwright.dev/java/docs/browsers#google-chrome--microsoft-edge">Google Chrome and
+     * Microsoft Edge</a>.
      */
     public Object channel;
     /**
@@ -457,9 +476,25 @@ public interface BrowserType {
      */
     public Boolean chromiumSandbox;
     /**
-     * Emulates {@code "prefers-colors-scheme"} media feature, supported values are {@code "light"}, {@code "dark"}, {@code
-     * "no-preference"}. See {@link Page#emulateMedia Page.emulateMedia()} for more details. Passing {@code null} resets
-     * emulation to system defaults. Defaults to {@code "light"}.
+     * TLS Client Authentication allows the server to request a client certificate and verify it.
+     *
+     * <p> <strong>Details</strong>
+     *
+     * <p> An array of client certificates to be used. Each certificate object must have either both {@code certPath} and {@code
+     * keyPath}, a single {@code pfxPath}, or their corresponding direct value equivalents ({@code cert} and {@code key}, or
+     * {@code pfx}). Optionally, {@code passphrase} property should be provided if the certificate is encrypted. The {@code
+     * origin} property should be provided with an exact match to the request origin that the certificate is valid for.
+     *
+     * <p> <strong>NOTE:</strong> When using WebKit on macOS, accessing {@code localhost} will not pick up client certificates. You can make it work by
+     * replacing {@code localhost} with {@code local.playwright}.
+     */
+    public List<ClientCertificate> clientCertificates;
+    /**
+     * Emulates <a
+     * href="https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme">prefers-colors-scheme</a> media
+     * feature, supported values are {@code "light"} and {@code "dark"}. See {@link com.microsoft.playwright.Page#emulateMedia
+     * Page.emulateMedia()} for more details. Passing {@code null} resets emulation to system defaults. Defaults to {@code
+     * "light"}.
      */
     public Optional<ColorScheme> colorScheme;
     /**
@@ -468,8 +503,7 @@ public interface BrowserType {
      */
     public Double deviceScaleFactor;
     /**
-     * **Chromium-only** Whether to auto-open a Developer Tools panel for each tab. If this option is {@code true}, the {@code
-     * headless} option will be set {@code false}.
+     * @deprecated Use <a href="https://playwright.dev/java/docs/debug">debugging tools</a> instead.
      */
     public Boolean devtools;
     /**
@@ -499,8 +533,8 @@ public interface BrowserType {
     public Map<String, Object> firefoxUserPrefs;
     /**
      * Emulates {@code "forced-colors"} media feature, supported values are {@code "active"}, {@code "none"}. See {@link
-     * Page#emulateMedia Page.emulateMedia()} for more details. Passing {@code null} resets emulation to system defaults.
-     * Defaults to {@code "none"}.
+     * com.microsoft.playwright.Page#emulateMedia Page.emulateMedia()} for more details. Passing {@code null} resets emulation
+     * to system defaults. Defaults to {@code "none"}.
      */
     public Optional<ForcedColors> forcedColors;
     public Geolocation geolocation;
@@ -571,8 +605,9 @@ public interface BrowserType {
      */
     public Boolean offline;
     /**
-     * A list of permissions to grant to all pages in this context. See {@link BrowserContext#grantPermissions
-     * BrowserContext.grantPermissions()} for more details. Defaults to none.
+     * A list of permissions to grant to all pages in this context. See {@link
+     * com.microsoft.playwright.BrowserContext#grantPermissions BrowserContext.grantPermissions()} for more details. Defaults
+     * to none.
      */
     public List<String> permissions;
     /**
@@ -597,14 +632,14 @@ public interface BrowserType {
     public Boolean recordHarOmitContent;
     /**
      * Enables <a href="http://www.softwareishard.com/blog/har-12-spec">HAR</a> recording for all pages into the specified HAR
-     * file on the filesystem. If not specified, the HAR is not recorded. Make sure to call {@link BrowserContext#close
-     * BrowserContext.close()} for the HAR to be saved.
+     * file on the filesystem. If not specified, the HAR is not recorded. Make sure to call {@link
+     * com.microsoft.playwright.BrowserContext#close BrowserContext.close()} for the HAR to be saved.
      */
     public Path recordHarPath;
     public Object recordHarUrlFilter;
     /**
      * Enables video recording for all pages into the specified directory. If not specified videos are not recorded. Make sure
-     * to call {@link BrowserContext#close BrowserContext.close()} for videos to be saved.
+     * to call {@link com.microsoft.playwright.BrowserContext#close BrowserContext.close()} for videos to be saved.
      */
     public Path recordVideoDir;
     /**
@@ -615,8 +650,8 @@ public interface BrowserType {
     public RecordVideoSize recordVideoSize;
     /**
      * Emulates {@code "prefers-reduced-motion"} media feature, supported values are {@code "reduce"}, {@code "no-preference"}.
-     * See {@link Page#emulateMedia Page.emulateMedia()} for more details. Passing {@code null} resets emulation to system
-     * defaults. Defaults to {@code "no-preference"}.
+     * See {@link com.microsoft.playwright.Page#emulateMedia Page.emulateMedia()} for more details. Passing {@code null} resets
+     * emulation to system defaults. Defaults to {@code "no-preference"}.
      */
     public Optional<ReducedMotion> reducedMotion;
     /**
@@ -691,10 +726,11 @@ public interface BrowserType {
       return this;
     }
     /**
-     * When using {@link Page#navigate Page.navigate()}, {@link Page#route Page.route()}, {@link Page#waitForURL
-     * Page.waitForURL()}, {@link Page#waitForRequest Page.waitForRequest()}, or {@link Page#waitForResponse
-     * Page.waitForResponse()} it takes the base URL in consideration by using the <a
-     * href="https://developer.mozilla.org/en-US/docs/Web/API/URL/URL">{@code URL()}</a> constructor for building the
+     * When using {@link com.microsoft.playwright.Page#navigate Page.navigate()}, {@link com.microsoft.playwright.Page#route
+     * Page.route()}, {@link com.microsoft.playwright.Page#waitForURL Page.waitForURL()}, {@link
+     * com.microsoft.playwright.Page#waitForRequest Page.waitForRequest()}, or {@link
+     * com.microsoft.playwright.Page#waitForResponse Page.waitForResponse()} it takes the base URL in consideration by using
+     * the <a href="https://developer.mozilla.org/en-US/docs/Web/API/URL/URL">{@code URL()}</a> constructor for building the
      * corresponding URL. Unset by default. Examples:
      * <ul>
      * <li> baseURL: {@code http://localhost:3000} and navigating to {@code /bar.html} results in {@code
@@ -718,18 +754,28 @@ public interface BrowserType {
     }
     @Deprecated
     /**
-     * Browser distribution channel.  Supported values are "chrome", "chrome-beta", "chrome-dev", "chrome-canary", "msedge",
-     * "msedge-beta", "msedge-dev", "msedge-canary". Read more about using <a
-     * href="https://playwright.dev/java/docs/browsers#google-chrome--microsoft-edge">Google Chrome and Microsoft Edge</a>.
+     * Browser distribution channel.
+     *
+     * <p> Use "chromium" to <a href="https://playwright.dev/java/docs/browsers#chromium-new-headless-mode">opt in to new headless
+     * mode</a>.
+     *
+     * <p> Use "chrome", "chrome-beta", "chrome-dev", "chrome-canary", "msedge", "msedge-beta", "msedge-dev", or "msedge-canary" to
+     * use branded <a href="https://playwright.dev/java/docs/browsers#google-chrome--microsoft-edge">Google Chrome and
+     * Microsoft Edge</a>.
      */
     public LaunchPersistentContextOptions setChannel(BrowserChannel channel) {
       this.channel = channel;
       return this;
     }
     /**
-     * Browser distribution channel.  Supported values are "chrome", "chrome-beta", "chrome-dev", "chrome-canary", "msedge",
-     * "msedge-beta", "msedge-dev", "msedge-canary". Read more about using <a
-     * href="https://playwright.dev/java/docs/browsers#google-chrome--microsoft-edge">Google Chrome and Microsoft Edge</a>.
+     * Browser distribution channel.
+     *
+     * <p> Use "chromium" to <a href="https://playwright.dev/java/docs/browsers#chromium-new-headless-mode">opt in to new headless
+     * mode</a>.
+     *
+     * <p> Use "chrome", "chrome-beta", "chrome-dev", "chrome-canary", "msedge", "msedge-beta", "msedge-dev", or "msedge-canary" to
+     * use branded <a href="https://playwright.dev/java/docs/browsers#google-chrome--microsoft-edge">Google Chrome and
+     * Microsoft Edge</a>.
      */
     public LaunchPersistentContextOptions setChannel(String channel) {
       this.channel = channel;
@@ -743,9 +789,28 @@ public interface BrowserType {
       return this;
     }
     /**
-     * Emulates {@code "prefers-colors-scheme"} media feature, supported values are {@code "light"}, {@code "dark"}, {@code
-     * "no-preference"}. See {@link Page#emulateMedia Page.emulateMedia()} for more details. Passing {@code null} resets
-     * emulation to system defaults. Defaults to {@code "light"}.
+     * TLS Client Authentication allows the server to request a client certificate and verify it.
+     *
+     * <p> <strong>Details</strong>
+     *
+     * <p> An array of client certificates to be used. Each certificate object must have either both {@code certPath} and {@code
+     * keyPath}, a single {@code pfxPath}, or their corresponding direct value equivalents ({@code cert} and {@code key}, or
+     * {@code pfx}). Optionally, {@code passphrase} property should be provided if the certificate is encrypted. The {@code
+     * origin} property should be provided with an exact match to the request origin that the certificate is valid for.
+     *
+     * <p> <strong>NOTE:</strong> When using WebKit on macOS, accessing {@code localhost} will not pick up client certificates. You can make it work by
+     * replacing {@code localhost} with {@code local.playwright}.
+     */
+    public LaunchPersistentContextOptions setClientCertificates(List<ClientCertificate> clientCertificates) {
+      this.clientCertificates = clientCertificates;
+      return this;
+    }
+    /**
+     * Emulates <a
+     * href="https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme">prefers-colors-scheme</a> media
+     * feature, supported values are {@code "light"} and {@code "dark"}. See {@link com.microsoft.playwright.Page#emulateMedia
+     * Page.emulateMedia()} for more details. Passing {@code null} resets emulation to system defaults. Defaults to {@code
+     * "light"}.
      */
     public LaunchPersistentContextOptions setColorScheme(ColorScheme colorScheme) {
       this.colorScheme = Optional.ofNullable(colorScheme);
@@ -760,8 +825,7 @@ public interface BrowserType {
       return this;
     }
     /**
-     * **Chromium-only** Whether to auto-open a Developer Tools panel for each tab. If this option is {@code true}, the {@code
-     * headless} option will be set {@code false}.
+     * @deprecated Use <a href="https://playwright.dev/java/docs/debug">debugging tools</a> instead.
      */
     public LaunchPersistentContextOptions setDevtools(boolean devtools) {
       this.devtools = devtools;
@@ -809,8 +873,8 @@ public interface BrowserType {
     }
     /**
      * Emulates {@code "forced-colors"} media feature, supported values are {@code "active"}, {@code "none"}. See {@link
-     * Page#emulateMedia Page.emulateMedia()} for more details. Passing {@code null} resets emulation to system defaults.
-     * Defaults to {@code "none"}.
+     * com.microsoft.playwright.Page#emulateMedia Page.emulateMedia()} for more details. Passing {@code null} resets emulation
+     * to system defaults. Defaults to {@code "none"}.
      */
     public LaunchPersistentContextOptions setForcedColors(ForcedColors forcedColors) {
       this.forcedColors = Optional.ofNullable(forcedColors);
@@ -936,8 +1000,9 @@ public interface BrowserType {
       return this;
     }
     /**
-     * A list of permissions to grant to all pages in this context. See {@link BrowserContext#grantPermissions
-     * BrowserContext.grantPermissions()} for more details. Defaults to none.
+     * A list of permissions to grant to all pages in this context. See {@link
+     * com.microsoft.playwright.BrowserContext#grantPermissions BrowserContext.grantPermissions()} for more details. Defaults
+     * to none.
      */
     public LaunchPersistentContextOptions setPermissions(List<String> permissions) {
       this.permissions = permissions;
@@ -983,8 +1048,8 @@ public interface BrowserType {
     }
     /**
      * Enables <a href="http://www.softwareishard.com/blog/har-12-spec">HAR</a> recording for all pages into the specified HAR
-     * file on the filesystem. If not specified, the HAR is not recorded. Make sure to call {@link BrowserContext#close
-     * BrowserContext.close()} for the HAR to be saved.
+     * file on the filesystem. If not specified, the HAR is not recorded. Make sure to call {@link
+     * com.microsoft.playwright.BrowserContext#close BrowserContext.close()} for the HAR to be saved.
      */
     public LaunchPersistentContextOptions setRecordHarPath(Path recordHarPath) {
       this.recordHarPath = recordHarPath;
@@ -1000,7 +1065,7 @@ public interface BrowserType {
     }
     /**
      * Enables video recording for all pages into the specified directory. If not specified videos are not recorded. Make sure
-     * to call {@link BrowserContext#close BrowserContext.close()} for videos to be saved.
+     * to call {@link com.microsoft.playwright.BrowserContext#close BrowserContext.close()} for videos to be saved.
      */
     public LaunchPersistentContextOptions setRecordVideoDir(Path recordVideoDir) {
       this.recordVideoDir = recordVideoDir;
@@ -1025,8 +1090,8 @@ public interface BrowserType {
     }
     /**
      * Emulates {@code "prefers-reduced-motion"} media feature, supported values are {@code "reduce"}, {@code "no-preference"}.
-     * See {@link Page#emulateMedia Page.emulateMedia()} for more details. Passing {@code null} resets emulation to system
-     * defaults. Defaults to {@code "no-preference"}.
+     * See {@link com.microsoft.playwright.Page#emulateMedia Page.emulateMedia()} for more details. Passing {@code null} resets
+     * emulation to system defaults. Defaults to {@code "no-preference"}.
      */
     public LaunchPersistentContextOptions setReducedMotion(ReducedMotion reducedMotion) {
       this.reducedMotion = Optional.ofNullable(reducedMotion);
@@ -1154,11 +1219,11 @@ public interface BrowserType {
   /**
    * This method attaches Playwright to an existing browser instance using the Chrome DevTools Protocol.
    *
-   * <p> The default browser context is accessible via {@link Browser#contexts Browser.contexts()}.
+   * <p> The default browser context is accessible via {@link com.microsoft.playwright.Browser#contexts Browser.contexts()}.
    *
    * <p> <strong>NOTE:</strong> Connecting over the Chrome DevTools Protocol is only supported for Chromium-based browsers.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * Browser browser = playwright.chromium().connectOverCDP("http://localhost:9222");
    * BrowserContext defaultContext = browser.contexts().get(0);
@@ -1175,11 +1240,11 @@ public interface BrowserType {
   /**
    * This method attaches Playwright to an existing browser instance using the Chrome DevTools Protocol.
    *
-   * <p> The default browser context is accessible via {@link Browser#contexts Browser.contexts()}.
+   * <p> The default browser context is accessible via {@link com.microsoft.playwright.Browser#contexts Browser.contexts()}.
    *
    * <p> <strong>NOTE:</strong> Connecting over the Chrome DevTools Protocol is only supported for Chromium-based browsers.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * Browser browser = playwright.chromium().connectOverCDP("http://localhost:9222");
    * BrowserContext defaultContext = browser.contexts().get(0);
@@ -1200,7 +1265,7 @@ public interface BrowserType {
   /**
    * Returns the browser instance.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> You can use {@code ignoreDefaultArgs} to filter out {@code --mute-audio} from default arguments:
    * <pre>{@code
@@ -1236,7 +1301,7 @@ public interface BrowserType {
   /**
    * Returns the browser instance.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> You can use {@code ignoreDefaultArgs} to filter out {@code --mute-audio} from default arguments:
    * <pre>{@code

@@ -19,12 +19,13 @@ package com.microsoft.playwright;
 import com.microsoft.playwright.options.*;
 
 /**
- * Keyboard provides an api for managing a virtual keyboard. The high level api is {@link Keyboard#type Keyboard.type()},
- * which takes raw characters and generates proper {@code keydown}, {@code keypress}/{@code input}, and {@code keyup}
- * events on your page.
+ * Keyboard provides an api for managing a virtual keyboard. The high level api is {@link
+ * com.microsoft.playwright.Keyboard#type Keyboard.type()}, which takes raw characters and generates proper {@code
+ * keydown}, {@code keypress}/{@code input}, and {@code keyup} events on your page.
  *
- * <p> For finer control, you can use {@link Keyboard#down Keyboard.down()}, {@link Keyboard#up Keyboard.up()}, and {@link
- * Keyboard#insertText Keyboard.insertText()} to manually fire events as if they were generated from a real keyboard.
+ * <p> For finer control, you can use {@link com.microsoft.playwright.Keyboard#down Keyboard.down()}, {@link
+ * com.microsoft.playwright.Keyboard#up Keyboard.up()}, and {@link com.microsoft.playwright.Keyboard#insertText
+ * Keyboard.insertText()} to manually fire events as if they were generated from a real keyboard.
  *
  * <p> An example of holding down {@code Shift} in order to select and delete some text:
  * <pre>{@code
@@ -47,10 +48,7 @@ import com.microsoft.playwright.options.*;
  *
  * <p> An example to trigger select-all with the keyboard
  * <pre>{@code
- * // on Windows and Linux
- * page.keyboard().press("Control+A");
- * // on macOS
- * page.keyboard().press("Meta+A");
+ * page.keyboard().press("ControlOrMeta+A");
  * }</pre>
  */
 public interface Keyboard {
@@ -96,7 +94,8 @@ public interface Keyboard {
    * ArrowUp}, etc.
    *
    * <p> Following modification shortcuts are also supported: {@code Shift}, {@code Control}, {@code Alt}, {@code Meta}, {@code
-   * ShiftLeft}.
+   * ShiftLeft}, {@code ControlOrMeta}. {@code ControlOrMeta} resolves to {@code Control} on Windows and Linux and to {@code
+   * Meta} on macOS.
    *
    * <p> Holding down {@code Shift} will type the text that corresponds to the {@code key} in the upper case.
    *
@@ -104,11 +103,12 @@ public interface Keyboard {
    * different respective texts.
    *
    * <p> If {@code key} is a modifier key, {@code Shift}, {@code Meta}, {@code Control}, or {@code Alt}, subsequent key presses
-   * will be sent with that modifier active. To release the modifier key, use {@link Keyboard#up Keyboard.up()}.
+   * will be sent with that modifier active. To release the modifier key, use {@link com.microsoft.playwright.Keyboard#up
+   * Keyboard.up()}.
    *
-   * <p> After the key is pressed once, subsequent calls to {@link Keyboard#down Keyboard.down()} will have <a
-   * href="https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/repeat">repeat</a> set to true. To release the key,
-   * use {@link Keyboard#up Keyboard.up()}.
+   * <p> After the key is pressed once, subsequent calls to {@link com.microsoft.playwright.Keyboard#down Keyboard.down()} will
+   * have <a href="https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/repeat">repeat</a> set to true. To release
+   * the key, use {@link com.microsoft.playwright.Keyboard#up Keyboard.up()}.
    *
    * <p> <strong>NOTE:</strong> Modifier keys DO influence {@code keyboard.down}. Holding down {@code Shift} will type the text in upper case.
    *
@@ -119,7 +119,7 @@ public interface Keyboard {
   /**
    * Dispatches only {@code input} event, does not emit the {@code keydown}, {@code keyup} or {@code keypress} events.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.keyboard().insertText("嗨");
    * }</pre>
@@ -132,7 +132,7 @@ public interface Keyboard {
    */
   void insertText(String text);
   /**
-   * <strong>NOTE:</strong> In most cases, you should use {@link Locator#press Locator.press()} instead.
+   * <strong>NOTE:</strong> In most cases, you should use {@link com.microsoft.playwright.Locator#press Locator.press()} instead.
    *
    * <p> {@code key} can specify the intended <a
    * href="https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key">keyboardEvent.key</a> value or a single
@@ -145,22 +145,23 @@ public interface Keyboard {
    * ArrowUp}, etc.
    *
    * <p> Following modification shortcuts are also supported: {@code Shift}, {@code Control}, {@code Alt}, {@code Meta}, {@code
-   * ShiftLeft}.
+   * ShiftLeft}, {@code ControlOrMeta}. {@code ControlOrMeta} resolves to {@code Control} on Windows and Linux and to {@code
+   * Meta} on macOS.
    *
    * <p> Holding down {@code Shift} will type the text that corresponds to the {@code key} in the upper case.
    *
    * <p> If {@code key} is a single character, it is case-sensitive, so the values {@code a} and {@code A} will generate
    * different respective texts.
    *
-   * <p> Shortcuts such as {@code key: "Control+o"} or {@code key: "Control+Shift+T"} are supported as well. When specified with
-   * the modifier, modifier is pressed and being held while the subsequent key is being pressed.
+   * <p> Shortcuts such as {@code key: "Control+o"}, {@code key: "Control++} or {@code key: "Control+Shift+T"} are supported as
+   * well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * Page page = browser.newPage();
    * page.navigate("https://keycode.info");
    * page.keyboard().press("A");
-   * page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get("A.png"));
+   * page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get("A.png")));
    * page.keyboard().press("ArrowLeft");
    * page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get("ArrowLeft.png")));
    * page.keyboard().press("Shift+O");
@@ -168,7 +169,8 @@ public interface Keyboard {
    * browser.close();
    * }</pre>
    *
-   * <p> Shortcut for {@link Keyboard#down Keyboard.down()} and {@link Keyboard#up Keyboard.up()}.
+   * <p> Shortcut for {@link com.microsoft.playwright.Keyboard#down Keyboard.down()} and {@link
+   * com.microsoft.playwright.Keyboard#up Keyboard.up()}.
    *
    * @param key Name of the key to press or a character to generate, such as {@code ArrowLeft} or {@code a}.
    * @since v1.8
@@ -177,7 +179,7 @@ public interface Keyboard {
     press(key, null);
   }
   /**
-   * <strong>NOTE:</strong> In most cases, you should use {@link Locator#press Locator.press()} instead.
+   * <strong>NOTE:</strong> In most cases, you should use {@link com.microsoft.playwright.Locator#press Locator.press()} instead.
    *
    * <p> {@code key} can specify the intended <a
    * href="https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key">keyboardEvent.key</a> value or a single
@@ -190,22 +192,23 @@ public interface Keyboard {
    * ArrowUp}, etc.
    *
    * <p> Following modification shortcuts are also supported: {@code Shift}, {@code Control}, {@code Alt}, {@code Meta}, {@code
-   * ShiftLeft}.
+   * ShiftLeft}, {@code ControlOrMeta}. {@code ControlOrMeta} resolves to {@code Control} on Windows and Linux and to {@code
+   * Meta} on macOS.
    *
    * <p> Holding down {@code Shift} will type the text that corresponds to the {@code key} in the upper case.
    *
    * <p> If {@code key} is a single character, it is case-sensitive, so the values {@code a} and {@code A} will generate
    * different respective texts.
    *
-   * <p> Shortcuts such as {@code key: "Control+o"} or {@code key: "Control+Shift+T"} are supported as well. When specified with
-   * the modifier, modifier is pressed and being held while the subsequent key is being pressed.
+   * <p> Shortcuts such as {@code key: "Control+o"}, {@code key: "Control++} or {@code key: "Control+Shift+T"} are supported as
+   * well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * Page page = browser.newPage();
    * page.navigate("https://keycode.info");
    * page.keyboard().press("A");
-   * page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get("A.png"));
+   * page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get("A.png")));
    * page.keyboard().press("ArrowLeft");
    * page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get("ArrowLeft.png")));
    * page.keyboard().press("Shift+O");
@@ -213,22 +216,24 @@ public interface Keyboard {
    * browser.close();
    * }</pre>
    *
-   * <p> Shortcut for {@link Keyboard#down Keyboard.down()} and {@link Keyboard#up Keyboard.up()}.
+   * <p> Shortcut for {@link com.microsoft.playwright.Keyboard#down Keyboard.down()} and {@link
+   * com.microsoft.playwright.Keyboard#up Keyboard.up()}.
    *
    * @param key Name of the key to press or a character to generate, such as {@code ArrowLeft} or {@code a}.
    * @since v1.8
    */
   void press(String key, PressOptions options);
   /**
-   * <strong>NOTE:</strong> In most cases, you should use {@link Locator#fill Locator.fill()} instead. You only need to press keys one by one if
-   * there is special keyboard handling on the page - in this case use {@link Locator#pressSequentially
-   * Locator.pressSequentially()}.
+   * <strong>NOTE:</strong> In most cases, you should use {@link com.microsoft.playwright.Locator#fill Locator.fill()} instead. You only need to
+   * press keys one by one if there is special keyboard handling on the page - in this case use {@link
+   * com.microsoft.playwright.Locator#pressSequentially Locator.pressSequentially()}.
    *
    * <p> Sends a {@code keydown}, {@code keypress}/{@code input}, and {@code keyup} event for each character in the text.
    *
-   * <p> To press a special key, like {@code Control} or {@code ArrowDown}, use {@link Keyboard#press Keyboard.press()}.
+   * <p> To press a special key, like {@code Control} or {@code ArrowDown}, use {@link com.microsoft.playwright.Keyboard#press
+   * Keyboard.press()}.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Types instantly
    * page.keyboard().type("Hello");
@@ -247,15 +252,16 @@ public interface Keyboard {
     type(text, null);
   }
   /**
-   * <strong>NOTE:</strong> In most cases, you should use {@link Locator#fill Locator.fill()} instead. You only need to press keys one by one if
-   * there is special keyboard handling on the page - in this case use {@link Locator#pressSequentially
-   * Locator.pressSequentially()}.
+   * <strong>NOTE:</strong> In most cases, you should use {@link com.microsoft.playwright.Locator#fill Locator.fill()} instead. You only need to
+   * press keys one by one if there is special keyboard handling on the page - in this case use {@link
+   * com.microsoft.playwright.Locator#pressSequentially Locator.pressSequentially()}.
    *
    * <p> Sends a {@code keydown}, {@code keypress}/{@code input}, and {@code keyup} event for each character in the text.
    *
-   * <p> To press a special key, like {@code Control} or {@code ArrowDown}, use {@link Keyboard#press Keyboard.press()}.
+   * <p> To press a special key, like {@code Control} or {@code ArrowDown}, use {@link com.microsoft.playwright.Keyboard#press
+   * Keyboard.press()}.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Types instantly
    * page.keyboard().type("Hello");

@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) Microsoft Corporation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.microsoft.playwright;
 
 import org.junit.jupiter.api.Assumptions;
@@ -327,10 +343,9 @@ public class TestPageKeyboard extends TestBase {
     page.navigate(server.PREFIX + "/input/textarea.html");
     ElementHandle textarea = page.querySelector("textarea");
     textarea.type("some text");
-    String modifier = isMac ? "Meta" : "Control";
-    page.keyboard().down(modifier);
+    page.keyboard().down("ControlOrMeta");
     page.keyboard().press("a");
-    page.keyboard().up(modifier);
+    page.keyboard().up("ControlOrMeta");
     page.keyboard().press("Backspace");
     assertTrue(((String)page.evalOnSelector("textarea", "textarea => textarea.value")).isEmpty());
   }
@@ -346,10 +361,9 @@ public class TestPageKeyboard extends TestBase {
       "      event.preventDefault();\n" +
       "  }, false);\n" +
       "}");
-    String modifier = isMac ? "Meta" : "Control";
-    page.keyboard().down(modifier);
+    page.keyboard().down("ControlOrMeta");
     page.keyboard().press("a");
-    page.keyboard().up(modifier);
+    page.keyboard().up("ControlOrMeta");
     page.keyboard().press("Backspace");
     assertEquals("some tex", page.evalOnSelector("textarea", "textarea => textarea.value"));
   }

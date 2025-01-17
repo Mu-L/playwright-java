@@ -48,7 +48,37 @@ public class PageImpl extends ChannelOwner implements Page {
   final Waitable<?> waitableClosedOrCrashed;
   private ViewportSize viewport;
   private final Router routes = new Router();
+  private final WebSocketRouter webSocketRoutes = new WebSocketRouter();
   private final Set<FrameImpl> frames = new LinkedHashSet<>();
+  private final Map<Integer, LocatorHandler> locatorHandlers = new HashMap<>();
+
+  private static class LocatorHandler {
+    private final Locator locator;
+    private final Consumer<Locator> handler;
+    private Integer times;
+
+    LocatorHandler(Locator locator, Consumer<Locator> handler, Integer times) {
+      this.locator = locator;
+      this.handler = handler;
+      this.times = times;
+    }
+
+    boolean call() {
+      if (shouldRemove()) {
+        return true;
+      }
+      if (times != null) {
+        --times;
+      }
+      handler.accept(locator);
+      return shouldRemove();
+    }
+
+    private boolean shouldRemove() {
+      return times != null && times == 0;
+    }
+  }
+
   private static final Map<EventType, String> eventSubscriptions() {
     Map<EventType, String> result = new HashMap<>();
     result.put(EventType.CONSOLE, "console");
@@ -170,6 +200,9 @@ public class PageImpl extends ChannelOwner implements Page {
         frame.parentFrame.childFrames.remove(frame);
       }
       listeners.notify(EventType.FRAMEDETACHED, frame);
+    } else if ("locatorHandlerTriggered".equals(event)) {
+      int uid = params.get("uid").getAsInt();
+      onLocatorHandlerTriggered(uid);
     } else if ("route".equals(event)) {
       RouteImpl route = connection.getExistingObject(params.getAsJsonObject("route").get("guid").getAsString());
       route.browserContext = browserContext;
@@ -179,6 +212,11 @@ public class PageImpl extends ChannelOwner implements Page {
       }
       if (handled == Router.HandleResult.NoMatchingHandler || handled == Router.HandleResult.Fallback) {
         browserContext.handleRoute(route);
+      }
+    } else if ("webSocketRoute".equals(event)) {
+      WebSocketRouteImpl route = connection.getExistingObject(params.getAsJsonObject("webSocketRoute").get("guid").getAsString());
+      if (!webSocketRoutes.handle(route)) {
+        browserContext.handleWebSocketRoute(route);
       }
     } else if ("video".equals(event)) {
       String artifactGuid = params.getAsJsonObject("artifact").get("guid").getAsString();
@@ -198,6 +236,7 @@ public class PageImpl extends ChannelOwner implements Page {
   void didClose() {
     isClosed = true;
     browserContext.pages.remove(this);
+    browserContext.backgroundPages.remove(this);
     listeners.notify(EventType.CLOSE, this);
   }
 
@@ -399,6 +438,11 @@ public class PageImpl extends ChannelOwner implements Page {
   }
 
   @Override
+  public ClockImpl clock() {
+    return browserContext.clock();
+  }
+
+  @Override
   public Page waitForClose(WaitForCloseOptions options, Runnable code) {
     return withWaitLogging("Page.waitForClose", logger -> waitForCloseImpl(options, code));
   }
@@ -524,6 +568,63 @@ public class PageImpl extends ChannelOwner implements Page {
   }
 
   @Override
+  public void addLocatorHandler(Locator locator, Consumer<Locator> handler, AddLocatorHandlerOptions options) {
+    LocatorImpl locatorImpl = (LocatorImpl) locator;
+    if (locatorImpl.frame != mainFrame) {
+      throw new PlaywrightException("Locator must belong to the main frame of this page");
+    }
+    if (options == null) {
+      options = new AddLocatorHandlerOptions();
+    }
+    if (options.times != null && options.times == 0) {
+      return;
+    }
+    AddLocatorHandlerOptions finalOptions = options;
+    withLogging("Page.addLocatorHandler", () -> {
+      JsonObject params = new JsonObject();
+      params.addProperty("selector", locatorImpl.selector);
+      if (finalOptions.noWaitAfter != null && finalOptions.noWaitAfter) {
+        params.addProperty("noWaitAfter", true);
+      }
+      params.addProperty("selector", locatorImpl.selector);
+      JsonObject json = (JsonObject) sendMessage("registerLocatorHandler", params);
+      int uid = json.get("uid").getAsInt();
+      locatorHandlers.put(uid, new LocatorHandler(locator, handler, finalOptions.times));
+    });
+  }
+
+  @Override
+  public void removeLocatorHandler(Locator locator) {
+    for (Map.Entry<Integer, LocatorHandler> entry: locatorHandlers.entrySet()) {
+      if (entry.getValue().locator.equals(locator)) {
+        locatorHandlers.remove(locator);
+        JsonObject params = new JsonObject();
+        params.addProperty("uid", entry.getKey());
+        try {
+          sendMessage("unregisterLocatorHandler", params);
+        } catch (PlaywrightException e) {
+        }
+      }
+    }
+  }
+
+  private void onLocatorHandlerTriggered(int uid) {
+    boolean remove = false;
+    try {
+      LocatorHandler handler = locatorHandlers.get(uid);
+      remove = handler != null && handler.call();
+    } finally {
+      if (remove) {
+        locatorHandlers.remove(uid);
+      }
+      JsonObject params = new JsonObject();
+      params.addProperty("uid", uid);
+      params.addProperty("remove", remove);
+      sendMessageAsync("resolveLocatorHandlerNoReply", params);
+    }
+  }
+
+  @Override
   public Object evalOnSelector(String selector, String pageFunction, Object arg, EvalOnSelectorOptions options) {
     return withLogging("Page.evalOnSelector", () -> mainFrame.evalOnSelectorImpl(
       selector, pageFunction, arg, convertType(options, Frame.EvalOnSelectorOptions.class)));
@@ -544,7 +645,8 @@ public class PageImpl extends ChannelOwner implements Page {
     withLogging("Page.addInitScript", () -> {
       try {
         byte[] bytes = readAllBytes(path);
-        addInitScriptImpl(new String(bytes, UTF_8));
+        String script = addSourceUrlToScript(new String(bytes, UTF_8), path);
+        addInitScriptImpl(script);
       } catch (IOException e) {
         throw new PlaywrightException("Failed to read script from file", e);
       }
@@ -832,6 +934,11 @@ public class PageImpl extends ChannelOwner implements Page {
   }
 
   @Override
+  public void requestGC() {
+    withLogging("Page.requestGC", () -> sendMessage("requestGC"));
+  }
+
+  @Override
   public ResponseImpl navigate(String url, NavigateOptions options) {
     return withLogging("Page.navigate", () -> mainFrame.navigateImpl(url, convertType(options, Frame.NavigateOptions.class)));
   }
@@ -1030,6 +1137,28 @@ public class PageImpl extends ChannelOwner implements Page {
     withLogging("Page.route", () -> {
       routes.add(matcher, handler, options == null ? null : options.times);
       updateInterceptionPatterns();
+    });
+  }
+
+    @Override
+  public void routeWebSocket(String url, Consumer<WebSocketRoute> handler) {
+    routeWebSocketImpl(new UrlMatcher(browserContext.baseUrl, url), handler);
+  }
+
+  @Override
+  public void routeWebSocket(Pattern pattern, Consumer<WebSocketRoute> handler) {
+    routeWebSocketImpl(new UrlMatcher(pattern), handler);
+  }
+
+  @Override
+  public void routeWebSocket(Predicate<String> predicate, Consumer<WebSocketRoute> handler) {
+    routeWebSocketImpl(new UrlMatcher(predicate), handler);
+  }
+
+  private void routeWebSocketImpl(UrlMatcher matcher, Consumer<WebSocketRoute> handler) {
+    withLogging("Page.routeWebSocket", () -> {
+      webSocketRoutes.add(matcher, handler);
+      updateWebSocketInterceptionPatterns();
     });
   }
 
@@ -1258,6 +1387,10 @@ public class PageImpl extends ChannelOwner implements Page {
 
   private void updateInterceptionPatterns() {
     sendMessage("setNetworkInterceptionPatterns", routes.interceptionPatterns());
+  }
+
+  private void updateWebSocketInterceptionPatterns() {
+    sendMessage("setWebSocketInterceptionPatterns", webSocketRoutes.interceptionPatterns());
   }
 
   @Override

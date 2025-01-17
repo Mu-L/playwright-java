@@ -1,7 +1,22 @@
+/*
+ * Copyright (c) Microsoft Corporation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.microsoft.playwright.impl;
 
 import com.google.gson.*;
-import com.google.gson.stream.JsonReader;
 import com.microsoft.playwright.APIRequestContext;
 import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.PlaywrightException;
@@ -10,11 +25,11 @@ import com.microsoft.playwright.options.FilePayload;
 import com.microsoft.playwright.options.RequestOptions;
 
 import java.io.File;
-import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Base64;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.microsoft.playwright.impl.Serialization.*;
@@ -22,6 +37,7 @@ import static com.microsoft.playwright.impl.Utils.toFilePayload;
 
 class APIRequestContextImpl extends ChannelOwner implements APIRequestContext {
   private final TracingImpl tracing;
+  private String disposeReason;
 
   APIRequestContextImpl(ChannelOwner parent, String type, String guid, JsonObject initializer) {
     super(parent, type, guid, initializer);
@@ -34,8 +50,17 @@ class APIRequestContextImpl extends ChannelOwner implements APIRequestContext {
   }
 
   @Override
-  public void dispose() {
-    withLogging("APIRequestContext.dispose", () -> sendMessage("dispose"));
+  public void dispose(DisposeOptions options) {
+    withLogging("APIRequestContext.dispose", () -> disposeImpl(options));
+  }
+
+  private void disposeImpl(DisposeOptions options) {
+    if (options == null) {
+      options = new DisposeOptions();
+    }
+    disposeReason = options.reason;
+    JsonObject params = gson().toJsonTree(options).getAsJsonObject();
+    sendMessage("dispose", params);
   }
 
   @Override
@@ -62,6 +87,9 @@ class APIRequestContextImpl extends ChannelOwner implements APIRequestContext {
   }
 
   private APIResponse fetchImpl(String url, RequestOptionsImpl options) {
+    if (disposeReason != null) {
+      throw new PlaywrightException(disposeReason);
+    }
     if (options == null) {
       options = new RequestOptionsImpl();
     }
@@ -72,7 +100,7 @@ class APIRequestContextImpl extends ChannelOwner implements APIRequestContext {
       for (Map.Entry<String, ?> e : options.params.entrySet()) {
         queryParams.put(e.getKey(), "" + e.getValue());
       }
-      params.add("params", toNameValueArray(queryParams));
+      params.add("params", toNameValueArray(queryParams.entrySet()));
     }
     if (options.method != null) {
       params.addProperty("method", options.method);
@@ -92,7 +120,7 @@ class APIRequestContextImpl extends ChannelOwner implements APIRequestContext {
         }
       }
       if (bytes == null) {
-        params.addProperty("jsonData", gson().toJson(options.data));
+        params.addProperty("jsonData", jsonDataSerializer.toJson(options.data));
       } else {
         String base64 = Base64.getEncoder().encodeToString(bytes);
         params.addProperty("postData", base64);
@@ -119,6 +147,12 @@ class APIRequestContextImpl extends ChannelOwner implements APIRequestContext {
       }
       params.addProperty("maxRedirects", options.maxRedirects);
     }
+    if (options.maxRetries != null) {
+      if (options.maxRetries < 0) {
+        throw new PlaywrightException("'maxRetries' must be greater than or equal to '0'");
+      }
+      params.addProperty("maxRetries", options.maxRetries);
+    }
     JsonObject json = sendMessage("fetch", params).getAsJsonObject();
     return new APIResponseImpl(this, json.getAsJsonObject("response"));
   }
@@ -135,9 +169,9 @@ class APIRequestContextImpl extends ChannelOwner implements APIRequestContext {
     return false;
   }
 
-  private static JsonArray serializeMultipartData(Map<String, Object> data) {
+  private static JsonArray serializeMultipartData(List<? extends Map.Entry<String, Object>> data) {
     JsonArray result = new JsonArray();
-    for (Map.Entry<String, Object> e : data.entrySet()) {
+    for (Map.Entry<String, ?> e : data) {
       FilePayload filePayload = null;
       if (e.getValue() instanceof FilePayload) {
         filePayload = (FilePayload) e.getValue();

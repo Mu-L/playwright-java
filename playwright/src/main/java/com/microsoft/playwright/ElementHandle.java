@@ -21,8 +21,8 @@ import java.nio.file.Path;
 import java.util.*;
 
 /**
- * ElementHandle represents an in-page DOM element. ElementHandles can be created with the {@link Page#querySelector
- * Page.querySelector()} method.
+ * ElementHandle represents an in-page DOM element. ElementHandles can be created with the {@link
+ * com.microsoft.playwright.Page#querySelector Page.querySelector()} method.
  *
  * <p> <strong>NOTE:</strong> The use of ElementHandle is discouraged, use {@code Locator} objects and web-first assertions instead.
  * <pre>{@code
@@ -30,11 +30,12 @@ import java.util.*;
  * hrefElement.click();
  * }</pre>
  *
- * <p> ElementHandle prevents DOM element from garbage collection unless the handle is disposed with {@link JSHandle#dispose
- * JSHandle.dispose()}. ElementHandles are auto-disposed when their origin frame gets navigated.
+ * <p> ElementHandle prevents DOM element from garbage collection unless the handle is disposed with {@link
+ * com.microsoft.playwright.JSHandle#dispose JSHandle.dispose()}. ElementHandles are auto-disposed when their origin frame
+ * gets navigated.
  *
- * <p> ElementHandle instances can be used as an argument in {@link Page#evalOnSelector Page.evalOnSelector()} and {@link
- * Page#evaluate Page.evaluate()} methods.
+ * <p> ElementHandle instances can be used as an argument in {@link com.microsoft.playwright.Page#evalOnSelector
+ * Page.evalOnSelector()} and {@link com.microsoft.playwright.Page#evaluate Page.evaluate()} methods.
  *
  * <p> The difference between the {@code Locator} and ElementHandle is that the ElementHandle points to a particular element,
  * while {@code Locator} captures the logic of how to retrieve an element.
@@ -64,9 +65,7 @@ public interface ElementHandle extends JSHandle {
      */
     public Boolean force;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public Boolean noWaitAfter;
     /**
@@ -76,8 +75,9 @@ public interface ElementHandle extends JSHandle {
     public Position position;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
@@ -96,9 +96,7 @@ public interface ElementHandle extends JSHandle {
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public CheckOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -121,8 +119,9 @@ public interface ElementHandle extends JSHandle {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public CheckOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -158,13 +157,12 @@ public interface ElementHandle extends JSHandle {
     public Boolean force;
     /**
      * Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current
-     * modifiers back. If not specified, currently pressed modifiers are used.
+     * modifiers back. If not specified, currently pressed modifiers are used. "ControlOrMeta" resolves to "Control" on Windows
+     * and Linux and to "Meta" on macOS.
      */
     public List<KeyboardModifier> modifiers;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option will default to {@code true} in the future.
      */
     public Boolean noWaitAfter;
     /**
@@ -174,8 +172,9 @@ public interface ElementHandle extends JSHandle {
     public Position position;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
@@ -216,16 +215,15 @@ public interface ElementHandle extends JSHandle {
     }
     /**
      * Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current
-     * modifiers back. If not specified, currently pressed modifiers are used.
+     * modifiers back. If not specified, currently pressed modifiers are used. "ControlOrMeta" resolves to "Control" on Windows
+     * and Linux and to "Meta" on macOS.
      */
     public ClickOptions setModifiers(List<KeyboardModifier> modifiers) {
       this.modifiers = modifiers;
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option will default to {@code true} in the future.
      */
     public ClickOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -248,8 +246,9 @@ public interface ElementHandle extends JSHandle {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public ClickOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -281,13 +280,12 @@ public interface ElementHandle extends JSHandle {
     public Boolean force;
     /**
      * Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current
-     * modifiers back. If not specified, currently pressed modifiers are used.
+     * modifiers back. If not specified, currently pressed modifiers are used. "ControlOrMeta" resolves to "Control" on Windows
+     * and Linux and to "Meta" on macOS.
      */
     public List<KeyboardModifier> modifiers;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public Boolean noWaitAfter;
     /**
@@ -297,8 +295,9 @@ public interface ElementHandle extends JSHandle {
     public Position position;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
@@ -332,16 +331,15 @@ public interface ElementHandle extends JSHandle {
     }
     /**
      * Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current
-     * modifiers back. If not specified, currently pressed modifiers are used.
+     * modifiers back. If not specified, currently pressed modifiers are used. "ControlOrMeta" resolves to "Control" on Windows
+     * and Linux and to "Meta" on macOS.
      */
     public DblclickOptions setModifiers(List<KeyboardModifier> modifiers) {
       this.modifiers = modifiers;
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public DblclickOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -364,8 +362,9 @@ public interface ElementHandle extends JSHandle {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public DblclickOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -388,15 +387,14 @@ public interface ElementHandle extends JSHandle {
      */
     public Boolean force;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public Boolean noWaitAfter;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -409,9 +407,7 @@ public interface ElementHandle extends JSHandle {
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public FillOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -419,8 +415,9 @@ public interface ElementHandle extends JSHandle {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public FillOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -435,13 +432,12 @@ public interface ElementHandle extends JSHandle {
     public Boolean force;
     /**
      * Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current
-     * modifiers back. If not specified, currently pressed modifiers are used.
+     * modifiers back. If not specified, currently pressed modifiers are used. "ControlOrMeta" resolves to "Control" on Windows
+     * and Linux and to "Meta" on macOS.
      */
     public List<KeyboardModifier> modifiers;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public Boolean noWaitAfter;
     /**
@@ -451,8 +447,9 @@ public interface ElementHandle extends JSHandle {
     public Position position;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
@@ -472,16 +469,15 @@ public interface ElementHandle extends JSHandle {
     }
     /**
      * Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current
-     * modifiers back. If not specified, currently pressed modifiers are used.
+     * modifiers back. If not specified, currently pressed modifiers are used. "ControlOrMeta" resolves to "Control" on Windows
+     * and Linux and to "Meta" on macOS.
      */
     public HoverOptions setModifiers(List<KeyboardModifier> modifiers) {
       this.modifiers = modifiers;
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public HoverOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -504,8 +500,9 @@ public interface ElementHandle extends JSHandle {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public HoverOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -524,15 +521,17 @@ public interface ElementHandle extends JSHandle {
   class InputValueOptions {
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public InputValueOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -545,15 +544,14 @@ public interface ElementHandle extends JSHandle {
      */
     public Double delay;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option will default to {@code true} in the future.
      */
     public Boolean noWaitAfter;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -565,9 +563,7 @@ public interface ElementHandle extends JSHandle {
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option will default to {@code true} in the future.
      */
     public PressOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -575,8 +571,9 @@ public interface ElementHandle extends JSHandle {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public PressOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -642,8 +639,9 @@ public interface ElementHandle extends JSHandle {
     public String style;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
@@ -736,8 +734,9 @@ public interface ElementHandle extends JSHandle {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public ScreenshotOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -754,15 +753,17 @@ public interface ElementHandle extends JSHandle {
   class ScrollIntoViewIfNeededOptions {
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public ScrollIntoViewIfNeededOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -776,15 +777,14 @@ public interface ElementHandle extends JSHandle {
      */
     public Boolean force;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public Boolean noWaitAfter;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -797,9 +797,7 @@ public interface ElementHandle extends JSHandle {
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public SelectOptionOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -807,8 +805,9 @@ public interface ElementHandle extends JSHandle {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public SelectOptionOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -823,8 +822,9 @@ public interface ElementHandle extends JSHandle {
     public Boolean force;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -838,8 +838,9 @@ public interface ElementHandle extends JSHandle {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public SelectTextOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -853,9 +854,7 @@ public interface ElementHandle extends JSHandle {
      */
     public Boolean force;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public Boolean noWaitAfter;
     /**
@@ -865,8 +864,9 @@ public interface ElementHandle extends JSHandle {
     public Position position;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
@@ -885,9 +885,7 @@ public interface ElementHandle extends JSHandle {
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public SetCheckedOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -910,8 +908,9 @@ public interface ElementHandle extends JSHandle {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public SetCheckedOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -929,22 +928,19 @@ public interface ElementHandle extends JSHandle {
   }
   class SetInputFilesOptions {
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public Boolean noWaitAfter;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public SetInputFilesOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -952,8 +948,9 @@ public interface ElementHandle extends JSHandle {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public SetInputFilesOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -968,13 +965,12 @@ public interface ElementHandle extends JSHandle {
     public Boolean force;
     /**
      * Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current
-     * modifiers back. If not specified, currently pressed modifiers are used.
+     * modifiers back. If not specified, currently pressed modifiers are used. "ControlOrMeta" resolves to "Control" on Windows
+     * and Linux and to "Meta" on macOS.
      */
     public List<KeyboardModifier> modifiers;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public Boolean noWaitAfter;
     /**
@@ -984,8 +980,9 @@ public interface ElementHandle extends JSHandle {
     public Position position;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
@@ -1005,16 +1002,15 @@ public interface ElementHandle extends JSHandle {
     }
     /**
      * Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current
-     * modifiers back. If not specified, currently pressed modifiers are used.
+     * modifiers back. If not specified, currently pressed modifiers are used. "ControlOrMeta" resolves to "Control" on Windows
+     * and Linux and to "Meta" on macOS.
      */
     public TapOptions setModifiers(List<KeyboardModifier> modifiers) {
       this.modifiers = modifiers;
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public TapOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -1037,8 +1033,9 @@ public interface ElementHandle extends JSHandle {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public TapOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -1060,15 +1057,14 @@ public interface ElementHandle extends JSHandle {
      */
     public Double delay;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public Boolean noWaitAfter;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -1080,9 +1076,7 @@ public interface ElementHandle extends JSHandle {
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public TypeOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -1090,8 +1084,9 @@ public interface ElementHandle extends JSHandle {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public TypeOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -1105,9 +1100,7 @@ public interface ElementHandle extends JSHandle {
      */
     public Boolean force;
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public Boolean noWaitAfter;
     /**
@@ -1117,8 +1110,9 @@ public interface ElementHandle extends JSHandle {
     public Position position;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
     /**
@@ -1137,9 +1131,7 @@ public interface ElementHandle extends JSHandle {
       return this;
     }
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public UncheckOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -1162,8 +1154,9 @@ public interface ElementHandle extends JSHandle {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public UncheckOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -1182,15 +1175,17 @@ public interface ElementHandle extends JSHandle {
   class WaitForElementStateOptions {
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public WaitForElementStateOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -1217,8 +1212,9 @@ public interface ElementHandle extends JSHandle {
     public Boolean strict;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
@@ -1247,8 +1243,9 @@ public interface ElementHandle extends JSHandle {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public WaitForSelectorOptions setTimeout(double timeout) {
       this.timeout = timeout;
@@ -1269,7 +1266,7 @@ public interface ElementHandle extends JSHandle {
    * <p> Assuming the page is static, it is safe to use bounding box coordinates to perform input. For example, the following
    * snippet should click the center of the element.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * BoundingBox box = elementHandle.boundingBox();
    * page.mouse().click(box.x + box.width / 2, box.y + box.height / 2);
@@ -1286,8 +1283,7 @@ public interface ElementHandle extends JSHandle {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the element, unless {@code
    * force} option is set.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to click in the center of the element.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to click in the center of the element.</li>
    * <li> Ensure that the element is now checked. If not, this method throws.</li>
    * </ol>
    *
@@ -1309,8 +1305,7 @@ public interface ElementHandle extends JSHandle {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the element, unless {@code
    * force} option is set.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to click in the center of the element.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to click in the center of the element.</li>
    * <li> Ensure that the element is now checked. If not, this method throws.</li>
    * </ol>
    *
@@ -1328,7 +1323,8 @@ public interface ElementHandle extends JSHandle {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the element, unless {@code
    * force} option is set.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to click in the center of the element, or the specified {@code position}.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to click in the center of the element, or the specified
+   * {@code position}.</li>
    * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
    * </ol>
    *
@@ -1348,7 +1344,8 @@ public interface ElementHandle extends JSHandle {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the element, unless {@code
    * force} option is set.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to click in the center of the element, or the specified {@code position}.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to click in the center of the element, or the specified
+   * {@code position}.</li>
    * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
    * </ol>
    *
@@ -1372,9 +1369,8 @@ public interface ElementHandle extends JSHandle {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the element, unless {@code
    * force} option is set.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to double click in the center of the element, or the specified {@code position}.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set. Note that if the
-   * first click of the {@code dblclick()} triggers a navigation event, this method will throw.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to double click in the center of the element, or the
+   * specified {@code position}.</li>
    * </ol>
    *
    * <p> If the element is detached from the DOM at any moment during the action, this method throws.
@@ -1395,9 +1391,8 @@ public interface ElementHandle extends JSHandle {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the element, unless {@code
    * force} option is set.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to double click in the center of the element, or the specified {@code position}.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set. Note that if the
-   * first click of the {@code dblclick()} triggers a navigation event, this method will throw.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to double click in the center of the element, or the
+   * specified {@code position}.</li>
    * </ol>
    *
    * <p> If the element is detached from the DOM at any moment during the action, this method throws.
@@ -1415,7 +1410,7 @@ public interface ElementHandle extends JSHandle {
    * {@code click} is dispatched. This is equivalent to calling <a
    * href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click">element.click()</a>.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * elementHandle.dispatchEvent("click");
    * }</pre>
@@ -1459,7 +1454,7 @@ public interface ElementHandle extends JSHandle {
    * {@code click} is dispatched. This is equivalent to calling <a
    * href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click">element.click()</a>.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * elementHandle.dispatchEvent("click");
    * }</pre>
@@ -1505,9 +1500,10 @@ public interface ElementHandle extends JSHandle {
    *
    * <p> If {@code expression} returns a <a
    * href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise'>Promise</a>, then {@link
-   * ElementHandle#evalOnSelector ElementHandle.evalOnSelector()} would wait for the promise to resolve and return its value.
+   * com.microsoft.playwright.ElementHandle#evalOnSelector ElementHandle.evalOnSelector()} would wait for the promise to
+   * resolve and return its value.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * ElementHandle tweetHandle = page.querySelector(".tweet");
    * assertEquals("100", tweetHandle.evalOnSelector(".like", "node => node.innerText"));
@@ -1530,9 +1526,10 @@ public interface ElementHandle extends JSHandle {
    *
    * <p> If {@code expression} returns a <a
    * href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise'>Promise</a>, then {@link
-   * ElementHandle#evalOnSelector ElementHandle.evalOnSelector()} would wait for the promise to resolve and return its value.
+   * com.microsoft.playwright.ElementHandle#evalOnSelector ElementHandle.evalOnSelector()} would wait for the promise to
+   * resolve and return its value.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * ElementHandle tweetHandle = page.querySelector(".tweet");
    * assertEquals("100", tweetHandle.evalOnSelector(".like", "node => node.innerText"));
@@ -1554,10 +1551,10 @@ public interface ElementHandle extends JSHandle {
    *
    * <p> If {@code expression} returns a <a
    * href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise'>Promise</a>, then {@link
-   * ElementHandle#evalOnSelectorAll ElementHandle.evalOnSelectorAll()} would wait for the promise to resolve and return its
-   * value.
+   * com.microsoft.playwright.ElementHandle#evalOnSelectorAll ElementHandle.evalOnSelectorAll()} would wait for the promise
+   * to resolve and return its value.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * ElementHandle feedHandle = page.querySelector(".feed");
    * assertEquals(Arrays.asList("Hello!", "Hi!"), feedHandle.evalOnSelectorAll(".tweet", "nodes => nodes.map(n => n.innerText)"));
@@ -1579,10 +1576,10 @@ public interface ElementHandle extends JSHandle {
    *
    * <p> If {@code expression} returns a <a
    * href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise'>Promise</a>, then {@link
-   * ElementHandle#evalOnSelectorAll ElementHandle.evalOnSelectorAll()} would wait for the promise to resolve and return its
-   * value.
+   * com.microsoft.playwright.ElementHandle#evalOnSelectorAll ElementHandle.evalOnSelectorAll()} would wait for the promise
+   * to resolve and return its value.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * ElementHandle feedHandle = page.querySelector(".feed");
    * assertEquals(Arrays.asList("Hello!", "Hi!"), feedHandle.evalOnSelectorAll(".tweet", "nodes => nodes.map(n => n.innerText)"));
@@ -1605,7 +1602,8 @@ public interface ElementHandle extends JSHandle {
    * href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control">control</a>, the control will be filled
    * instead.
    *
-   * <p> To send fine-grained keyboard events, use {@link Locator#pressSequentially Locator.pressSequentially()}.
+   * <p> To send fine-grained keyboard events, use {@link com.microsoft.playwright.Locator#pressSequentially
+   * Locator.pressSequentially()}.
    *
    * @param value Value to set for the {@code <input>}, {@code <textarea>} or {@code [contenteditable]} element.
    * @since v1.8
@@ -1623,7 +1621,8 @@ public interface ElementHandle extends JSHandle {
    * href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control">control</a>, the control will be filled
    * instead.
    *
-   * <p> To send fine-grained keyboard events, use {@link Locator#pressSequentially Locator.pressSequentially()}.
+   * <p> To send fine-grained keyboard events, use {@link com.microsoft.playwright.Locator#pressSequentially
+   * Locator.pressSequentially()}.
    *
    * @param value Value to set for the {@code <input>}, {@code <textarea>} or {@code [contenteditable]} element.
    * @since v1.8
@@ -1648,8 +1647,8 @@ public interface ElementHandle extends JSHandle {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the element, unless {@code
    * force} option is set.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to hover over the center of the element, or the specified {@code position}.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to hover over the center of the element, or the specified
+   * {@code position}.</li>
    * </ol>
    *
    * <p> If the element is detached from the DOM at any moment during the action, this method throws.
@@ -1668,8 +1667,8 @@ public interface ElementHandle extends JSHandle {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the element, unless {@code
    * force} option is set.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to hover over the center of the element, or the specified {@code position}.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to hover over the center of the element, or the specified
+   * {@code position}.</li>
    * </ol>
    *
    * <p> If the element is detached from the DOM at any moment during the action, this method throws.
@@ -1759,7 +1758,8 @@ public interface ElementHandle extends JSHandle {
    */
   Frame ownerFrame();
   /**
-   * Focuses the element, and then uses {@link Keyboard#down Keyboard.down()} and {@link Keyboard#up Keyboard.up()}.
+   * Focuses the element, and then uses {@link com.microsoft.playwright.Keyboard#down Keyboard.down()} and {@link
+   * com.microsoft.playwright.Keyboard#up Keyboard.up()}.
    *
    * <p> {@code key} can specify the intended <a
    * href="https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key">keyboardEvent.key</a> value or a single
@@ -1772,15 +1772,15 @@ public interface ElementHandle extends JSHandle {
    * ArrowUp}, etc.
    *
    * <p> Following modification shortcuts are also supported: {@code Shift}, {@code Control}, {@code Alt}, {@code Meta}, {@code
-   * ShiftLeft}.
+   * ShiftLeft}, {@code ControlOrMeta}.
    *
    * <p> Holding down {@code Shift} will type the text that corresponds to the {@code key} in the upper case.
    *
    * <p> If {@code key} is a single character, it is case-sensitive, so the values {@code a} and {@code A} will generate
    * different respective texts.
    *
-   * <p> Shortcuts such as {@code key: "Control+o"} or {@code key: "Control+Shift+T"} are supported as well. When specified with
-   * the modifier, modifier is pressed and being held while the subsequent key is being pressed.
+   * <p> Shortcuts such as {@code key: "Control+o"}, {@code key: "Control++} or {@code key: "Control+Shift+T"} are supported as
+   * well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
    *
    * @param key Name of the key to press or a character to generate, such as {@code ArrowLeft} or {@code a}.
    * @since v1.8
@@ -1789,7 +1789,8 @@ public interface ElementHandle extends JSHandle {
     press(key, null);
   }
   /**
-   * Focuses the element, and then uses {@link Keyboard#down Keyboard.down()} and {@link Keyboard#up Keyboard.up()}.
+   * Focuses the element, and then uses {@link com.microsoft.playwright.Keyboard#down Keyboard.down()} and {@link
+   * com.microsoft.playwright.Keyboard#up Keyboard.up()}.
    *
    * <p> {@code key} can specify the intended <a
    * href="https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key">keyboardEvent.key</a> value or a single
@@ -1802,15 +1803,15 @@ public interface ElementHandle extends JSHandle {
    * ArrowUp}, etc.
    *
    * <p> Following modification shortcuts are also supported: {@code Shift}, {@code Control}, {@code Alt}, {@code Meta}, {@code
-   * ShiftLeft}.
+   * ShiftLeft}, {@code ControlOrMeta}.
    *
    * <p> Holding down {@code Shift} will type the text that corresponds to the {@code key} in the upper case.
    *
    * <p> If {@code key} is a single character, it is case-sensitive, so the values {@code a} and {@code A} will generate
    * different respective texts.
    *
-   * <p> Shortcuts such as {@code key: "Control+o"} or {@code key: "Control+Shift+T"} are supported as well. When specified with
-   * the modifier, modifier is pressed and being held while the subsequent key is being pressed.
+   * <p> Shortcuts such as {@code key: "Control+o"}, {@code key: "Control++} or {@code key: "Control+Shift+T"} are supported as
+   * well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
    *
    * @param key Name of the key to press or a character to generate, such as {@code ArrowLeft} or {@code a}.
    * @since v1.8
@@ -1869,6 +1870,8 @@ public interface ElementHandle extends JSHandle {
    * <p> Throws when {@code elementHandle} does not point to an element <a
    * href="https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected">connected</a> to a Document or a ShadowRoot.
    *
+   * <p> See <a href="https://playwright.dev/java/docs/input#scrolling">scrolling</a> for alternative ways to scroll.
+   *
    * @since v1.8
    */
   default void scrollIntoViewIfNeeded() {
@@ -1882,6 +1885,8 @@ public interface ElementHandle extends JSHandle {
    *
    * <p> Throws when {@code elementHandle} does not point to an element <a
    * href="https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected">connected</a> to a Document or a ShadowRoot.
+   *
+   * <p> See <a href="https://playwright.dev/java/docs/input#scrolling">scrolling</a> for alternative ways to scroll.
    *
    * @since v1.8
    */
@@ -1899,7 +1904,7 @@ public interface ElementHandle extends JSHandle {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * handle.selectOption("blue");
@@ -1930,7 +1935,7 @@ public interface ElementHandle extends JSHandle {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * handle.selectOption("blue");
@@ -1959,7 +1964,7 @@ public interface ElementHandle extends JSHandle {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * handle.selectOption("blue");
@@ -1990,7 +1995,7 @@ public interface ElementHandle extends JSHandle {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * handle.selectOption("blue");
@@ -2019,7 +2024,7 @@ public interface ElementHandle extends JSHandle {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * handle.selectOption("blue");
@@ -2050,7 +2055,7 @@ public interface ElementHandle extends JSHandle {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * handle.selectOption("blue");
@@ -2079,7 +2084,7 @@ public interface ElementHandle extends JSHandle {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * handle.selectOption("blue");
@@ -2110,7 +2115,7 @@ public interface ElementHandle extends JSHandle {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * handle.selectOption("blue");
@@ -2139,7 +2144,7 @@ public interface ElementHandle extends JSHandle {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * handle.selectOption("blue");
@@ -2170,7 +2175,7 @@ public interface ElementHandle extends JSHandle {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * handle.selectOption("blue");
@@ -2199,7 +2204,7 @@ public interface ElementHandle extends JSHandle {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * handle.selectOption("blue");
@@ -2230,7 +2235,7 @@ public interface ElementHandle extends JSHandle {
    *
    * <p> Triggers a {@code change} and {@code input} event once all the provided options have been selected.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * // Single selection matching the value or label
    * handle.selectOption("blue");
@@ -2278,8 +2283,7 @@ public interface ElementHandle extends JSHandle {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the matched element,
    * unless {@code force} option is set. If the element is detached during the checks, the whole action is retried.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to click in the center of the element.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to click in the center of the element.</li>
    * <li> Ensure that the element is now checked or unchecked. If not, this method throws.</li>
    * </ol>
    *
@@ -2300,8 +2304,7 @@ public interface ElementHandle extends JSHandle {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the matched element,
    * unless {@code force} option is set. If the element is detached during the checks, the whole action is retried.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to click in the center of the element.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to click in the center of the element.</li>
    * <li> Ensure that the element is now checked or unchecked. If not, this method throws.</li>
    * </ol>
    *
@@ -2314,7 +2317,8 @@ public interface ElementHandle extends JSHandle {
   void setChecked(boolean checked, SetCheckedOptions options);
   /**
    * Sets the value of the file input to these file paths or files. If some of the {@code filePaths} are relative paths, then
-   * they are resolved relative to the current working directory. For empty array, clears the selected files.
+   * they are resolved relative to the current working directory. For empty array, clears the selected files. For inputs with
+   * a {@code [webkitdirectory]} attribute, only a single directory path is supported.
    *
    * <p> This method expects {@code ElementHandle} to point to an <a
    * href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input">input element</a>. However, if the element is
@@ -2329,7 +2333,8 @@ public interface ElementHandle extends JSHandle {
   }
   /**
    * Sets the value of the file input to these file paths or files. If some of the {@code filePaths} are relative paths, then
-   * they are resolved relative to the current working directory. For empty array, clears the selected files.
+   * they are resolved relative to the current working directory. For empty array, clears the selected files. For inputs with
+   * a {@code [webkitdirectory]} attribute, only a single directory path is supported.
    *
    * <p> This method expects {@code ElementHandle} to point to an <a
    * href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input">input element</a>. However, if the element is
@@ -2342,7 +2347,8 @@ public interface ElementHandle extends JSHandle {
   void setInputFiles(Path files, SetInputFilesOptions options);
   /**
    * Sets the value of the file input to these file paths or files. If some of the {@code filePaths} are relative paths, then
-   * they are resolved relative to the current working directory. For empty array, clears the selected files.
+   * they are resolved relative to the current working directory. For empty array, clears the selected files. For inputs with
+   * a {@code [webkitdirectory]} attribute, only a single directory path is supported.
    *
    * <p> This method expects {@code ElementHandle} to point to an <a
    * href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input">input element</a>. However, if the element is
@@ -2357,7 +2363,8 @@ public interface ElementHandle extends JSHandle {
   }
   /**
    * Sets the value of the file input to these file paths or files. If some of the {@code filePaths} are relative paths, then
-   * they are resolved relative to the current working directory. For empty array, clears the selected files.
+   * they are resolved relative to the current working directory. For empty array, clears the selected files. For inputs with
+   * a {@code [webkitdirectory]} attribute, only a single directory path is supported.
    *
    * <p> This method expects {@code ElementHandle} to point to an <a
    * href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input">input element</a>. However, if the element is
@@ -2370,7 +2377,8 @@ public interface ElementHandle extends JSHandle {
   void setInputFiles(Path[] files, SetInputFilesOptions options);
   /**
    * Sets the value of the file input to these file paths or files. If some of the {@code filePaths} are relative paths, then
-   * they are resolved relative to the current working directory. For empty array, clears the selected files.
+   * they are resolved relative to the current working directory. For empty array, clears the selected files. For inputs with
+   * a {@code [webkitdirectory]} attribute, only a single directory path is supported.
    *
    * <p> This method expects {@code ElementHandle} to point to an <a
    * href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input">input element</a>. However, if the element is
@@ -2385,7 +2393,8 @@ public interface ElementHandle extends JSHandle {
   }
   /**
    * Sets the value of the file input to these file paths or files. If some of the {@code filePaths} are relative paths, then
-   * they are resolved relative to the current working directory. For empty array, clears the selected files.
+   * they are resolved relative to the current working directory. For empty array, clears the selected files. For inputs with
+   * a {@code [webkitdirectory]} attribute, only a single directory path is supported.
    *
    * <p> This method expects {@code ElementHandle} to point to an <a
    * href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input">input element</a>. However, if the element is
@@ -2398,7 +2407,8 @@ public interface ElementHandle extends JSHandle {
   void setInputFiles(FilePayload files, SetInputFilesOptions options);
   /**
    * Sets the value of the file input to these file paths or files. If some of the {@code filePaths} are relative paths, then
-   * they are resolved relative to the current working directory. For empty array, clears the selected files.
+   * they are resolved relative to the current working directory. For empty array, clears the selected files. For inputs with
+   * a {@code [webkitdirectory]} attribute, only a single directory path is supported.
    *
    * <p> This method expects {@code ElementHandle} to point to an <a
    * href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input">input element</a>. However, if the element is
@@ -2413,7 +2423,8 @@ public interface ElementHandle extends JSHandle {
   }
   /**
    * Sets the value of the file input to these file paths or files. If some of the {@code filePaths} are relative paths, then
-   * they are resolved relative to the current working directory. For empty array, clears the selected files.
+   * they are resolved relative to the current working directory. For empty array, clears the selected files. For inputs with
+   * a {@code [webkitdirectory]} attribute, only a single directory path is supported.
    *
    * <p> This method expects {@code ElementHandle} to point to an <a
    * href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input">input element</a>. However, if the element is
@@ -2430,8 +2441,8 @@ public interface ElementHandle extends JSHandle {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the element, unless {@code
    * force} option is set.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#touchscreen Page.touchscreen()} to tap the center of the element, or the specified {@code position}.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#touchscreen Page.touchscreen()} to tap the center of the element, or the
+   * specified {@code position}.</li>
    * </ol>
    *
    * <p> If the element is detached from the DOM at any moment during the action, this method throws.
@@ -2452,8 +2463,8 @@ public interface ElementHandle extends JSHandle {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the element, unless {@code
    * force} option is set.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#touchscreen Page.touchscreen()} to tap the center of the element, or the specified {@code position}.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#touchscreen Page.touchscreen()} to tap the center of the element, or the
+   * specified {@code position}.</li>
    * </ol>
    *
    * <p> If the element is detached from the DOM at any moment during the action, this method throws.
@@ -2473,9 +2484,9 @@ public interface ElementHandle extends JSHandle {
    */
   String textContent();
   /**
-   * @deprecated In most cases, you should use {@link Locator#fill Locator.fill()} instead. You only need to press keys one by one if
-   * there is special keyboard handling on the page - in this case use {@link Locator#pressSequentially
-   * Locator.pressSequentially()}.
+   * @deprecated In most cases, you should use {@link com.microsoft.playwright.Locator#fill Locator.fill()} instead. You only need to
+   * press keys one by one if there is special keyboard handling on the page - in this case use {@link
+   * com.microsoft.playwright.Locator#pressSequentially Locator.pressSequentially()}.
    *
    * @param text A text to type into a focused element.
    * @since v1.8
@@ -2484,9 +2495,9 @@ public interface ElementHandle extends JSHandle {
     type(text, null);
   }
   /**
-   * @deprecated In most cases, you should use {@link Locator#fill Locator.fill()} instead. You only need to press keys one by one if
-   * there is special keyboard handling on the page - in this case use {@link Locator#pressSequentially
-   * Locator.pressSequentially()}.
+   * @deprecated In most cases, you should use {@link com.microsoft.playwright.Locator#fill Locator.fill()} instead. You only need to
+   * press keys one by one if there is special keyboard handling on the page - in this case use {@link
+   * com.microsoft.playwright.Locator#pressSequentially Locator.pressSequentially()}.
    *
    * @param text A text to type into a focused element.
    * @since v1.8
@@ -2500,8 +2511,7 @@ public interface ElementHandle extends JSHandle {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the element, unless {@code
    * force} option is set.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to click in the center of the element.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to click in the center of the element.</li>
    * <li> Ensure that the element is now unchecked. If not, this method throws.</li>
    * </ol>
    *
@@ -2523,8 +2533,7 @@ public interface ElementHandle extends JSHandle {
    * <li> Wait for <a href="https://playwright.dev/java/docs/actionability">actionability</a> checks on the element, unless {@code
    * force} option is set.</li>
    * <li> Scroll the element into view if needed.</li>
-   * <li> Use {@link Page#mouse Page.mouse()} to click in the center of the element.</li>
-   * <li> Wait for initiated navigations to either succeed or fail, unless {@code noWaitAfter} option is set.</li>
+   * <li> Use {@link com.microsoft.playwright.Page#mouse Page.mouse()} to click in the center of the element.</li>
    * <li> Ensure that the element is now unchecked. If not, this method throws.</li>
    * </ol>
    *
@@ -2603,7 +2612,7 @@ public interface ElementHandle extends JSHandle {
    * condition, the method will return immediately. If the selector doesn't satisfy the condition for the {@code timeout}
    * milliseconds, the function will throw.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.setContent("<div><span></span></div>");
    * ElementHandle div = page.querySelector("div");
@@ -2612,7 +2621,8 @@ public interface ElementHandle extends JSHandle {
    *   .setState(WaitForSelectorState.ATTACHED));
    * }</pre>
    *
-   * <p> <strong>NOTE:</strong> This method does not work across navigations, use {@link Page#waitForSelector Page.waitForSelector()} instead.
+   * <p> <strong>NOTE:</strong> This method does not work across navigations, use {@link com.microsoft.playwright.Page#waitForSelector
+   * Page.waitForSelector()} instead.
    *
    * @param selector A selector to query for.
    * @since v1.8
@@ -2629,7 +2639,7 @@ public interface ElementHandle extends JSHandle {
    * condition, the method will return immediately. If the selector doesn't satisfy the condition for the {@code timeout}
    * milliseconds, the function will throw.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.setContent("<div><span></span></div>");
    * ElementHandle div = page.querySelector("div");
@@ -2638,7 +2648,8 @@ public interface ElementHandle extends JSHandle {
    *   .setState(WaitForSelectorState.ATTACHED));
    * }</pre>
    *
-   * <p> <strong>NOTE:</strong> This method does not work across navigations, use {@link Page#waitForSelector Page.waitForSelector()} instead.
+   * <p> <strong>NOTE:</strong> This method does not work across navigations, use {@link com.microsoft.playwright.Page#waitForSelector
+   * Page.waitForSelector()} instead.
    *
    * @param selector A selector to query for.
    * @since v1.8

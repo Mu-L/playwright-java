@@ -20,8 +20,9 @@ import java.nio.file.Path;
 import java.util.*;
 
 /**
- * Whenever a network route is set up with {@link Page#route Page.route()} or {@link BrowserContext#route
- * BrowserContext.route()}, the {@code Route} object allows to handle the route.
+ * Whenever a network route is set up with {@link com.microsoft.playwright.Page#route Page.route()} or {@link
+ * com.microsoft.playwright.BrowserContext#route BrowserContext.route()}, the {@code Route} object allows to handle the
+ * route.
  *
  * <p> Learn more about <a href="https://playwright.dev/java/docs/network">networking</a>.
  */
@@ -147,6 +148,12 @@ public interface Route {
      */
     public Integer maxRedirects;
     /**
+     * Maximum number of times network errors should be retried. Currently only {@code ECONNRESET} error is retried. Does not
+     * retry based on HTTP response codes. An error will be thrown if the limit is exceeded. Defaults to {@code 0} - no
+     * retries.
+     */
+    public Integer maxRetries;
+    /**
      * If set changes the request method (e.g. GET or POST).
      */
     public String method;
@@ -176,6 +183,15 @@ public interface Route {
      */
     public FetchOptions setMaxRedirects(int maxRedirects) {
       this.maxRedirects = maxRedirects;
+      return this;
+    }
+    /**
+     * Maximum number of times network errors should be retried. Currently only {@code ECONNRESET} error is retried. Does not
+     * retry based on HTTP response codes. An error will be thrown if the limit is exceeded. Defaults to {@code 0} - no
+     * retries.
+     */
+    public FetchOptions setMaxRetries(int maxRetries) {
+      this.maxRetries = maxRetries;
       return this;
     }
     /**
@@ -332,9 +348,9 @@ public interface Route {
    */
   void abort(String errorCode);
   /**
-   * Continues route's request with optional overrides.
+   * Sends route's request to the network with optional overrides.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.route("**\/*", route -> {
    *   // Override headers
@@ -345,12 +361,14 @@ public interface Route {
    * });
    * }</pre>
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
-   * <p> Note that any overrides such as {@code url} or {@code headers} only apply to the request being routed. If this request
-   * results in a redirect, overrides will not be applied to the new redirected request. If you want to propagate a header
-   * through redirects, use the combination of {@link Route#fetch Route.fetch()} and {@link Route#fulfill Route.fulfill()}
-   * instead.
+   * <p> The {@code headers} option applies to both the routed request and any redirects it initiates. However, {@code url},
+   * {@code method}, and {@code postData} only apply to the original request and are not carried over to redirected requests.
+   *
+   * <p> {@link com.microsoft.playwright.Route#resume Route.resume()} will immediately send the request to the network, other
+   * matching handlers won't be invoked. Use {@link com.microsoft.playwright.Route#fallback Route.fallback()} If you want
+   * next matching handler in the chain to be invoked.
    *
    * @since v1.8
    */
@@ -358,9 +376,9 @@ public interface Route {
     resume(null);
   }
   /**
-   * Continues route's request with optional overrides.
+   * Sends route's request to the network with optional overrides.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.route("**\/*", route -> {
    *   // Override headers
@@ -371,23 +389,28 @@ public interface Route {
    * });
    * }</pre>
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
-   * <p> Note that any overrides such as {@code url} or {@code headers} only apply to the request being routed. If this request
-   * results in a redirect, overrides will not be applied to the new redirected request. If you want to propagate a header
-   * through redirects, use the combination of {@link Route#fetch Route.fetch()} and {@link Route#fulfill Route.fulfill()}
-   * instead.
+   * <p> The {@code headers} option applies to both the routed request and any redirects it initiates. However, {@code url},
+   * {@code method}, and {@code postData} only apply to the original request and are not carried over to redirected requests.
+   *
+   * <p> {@link com.microsoft.playwright.Route#resume Route.resume()} will immediately send the request to the network, other
+   * matching handlers won't be invoked. Use {@link com.microsoft.playwright.Route#fallback Route.fallback()} If you want
+   * next matching handler in the chain to be invoked.
    *
    * @since v1.8
    */
   void resume(ResumeOptions options);
   /**
-   * When several routes match the given pattern, they run in the order opposite to their registration. That way the last
+   * Continues route's request with optional overrides. The method is similar to {@link com.microsoft.playwright.Route#resume
+   * Route.resume()} with the difference that other matching handlers will be invoked before sending the request.
+   *
+   * <p> <strong>Usage</strong>
+   *
+   * <p> When several routes match the given pattern, they run in the order opposite to their registration. That way the last
    * registered route can always override all the previous ones. In the example below, request will be handled by the
    * bottom-most handler first, then it'll fall back to the previous one and in the end will be aborted by the first
    * registered route.
-   *
-   * <p> **Usage**
    * <pre>{@code
    * page.route("**\/*", route -> {
    *   // Runs last.
@@ -440,6 +463,9 @@ public interface Route {
    *   route.fallback(new Route.ResumeOptions().setHeaders(headers));
    * });
    * }</pre>
+   *
+   * <p> Use {@link com.microsoft.playwright.Route#resume Route.resume()} to immediately send the request to the network, other
+   * matching handlers won't be invoked in that case.
    *
    * @since v1.23
    */
@@ -447,12 +473,15 @@ public interface Route {
     fallback(null);
   }
   /**
-   * When several routes match the given pattern, they run in the order opposite to their registration. That way the last
+   * Continues route's request with optional overrides. The method is similar to {@link com.microsoft.playwright.Route#resume
+   * Route.resume()} with the difference that other matching handlers will be invoked before sending the request.
+   *
+   * <p> <strong>Usage</strong>
+   *
+   * <p> When several routes match the given pattern, they run in the order opposite to their registration. That way the last
    * registered route can always override all the previous ones. In the example below, request will be handled by the
    * bottom-most handler first, then it'll fall back to the previous one and in the end will be aborted by the first
    * registered route.
-   *
-   * <p> **Usage**
    * <pre>{@code
    * page.route("**\/*", route -> {
    *   // Runs last.
@@ -505,6 +534,9 @@ public interface Route {
    *   route.fallback(new Route.ResumeOptions().setHeaders(headers));
    * });
    * }</pre>
+   *
+   * <p> Use {@link com.microsoft.playwright.Route#resume Route.resume()} to immediately send the request to the network, other
+   * matching handlers won't be invoked in that case.
    *
    * @since v1.23
    */
@@ -513,7 +545,7 @@ public interface Route {
    * Performs the request and fetches result without fulfilling it, so that the response could be modified and then
    * fulfilled.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.route("https://dog.ceo/api/breeds/list/all", route -> {
    *   APIResponse response = route.fetch();
@@ -526,11 +558,11 @@ public interface Route {
    * });
    * }</pre>
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> Note that {@code headers} option will apply to the fetched request as well as any redirects initiated by it. If you want
-   * to only apply {@code headers} to the original request, but not to redirects, look into {@link Route#resume
-   * Route.resume()} instead.
+   * to only apply {@code headers} to the original request, but not to redirects, look into {@link
+   * com.microsoft.playwright.Route#resume Route.resume()} instead.
    *
    * @since v1.29
    */
@@ -541,7 +573,7 @@ public interface Route {
    * Performs the request and fetches result without fulfilling it, so that the response could be modified and then
    * fulfilled.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    * <pre>{@code
    * page.route("https://dog.ceo/api/breeds/list/all", route -> {
    *   APIResponse response = route.fetch();
@@ -554,11 +586,11 @@ public interface Route {
    * });
    * }</pre>
    *
-   * <p> **Details**
+   * <p> <strong>Details</strong>
    *
    * <p> Note that {@code headers} option will apply to the fetched request as well as any redirects initiated by it. If you want
-   * to only apply {@code headers} to the original request, but not to redirects, look into {@link Route#resume
-   * Route.resume()} instead.
+   * to only apply {@code headers} to the original request, but not to redirects, look into {@link
+   * com.microsoft.playwright.Route#resume Route.resume()} instead.
    *
    * @since v1.29
    */
@@ -566,7 +598,7 @@ public interface Route {
   /**
    * Fulfills route's request with given response.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of fulfilling all requests with 404 responses:
    * <pre>{@code
@@ -592,7 +624,7 @@ public interface Route {
   /**
    * Fulfills route's request with given response.
    *
-   * <p> **Usage**
+   * <p> <strong>Usage</strong>
    *
    * <p> An example of fulfilling all requests with 404 responses:
    * <pre>{@code

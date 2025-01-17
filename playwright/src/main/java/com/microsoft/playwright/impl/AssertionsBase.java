@@ -20,6 +20,7 @@ import com.microsoft.playwright.PlaywrightException;
 import org.opentest4j.AssertionFailedError;
 import org.opentest4j.ValueWrapper;
 
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -46,7 +47,6 @@ class AssertionsBase {
       options = new FrameExpectOptions();
     }
     options.expectedText = expectedText;
-    options.isNot = isNot;
     expectImpl(expression, options, expected, message);
   }
 
@@ -54,13 +54,14 @@ class AssertionsBase {
     if (expectOptions.timeout == null) {
       expectOptions.timeout = AssertionsTimeout.defaultTimeout;
     }
-    if (expectOptions.isNot) {
+    expectOptions.isNot = isNot;
+    if (isNot) {
       message = message.replace("expected to", "expected not to");
     }
     FrameExpectResult result = actualLocator.expect(expression, expectOptions);
     if (result.matches == isNot) {
       Object actual = result.received == null ? null : Serialization.deserialize(result.received);
-      String log = String.join("\n", result.log);
+      String log = (result.log == null) ? "" : String.join("\n", result.log);
       if (!log.isEmpty()) {
         log = "\nCall log:\n" + log;
       }
@@ -90,5 +91,18 @@ class AssertionsBase {
       expected.regexFlags = toJsRegexFlags(pattern);
     }
     return expected;
+  }
+
+  static Boolean shouldIgnoreCase(Object options) {
+    if (options == null) {
+      return null;
+    }
+    try {
+      Field fromField = options.getClass().getDeclaredField("ignoreCase");
+      Object value = fromField.get(options);
+      return (Boolean) value;
+    } catch (NoSuchFieldException | IllegalAccessException e) {
+      return null;
+    }
   }
 }

@@ -20,7 +20,8 @@ import com.microsoft.playwright.options.*;
 import java.nio.file.Path;
 
 /**
- * {@code FileChooser} objects are dispatched by the page in the {@link Page#onFileChooser Page.onFileChooser()} event.
+ * {@code FileChooser} objects are dispatched by the page in the {@link com.microsoft.playwright.Page#onFileChooser
+ * Page.onFileChooser()} event.
  * <pre>{@code
  * FileChooser fileChooser = page.waitForFileChooser(() -> page.getByText("Upload file").click());
  * fileChooser.setFiles(Paths.get("myfile.pdf"));
@@ -29,22 +30,19 @@ import java.nio.file.Path;
 public interface FileChooser {
   class SetFilesOptions {
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public Boolean noWaitAfter;
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public Double timeout;
 
     /**
-     * Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can
-     * opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to
-     * inaccessible pages. Defaults to {@code false}.
+     * @deprecated This option has no effect.
      */
     public SetFilesOptions setNoWaitAfter(boolean noWaitAfter) {
       this.noWaitAfter = noWaitAfter;
@@ -52,8 +50,9 @@ public interface FileChooser {
     }
     /**
      * Maximum time in milliseconds. Defaults to {@code 30000} (30 seconds). Pass {@code 0} to disable timeout. The default
-     * value can be changed by using the {@link BrowserContext#setDefaultTimeout BrowserContext.setDefaultTimeout()} or {@link
-     * Page#setDefaultTimeout Page.setDefaultTimeout()} methods.
+     * value can be changed by using the {@link com.microsoft.playwright.BrowserContext#setDefaultTimeout
+     * BrowserContext.setDefaultTimeout()} or {@link com.microsoft.playwright.Page#setDefaultTimeout Page.setDefaultTimeout()}
+     * methods.
      */
     public SetFilesOptions setTimeout(double timeout) {
       this.timeout = timeout;

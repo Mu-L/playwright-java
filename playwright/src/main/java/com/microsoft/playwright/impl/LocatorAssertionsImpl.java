@@ -18,10 +18,13 @@ package com.microsoft.playwright.impl;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.assertions.LocatorAssertions;
+import com.microsoft.playwright.options.AriaRole;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import static com.microsoft.playwright.impl.Serialization.serializeArgument;
@@ -80,6 +83,57 @@ public class LocatorAssertionsImpl extends AssertionsBase implements LocatorAsse
       list.add(expected);
     }
     expectImpl("to.contain.text.array", list, patterns, "Locator expected to contain text", convertType(options, FrameExpectOptions.class));
+  }
+
+  @Override
+  public void hasAccessibleDescription(String description, HasAccessibleDescriptionOptions options) {
+    ExpectedTextValue expected = new ExpectedTextValue();
+    expected.string = description;
+    expected.ignoreCase = shouldIgnoreCase(options);
+    expected.normalizeWhiteSpace = true;
+    expectImpl("to.have.accessible.description", expected, description, "Locator expected to have accessible description", convertType(options, FrameExpectOptions.class));
+  }
+
+  @Override
+  public void hasAccessibleDescription(Pattern pattern, HasAccessibleDescriptionOptions options) {
+    ExpectedTextValue expected = expectedRegex(pattern);
+    expected.ignoreCase = shouldIgnoreCase(options);
+    expected.normalizeWhiteSpace = true;
+    expectImpl("to.have.accessible.description", expected, pattern, "Locator expected to have accessible description", convertType(options, FrameExpectOptions.class));
+  }
+
+  @Override
+  public void hasAccessibleErrorMessage(String errorMessage, HasAccessibleErrorMessageOptions options) {
+    ExpectedTextValue expected = new ExpectedTextValue();
+    expected.string = errorMessage;
+    expected.ignoreCase = shouldIgnoreCase(options);
+    expected.normalizeWhiteSpace = true;
+    expectImpl("to.have.accessible.error.message", expected, errorMessage, "Locator expected to have accessible error message", convertType(options, FrameExpectOptions.class));
+  }
+
+  @Override
+  public void hasAccessibleErrorMessage(Pattern pattern, HasAccessibleErrorMessageOptions options) {
+    ExpectedTextValue expected = expectedRegex(pattern);
+    expected.ignoreCase = shouldIgnoreCase(options);
+    expected.normalizeWhiteSpace = true;
+    expectImpl("to.have.accessible.error.message", expected, pattern, "Locator expected to have accessible error message", convertType(options, FrameExpectOptions.class));
+  }
+
+  @Override
+  public void hasAccessibleName(String name, HasAccessibleNameOptions options) {
+    ExpectedTextValue expected = new ExpectedTextValue();
+    expected.string = name;
+    expected.ignoreCase = shouldIgnoreCase(options);
+    expected.normalizeWhiteSpace = true;
+    expectImpl("to.have.accessible.name", expected, name, "Locator expected to have accessible name", convertType(options, FrameExpectOptions.class));
+  }
+
+  @Override
+  public void hasAccessibleName(Pattern pattern, HasAccessibleNameOptions options) {
+    ExpectedTextValue expected = expectedRegex(pattern);
+    expected.ignoreCase = shouldIgnoreCase(options);
+    expected.normalizeWhiteSpace = true;
+    expectImpl("to.have.accessible.name", expected, pattern, "Locator expected to have accessible name", convertType(options, FrameExpectOptions.class));
   }
 
   @Override
@@ -207,6 +261,13 @@ public class LocatorAssertionsImpl extends AssertionsBase implements LocatorAsse
   }
 
   @Override
+  public void hasRole(AriaRole role, HasRoleOptions options) {
+    ExpectedTextValue expected = new ExpectedTextValue();
+    expected.string = role.toString().toLowerCase();
+    expectImpl("to.have.role", expected, expected.string, "Locator expected to have role", convertType(options, FrameExpectOptions.class));
+  }
+
+  @Override
   public void hasText(String text, HasTextOptions options) {
     ExpectedTextValue expected = new ExpectedTextValue();
     expected.string = text;
@@ -289,11 +350,41 @@ public class LocatorAssertionsImpl extends AssertionsBase implements LocatorAsse
   }
 
   @Override
+  public void matchesAriaSnapshot(String expected, MatchesAriaSnapshotOptions snapshotOptions) {
+    if (snapshotOptions == null) {
+      snapshotOptions = new MatchesAriaSnapshotOptions();
+    }
+    FrameExpectOptions options = convertType(snapshotOptions, FrameExpectOptions.class);
+    options.expectedValue = serializeArgument(expected);
+    expectImpl("to.match.aria", options, expected,"Locator expected to match Aria snapshot");
+  }
+
+  @Override
   public void isChecked(IsCheckedOptions options) {
-    boolean unchecked = options != null && options.checked != null && !options.checked;
-    String expression = unchecked ? "to.be.unchecked" : "to.be.checked";
-    String message = "Locator expected to be " + (unchecked ? "un" : "") + "checked";
-    expectTrue(expression, message, convertType(options, FrameExpectOptions.class));
+    if (options == null) {
+      options = new IsCheckedOptions();
+    }
+
+    Map<String, Boolean> expectedValue = new HashMap<>();
+    if (options.indeterminate != null) {
+      expectedValue.put("indeterminate", options.indeterminate);
+    }
+    if (options.checked != null) {
+      expectedValue.put("checked", options.checked);
+    }
+
+    String expected;
+    if (options.indeterminate != null && options.indeterminate) {
+      expected = "indeterminate";
+    } else {
+      boolean unchecked = options.checked != null && !options.checked;
+      expected = unchecked ? "unchecked" : "checked";
+    }
+
+    String message = "Locator expected to be";
+    FrameExpectOptions expectOptions = convertType(options, FrameExpectOptions.class);
+    expectOptions.expectedValue = serializeArgument(expectedValue);
+    expectImpl("to.be.checked", expectOptions, expected, message);
   }
 
   @Override
@@ -365,18 +456,5 @@ public class LocatorAssertionsImpl extends AssertionsBase implements LocatorAsse
     boolean attached = options == null || options.attached == null || options.attached == true;
     String message = "Locator expected to be " + (attached ? "attached" : "detached");
     expectTrue(attached ? "to.be.attached" : "to.be.detached", message, frameOptions);
-  }
-
-  private static Boolean shouldIgnoreCase(Object options) {
-    if (options == null) {
-      return null;
-    }
-    try {
-      Field fromField = options.getClass().getDeclaredField("ignoreCase");
-      Object value = fromField.get(options);
-      return (Boolean) value;
-    } catch (NoSuchFieldException | IllegalAccessException e) {
-      return null;
-    }
   }
 }

@@ -1,7 +1,24 @@
+/*
+ * Copyright (c) Microsoft Corporation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.microsoft.playwright;
 
 import com.microsoft.playwright.assertions.LocatorAssertions;
 import com.microsoft.playwright.options.AriaRole;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -12,6 +29,11 @@ import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestSelectorsGetBy extends TestBase {
+
+  @AfterEach
+  void resetTestId() {
+    playwright.selectors().setTestIdAttribute("data-testid");
+  }
   @Test
   void getByTestIdShouldWork() {
     page.setContent("<div><div data-testid='Hello'>Hello world</div></div>");
@@ -19,6 +41,41 @@ public class TestSelectorsGetBy extends TestBase {
     assertThat(page.mainFrame().getByTestId("Hello")).hasText("Hello world");
     assertThat(page.locator("div").getByTestId("Hello")).hasText("Hello world");
   }
+
+  @Test
+  void getByTestIdWithCustomTestIdShouldWork() {
+    page.setContent("<div><div data-my-custom-testid='Hello'>Hello world</div></div>");
+    playwright.selectors().setTestIdAttribute("data-my-custom-testid");
+    assertThat(page.getByTestId("Hello")).hasText("Hello world");
+    assertThat(page.mainFrame().getByTestId("Hello")).hasText("Hello world");
+    assertThat(page.locator("div").getByTestId("Hello")).hasText("Hello world");
+  }
+
+  @Test
+  void shouldUseDataTestidInStrictErrors() {
+    playwright.selectors().setTestIdAttribute("data-custom-id");
+    page.setContent("" +
+      "      <div>\n" +
+      "      <div></div>\n" +
+      "        <div>\n" +
+      "          <div></div>\n" +
+      "          <div></div>\n" +
+      "        </div>\n" +
+      "      </div>\n" +
+      "      <div>\n" +
+      "        <div class='foo bar:0' data-custom-id='One'>\n" +
+      "        </div>\n" +
+      "        <div class='foo bar:1' data-custom-id='Two'>\n" +
+      "        </div>\n" +
+      "      </div>");
+    PlaywrightException e = assertThrows(PlaywrightException.class, () -> page.locator(".foo").hover());
+    assertTrue(e.getMessage().contains("strict mode violation"), e.getMessage());
+    assertTrue(e.getMessage().contains("<div class=\"foo bar:0"), e.getMessage());
+    assertTrue(e.getMessage().contains("<div class=\"foo bar:1"), e.getMessage());
+    assertTrue(e.getMessage().contains("aka getByTestId(\"One\")"), e.getMessage());
+    assertTrue(e.getMessage().contains("aka getByTestId(\"Two\")"), e.getMessage());
+  }
+
 
   @Test
   void getByTestIdShouldEscapeId() {

@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) Microsoft Corporation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.microsoft.playwright.impl;
 
 import com.google.gson.JsonElement;
@@ -22,6 +38,10 @@ import static com.microsoft.playwright.impl.Utils.toJsRegexFlags;
 class LocatorImpl implements Locator {
   final FrameImpl frame;
   final String selector;
+
+  LocatorImpl(FrameImpl frame, String frameSelector) {
+    this(frame, frameSelector, null);
+  }
 
   public LocatorImpl(FrameImpl frame, String selector, LocatorOptions options) {
     this.frame = frame;
@@ -97,6 +117,21 @@ class LocatorImpl implements Locator {
     if (other.frame != frame)
       throw new Error("Locators must belong to the same frame.");
     return new LocatorImpl(frame, selector + " >> internal:and=" + gson().toJson(other.selector), null);
+  }
+
+  @Override
+  public String ariaSnapshot(AriaSnapshotOptions options) {
+    return frame.withLogging("Locator.ariaSnapshot", () -> ariaSnapshotImpl(options));
+  }
+
+  private String ariaSnapshotImpl(AriaSnapshotOptions options) {
+    if (options == null) {
+      options = new AriaSnapshotOptions();
+    }
+    JsonObject params = gson().toJsonTree(options).getAsJsonObject();
+    params.addProperty("selector", selector);
+    JsonObject result = frame.sendMessage("ariaSnapshot", params).getAsJsonObject();
+    return result.get("snapshot").getAsString();
   }
 
   @Override
@@ -185,6 +220,11 @@ class LocatorImpl implements Locator {
   @Override
   public List<ElementHandle> elementHandles() {
     return frame.querySelectorAll(selector);
+  }
+
+  @Override
+  public FrameLocator contentFrame() {
+    return new FrameLocatorImpl(frame, selector);
   }
 
   @Override
@@ -278,12 +318,12 @@ class LocatorImpl implements Locator {
 
   @Override
   public Locator getByTestId(String testId) {
-    return locator(getByTestIdSelector(testId));
+    return locator(getByTestIdSelector(testId, frame.connection.playwright));
   }
 
   @Override
   public Locator getByTestId(Pattern testId) {
-    return locator(getByTestIdSelector(testId));
+    return locator(getByTestIdSelector(testId, frame.connection.playwright));
   }
 
   @Override
@@ -599,6 +639,20 @@ class LocatorImpl implements Locator {
     return "Locator@" + selector;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof LocatorImpl)) {
+      return false;
+    }
+    LocatorImpl locator = (LocatorImpl) obj;
+    return  frame.equals(locator.frame) && selector.equals(locator.selector);
+  }
+
+  @Override
+  public int hashCode() {
+    return frame.hashCode() ^ selector.hashCode();
+  }
+
   FrameExpectResult expect(String expression, FrameExpectOptions options) {
     return frame.withLogging("Locator.expect", () -> expectImpl(expression, options));
   }
@@ -611,9 +665,6 @@ class LocatorImpl implements Locator {
   }
 
   private FrameExpectResult expectImpl(String expression, FrameExpectOptions options) {
-    if (options == null) {
-      options = new FrameExpectOptions();
-    }
     JsonObject params = gson().toJsonTree(options).getAsJsonObject();
     params.addProperty("selector", selector);
     params.addProperty("expression", expression);
